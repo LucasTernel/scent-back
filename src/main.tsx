@@ -12,8 +12,17 @@ document.addEventListener('click', (e) => {
   if (a) Object.assign(document.documentElement.dataset, { vt: a.dataset.vt ?? 'flip', dir: a.dataset.dir ?? 'avant' })
 }, true)
 
-// Nouvelle version en ligne → elle remplace l'ancienne et la page se recharge toute seule
-registerSW({ immediate: true })
+// Mise à jour forcée : à chaque nouvelle version en ligne, l'ancien cache est jeté et la page se recharge.
+// On vérifie au lancement, à chaque retour sur l'appli (iPhone : appli rouverte) et toutes les minutes.
+registerSW({
+  immediate: true,
+  onRegisteredSW(_url, r) {
+    if (!r) return
+    const verifier = () => { if (navigator.onLine) r.update() }
+    setInterval(verifier, 60_000)
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verifier() })
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

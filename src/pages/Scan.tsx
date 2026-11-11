@@ -107,7 +107,7 @@ export default function Scan() {
 
   return (
     <>
-      <div className="carte-chasse fixed inset-0 z-0"><div ref={boite} className="size-full" aria-label="Carte de chasse" /></div>
+      <div className="carte-chasse fixed inset-x-0 -top-12 -bottom-12 z-0"><div ref={boite} className="size-full" aria-label="Carte de chasse" /></div>
 
       <header className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3rem)] z-10 mx-auto flex max-w-md items-center justify-between px-4 pt-2">
         <span className="pointer-events-auto rounded-full bg-papier/95 px-4 py-2 text-sm font-bold shadow-md">{profile?.username ?? '…'} · {found.size}/{statues.length}</span>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import Scan from './pages/Scan'
 import Gallery, { GalleryCollection } from './pages/Gallery'
 import Account from './pages/Account'
@@ -18,7 +18,10 @@ import { useAuth } from './lib/useAuth'
 
 function Layout({ admin }: { admin?: boolean }) {
   const { pathname } = useLocation()
-  const carte = !admin && pathname === '/' // la carte de chasse prend tout l'écran
+  const carte = !admin && pathname === '/'
+  // Nouvelle page → on repart en haut (sauf retour arrière, où le navigateur garde la position)
+  const type = useNavigationType()
+  useEffect(() => { if (type !== 'POP') window.scrollTo(0, 0) }, [pathname, type]) // la carte de chasse prend tout l'écran
   return (
     <div className="mx-auto min-h-dvh max-w-md">
       {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
