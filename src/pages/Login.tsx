@@ -1,7 +1,7 @@
 import { LogoMarque } from '../ui'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { getStatues, supabase, type Statue } from '../lib/api'
+import { getStatues, supabase, verifierPseudo, type Statue } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Carte } from '../ui'
 
@@ -35,6 +35,8 @@ export default function Login() {
     e.preventDefault()
     const f = new FormData(e.currentTarget)
     const email = String(f.get('email')), password = String(f.get('password'))
+    const pb = mode === 'signup' ? verifierPseudo(String(f.get('username')).trim()) : ''
+    if (pb) return setError(pb)
     setBusy(true); setError(''); setInfo('')
     const { data, error } = mode === 'login'
       ? await supabase.auth.signInWithPassword({ email, password })
@@ -42,7 +44,7 @@ export default function Login() {
     setBusy(false)
     if (error) setError(
       error.message.includes('Invalid login') ? 'E-mail ou mot de passe incorrect.'
-      : error.message.includes('Database error') ? 'Ce nom de code est déjà pris.'
+      : error.message.includes('Database error') ? 'Ce nom de code est déjà pris, essaie une variante (ex. ajoute un chiffre).'
       : error.message.includes('rate limit') ? 'Trop d\'inscriptions d\'affilée, réessaie dans quelques minutes.'
       : error.message.includes('already registered') ? 'Un compte existe déjà avec cet e-mail.'
       : error.message)
@@ -86,7 +88,7 @@ export default function Login() {
       <form onSubmit={submit} className="flex flex-col gap-2.5">
         {mode === 'signup' && (
           <label className="flex flex-col gap-1 text-[13px] font-medium">Nom de code
-            <input name="username" required minLength={3} maxLength={20} placeholder="ezio_cretin" className="champ !min-h-12" />
+            <input name="username" required maxLength={20} placeholder="ezio_cretin" autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false} data-1p-ignore className="champ !min-h-12" />
           </label>
         )}
         <label className="flex flex-col gap-1 text-[13px] font-medium">E-mail

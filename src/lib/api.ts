@@ -106,11 +106,27 @@ export async function getProfile(): Promise<{ username: string; friend_code: str
   const { data } = await supabase.from('profiles').select('username, friend_code, created_at, role').eq('id', user!.id).single()
   return { ...data!, email: user!.email ?? '' }
 }
+/** Règle du nom de code : renvoie le problème en clair, ou '' si c'est bon. */
+export function verifierPseudo(s: string) {
+  if (s.length < 3) return `Trop court : 3 caractères minimum (tu en as ${s.length}).`
+  if (s.length > 20) return `Trop long : 20 caractères maximum (tu en as ${s.length}).`
+  if (!/^[\p{L}\p{N}_.-]+$/u.test(s)) return 'Lettres, chiffres, « _ », « - » et « . » uniquement (pas d\'espace ni d\'emoji).'
+  return ''
+}
+/** Erreur Supabase → message compréhensible. */
+export function messagePseudo(e: { code?: string; message?: string }) {
+  if (e.code === '23505') return 'Ce nom de code est déjà pris, essaie une variante (ex. ajoute un chiffre).'
+  if (e.code === '23514') return 'Le nom de code doit faire entre 3 et 20 caractères.'
+  return 'Impossible d\'enregistrer le nom de code pour le moment. Réessaie dans un instant.'
+}
+
 export async function setUsername(username: string) {
+  const pb = verifierPseudo(username)
+  if (pb) throw new Error(pb)
   if (MOCK) return
   const { data: { user } } = await supabase.auth.getUser()
   const { error } = await supabase.from('profiles').update({ username }).eq('id', user!.id)
-  if (error) throw new Error(error.code === '23505' ? 'Ce pseudo est déjà pris.' : error.message)
+  if (error) throw new Error(messagePseudo(error))
 }
 export async function getLeaderboard(): Promise<{ username: string; total: number }[]> {
   if (MOCK) return [{ username: 'altair_bwaah', total: 620 }, { username: 'ezio_cretin', total: (await mock.getWallet()).total }, { username: 'lapin_furtif', total: 180 }].sort((a, b) => b.total - a.total)
