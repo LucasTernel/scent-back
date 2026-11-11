@@ -11,11 +11,6 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
 
   // iPhone (Safari) : les bandeaux sous l'heure et sous la barre d'outils affichent le fond de la PAGE,
   // pas le loader → on met la page au même bleu le temps du loader (fini le flou crème et la marge)
-  useEffect(() => {
-    const h = document.documentElement, meta = document.querySelector('meta[name=theme-color]')
-    h.style.backgroundColor = document.body.style.backgroundColor = '#023341'
-    return () => { h.style.backgroundColor = document.body.style.backgroundColor = ''; meta?.setAttribute('content', '#023341') }
-  }, [])
 
   useEffect(() => {
     if (!ready) return
@@ -34,6 +29,13 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
   }, [ready, onReveal, onDone])
 
   const iris = phase === 'iris'
+  // fond bleu seulement tant que le logo est affiché ; dès que la page se dévoile, on rend le fond normal
+  const bleu = phase === 'logo' || phase === 'fuite'
+  useEffect(() => {
+    const h = document.documentElement.style, b = document.body.style
+    h.backgroundColor = b.backgroundColor = bleu ? '#023341' : ''
+    return () => { h.backgroundColor = b.backgroundColor = '' }
+  }, [bleu])
   return (
     <div role="status" aria-label="Chargement" className="fixed inset-x-0 -top-12 -bottom-12 z-50 grid place-items-center"
       style={{
