@@ -1,3 +1,4 @@
+import { LogoMarque } from '../ui'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { getStatues, supabase, type Statue } from '../lib/api'
@@ -49,7 +50,7 @@ export default function Login() {
         })}
       </div>
       <div className="flex items-center gap-2">
-        <img src="/logo-bleu.png" alt="Scent Back" className="-my-6 -ml-5 w-32 shrink-0" />
+        <LogoMarque className="-my-6 -ml-5 w-32 shrink-0" />
         <h1 className="titre text-[22px] leading-tight">Rejoins la Confrérie.</h1>
       </div>
 

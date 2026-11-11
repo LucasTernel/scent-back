@@ -1,3 +1,4 @@
+import { LogoMarque } from './ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import Scan from './pages/Scan'
@@ -26,9 +27,9 @@ function Layout({ admin }: { admin?: boolean }) {
     <div className="mx-auto min-h-dvh max-w-md">
       {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
       {carte
-        ? <img src="/logo-bleu.png" alt="Scent Back" className="pointer-events-none fixed top-[calc(env(safe-area-inset-top)_-_14px)] left-1/2 z-30 h-[92px] w-auto -translate-x-1/2" />
+        ? <LogoMarque className="pointer-events-none fixed top-[calc(env(safe-area-inset-top)_-_14px)] left-1/2 z-30 h-[92px] w-auto -translate-x-1/2" />
         : <header className="sticky top-0 z-30 flex justify-center bg-creme pt-[env(safe-area-inset-top)]">
-            <img src="/logo-bleu.png" alt="Scent Back" className="-my-5 h-[92px] w-auto" />
+            <LogoMarque className="-my-5 h-[92px] w-auto" />
           </header>}
       <main className="px-5 pt-4 pb-36"><Outlet /></main>
       <TabBar tabs={admin ? tabsAdmin : undefined} fondu={!carte} />

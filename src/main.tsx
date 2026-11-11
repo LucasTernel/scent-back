@@ -5,6 +5,15 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App'
+import { appliquerTheme } from './lib/theme'
+
+appliquerTheme()
+
+// iPhone (appli installée) : au 1er affichage la hauteur d'écran est mal calculée et le menu flotte trop haut.
+// Un micro-défilement aller-retour force iOS à recalculer (comme quand on change de page).
+const recaler = () => setTimeout(() => { window.scrollTo(0, 1); window.scrollTo(0, 0) }, 300)
+addEventListener('load', recaler)
+addEventListener('pageshow', recaler)
 
 // Type d'animation de page (flip de carte / zoom) choisi par le lien cliqué, lu par le CSS des View Transitions
 document.addEventListener('click', (e) => {

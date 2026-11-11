@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Logo } from '../ui'
+import { couleurBarre } from '../lib/theme'
 
 /**
  * Loader : logo blanc → il se désagrège → l'écran noir se referme en iris
@@ -35,13 +36,13 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
     const h = document.documentElement.style, b = document.body.style
     const meta = document.querySelector('meta[name=theme-color]')
     h.backgroundColor = b.backgroundColor = bleu ? '#023341' : ''
-    meta?.setAttribute('content', bleu ? '#023341' : '#FCF5E3') // barre d'état bleue pendant le logo
-    return () => { h.backgroundColor = b.backgroundColor = ''; meta?.setAttribute('content', '#FCF5E3') }
+    meta?.setAttribute('content', bleu ? '#023341' : couleurBarre()) // barre d'état bleue pendant le logo
+    return () => { h.backgroundColor = b.backgroundColor = ''; meta?.setAttribute('content', couleurBarre()) }
   }, [bleu])
   return (
     <div role="status" aria-label="Chargement" className="fixed inset-x-0 -top-12 -bottom-12 z-50 grid place-items-center"
       style={{
-        background: iris ? 'var(--color-flamme)' : 'var(--color-encre)',
+        background: iris ? 'var(--color-flamme)' : '#023341',
         clipPath: `circle(${iris ? '32px' : '150vmax'} at ${cible.x} ${cible.y})`,
         opacity: phase === 'fondu' ? 0 : 1, pointerEvents: phase === 'fondu' ? 'none' : undefined,
         transition: 'clip-path 1s cubic-bezier(.75,0,.2,1), background-color .9s ease-in .1s, opacity .6s ease',

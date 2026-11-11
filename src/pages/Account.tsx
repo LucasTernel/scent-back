@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getIdentite, getProfile, getWallet, MOCK, resetMock, setIdentite, setUsername, supabase } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin } from '../ui'
+import { choisirTheme, lireTheme, type Choix } from '../lib/theme'
 
 const Info = ({ k, v }: { k: string; v?: string }) => (
   <div className="flex items-center justify-between gap-3 border-t border-creme-2 px-4 py-3 first:border-0">
@@ -16,6 +17,7 @@ export default function Account() {
   const id = useData(getIdentite, v)
   const w = useData(getWallet)
   const [edition, setEdition] = useState(false)
+  const [theme, setTheme] = useState(lireTheme)
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const depuis = p && new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -79,6 +81,17 @@ export default function Account() {
             <Info k="Code ami" v={p?.friend_code} />
           </dl>
         )}
+      </section>
+
+      <section className="monte rounded-[20px] border-[1.5px] border-trait bg-papier p-4" style={{ animationDelay: '.09s' }} aria-labelledby="apparence">
+        <h2 id="apparence" className="font-serif text-lg font-bold">Apparence</h2>
+        <p className="mb-3 text-xs text-doux">Auto suit le mode clair ou sombre de ton téléphone.</p>
+        <div role="radiogroup" aria-labelledby="apparence" className="grid grid-cols-3 gap-1 rounded-full bg-creme-2 p-1">
+          {([['auto', 'Auto'], ['clair', 'Clair'], ['sombre', 'Sombre']] as [Choix, string][]).map(([k, l]) => (
+            <button key={k} role="radio" aria-checked={theme === k} onClick={() => { choisirTheme(k); setTheme(k) }}
+              className={`min-h-11 rounded-full text-sm font-bold transition ${theme === k ? 'bg-encre text-creme shadow-sm' : 'text-doux'}`}>{l}</button>
+          ))}
+        </div>
       </section>
 
       {p?.role !== 'admin' && <nav className="monte overflow-hidden rounded-[20px] border-[1.5px] border-trait bg-papier" style={{ animationDelay: '.12s' }}>

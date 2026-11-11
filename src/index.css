@@ -18,6 +18,21 @@
   --font-sans: 'Outfit', system-ui, sans-serif;
 }
 
+@custom-variant dark (&:where([data-theme=sombre], [data-theme=sombre] *));
+
+/* Mode sombre : fond bleu, écriture blanc coquille (mêmes noms de couleurs, valeurs inversées) */
+[data-theme=sombre] {
+  --color-creme: #023341;
+  --color-creme-2: #0B4A5E;
+  --color-papier: #073D4F;
+  --color-encre: #FCF5E3;
+  --color-doux: #A4BAC4;
+  --color-trait: #1E5B6E;
+  color-scheme: dark;
+}
+[data-theme=sombre] .carte-chasse .leaflet-tile-pane { filter: invert(.92) hue-rotate(180deg) saturate(.8) brightness(.95); }
+[data-theme=sombre] html.sans-defilement, html[data-theme=sombre].sans-defilement, html[data-theme=sombre].sans-defilement body { background: #1d2a30; }
+
 html, body { background: var(--color-creme); }
 /* Pas de défilement horizontal parasite ni d'effet élastique (web app iOS / Android) */
 html, body { overflow-x: clip; overscroll-behavior: none; }
