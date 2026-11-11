@@ -10,7 +10,15 @@ const exemples = [s('Lapin Gargouille', 'Île de la Cité', 'rare', 80), s('Lapi
 
 export default function Login() {
   const [mode, setMode] = useState<'signup' | 'login'>('signup')
-  const [error, setError] = useState('')
+  // Retour de Google avec une erreur (?error=…) → message clair, et on nettoie l'adresse
+  const [error, setError] = useState(() => {
+    const q = new URLSearchParams(location.search + location.hash.replace('#', '&'))
+    if (!q.get('error')) return ''
+    history.replaceState(null, '', location.pathname)
+    return q.get('error_code') === 'bad_oauth_state'
+      ? 'La connexion Google a expiré. Réessaie.'
+      : `Connexion Google impossible : ${q.get('error_description') ?? q.get('error')}`
+  })
   const [info, setInfo] = useState('')
   const [busy, setBusy] = useState(false)
   const statues = useData(getStatues)
