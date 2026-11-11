@@ -109,23 +109,23 @@ export default function Scan() {
     <>
       <div className="carte-chasse fixed inset-0 z-0"><div ref={boite} className="size-full" aria-label="Carte de chasse" /></div>
 
-      <header className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.5rem)] z-10 mx-auto flex max-w-md items-center justify-between px-4 pt-2">
+      <header className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3rem)] z-10 mx-auto flex max-w-md items-center justify-between px-4 pt-2">
         <span className="pointer-events-auto rounded-full bg-papier/95 px-4 py-2 text-sm font-bold shadow-md">{profile?.username ?? '…'} · {found.size}/{statues.length}</span>
         <span className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-encre py-2 pr-3.5 pl-3 text-[15px] font-bold text-creme shadow-md"><Flamme />{wallet?.total ?? 0}</span>
       </header>
 
-      <details className="credits fixed bottom-[262px] left-4 z-10">
+      <details className="credits fixed bottom-[calc(max(.75rem,env(safe-area-inset-bottom)_-_10px)+272px)] left-4 z-10">
         <summary aria-label="Crédits de la carte" className="grid size-8 cursor-pointer list-none place-items-center rounded-full bg-papier font-serif text-sm font-bold shadow-md">i</summary>
         <p className="absolute bottom-10 left-0 rounded-xl bg-papier px-3 py-2 text-[11px] whitespace-nowrap shadow-md">© <a href="https://www.openstreetmap.org/copyright" className="underline">OpenStreetMap</a></p>
       </details>
-      <button onClick={toutVoir} className="fixed right-4 bottom-[322px] z-10 flex h-12 items-center gap-1.5 rounded-full bg-papier px-4 text-sm font-bold text-encre shadow-md">
+      <button onClick={toutVoir} className="fixed right-4 bottom-[calc(max(.75rem,env(safe-area-inset-bottom)_-_10px)+328px)] z-10 flex h-12 items-center gap-1.5 rounded-full bg-papier px-4 text-sm font-bold text-encre shadow-md">
         <Icon name="collection" size={18} />Lapins
       </button>
-      <button onClick={recentrer} aria-label="Me recentrer" className="fixed right-4 bottom-[262px] z-10 grid size-12 place-items-center rounded-full bg-papier text-encre shadow-md">
+      <button onClick={recentrer} aria-label="Me recentrer" className="fixed right-4 bottom-[calc(max(.75rem,env(safe-area-inset-bottom)_-_10px)+268px)] z-10 grid size-12 place-items-center rounded-full bg-papier text-encre shadow-md">
         <Icon name="lieu" size={20} />
       </button>
 
-      <section className="fixed inset-x-0 bottom-[104px] z-[35] mx-auto max-w-md px-4">
+      <section className="fixed inset-x-0 bottom-[calc(max(.75rem,env(safe-area-inset-bottom)_-_10px)+118px)] z-[35] mx-auto max-w-md px-4">
         <div className="flex flex-col gap-3 rounded-[26px] bg-encre p-4 text-creme shadow-xl">
           <div className="flex items-center gap-3">
             <span id="scan-core" className="relative grid size-14 shrink-0 place-items-center rounded-full bg-flamme text-encre">
