@@ -8,8 +8,12 @@ const pages: Record<string, { titre: string; sections: [string, string][] }> = {
   mentions: {
     titre: 'Mentions légales',
     sections: [
-      ['Éditeur', 'Scent Back est un prototype réalisé dans le cadre du BUT MMI (projet étudiant, non commercial). Projet fictif inspiré d\'une collaboration Ubisoft × La Belle Mèche.'],
-      ['Hébergement', 'Application hébergée par l\'équipe projet. Données stockées chez Supabase (Union européenne).'],
+      ['Éditeur', 'Lucas TERNEL — BUT MMI 3, parcours Développement web (WEB).\nResponsable de la publication : Lucas TERNEL.'],
+      ['Cadre du projet', 'Scent Back est réalisé dans le cadre d\'une SAE (situation d\'apprentissage et d\'évaluation) de 3ᵉ année de BUT Métiers du Multimédia et de l\'Internet.\n\nLe projet imagine une collaboration fictive entre Ubisoft (Assassin\'s Creed × The Lapins Crétins) et la marque de bougies La Belle Mèche : une identité de marque (Scent Back), des bougies et coffrets, un pop-up store parisien, et cette application de chasse urbaine où les joueurs retrouvent des statuettes équipées de puces NFC.\n\nProjet pédagogique, non commercial.'],
+      ['Équipe projet', 'Lucas TERNEL — MMI3 WEB\nRobin BRIDOUX — MMI3 MUL\nMathis BRIANCHON — MMI3 MUL\nEthan HELDEBAUME — MMI3 MUL\nAdrien POUILLART — MMI3 MUL\nClémentine JASIAK — MMI3 COM\nKenza SALMI — MMI3 COM\nCandice DECROIX — MMI3 COM\n\nWEB : développement web · MUL : création multimédia · COM : stratégie de communication.'],
+      ['Hébergement', 'Application hébergée sur un serveur privé loué par Lucas TERNEL auprès de :\nHostinger International Ltd.\n61 Lordou Vironos, 6023 Larnaca, Chypre\nhttps://www.hostinger.fr'],
+      ['Base de données et authentification', 'Comptes, photos de capture et points sont gérés par :\nSupabase\n65 Chulia Street, OCBC Centre, Singapour 049513\nhttps://supabase.com'],
+      ['Cartographie', 'Fond de carte © les contributeurs OpenStreetMap (licence ODbL) — https://www.openstreetmap.org/copyright'],
       ['Propriété intellectuelle', 'Les marques Assassin\'s Creed et The Lapins Crétins appartiennent à Ubisoft. Elles sont utilisées ici à titre pédagogique uniquement.'],
     ],
   },
@@ -48,7 +52,7 @@ export default function Legal() {
       {p.sections.map(([h, txt]) => (
         <section key={h} className="monte flex flex-col gap-1.5">
           <h2 className="font-serif text-sm font-bold text-flamme">{h}</h2>
-          <p className="text-[15px] leading-relaxed text-doux">{txt}</p>
+          <p className="text-[15px] leading-relaxed whitespace-pre-line text-doux">{txt}</p>
         </section>
       ))}
       {page === 'cookies' && (
