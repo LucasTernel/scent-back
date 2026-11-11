@@ -1,0 +1,15 @@
+# Hostinger (Apache/LiteSpeed) : appli monopage + pages légales statiques
+DirectoryIndex index.html
+RewriteEngine On
+RewriteBase /
+# fichier ou dossier existant (assets, /legal/xxx/) → servi tel quel
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+# toute autre adresse (/galerie, /s/CODE…) → l'appli
+RewriteRule ^ index.html [L]
+
+# Mises à jour immédiates : jamais de cache sur la page et le service worker
+<FilesMatch "(index\.html|sw\.js|registerSW\.js|manifest\.webmanifest)$">
+  Header set Cache-Control "no-cache, no-store, must-revalidate"
+</FilesMatch>

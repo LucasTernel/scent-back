@@ -2,53 +2,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ecrireConsent, lireConsent } from '../lib/consent'
 import { useState } from 'react'
 import { Icon } from '../ui'
+import { pages } from '../legal'
 
-// ponytail: textes types pour le prototype étudiant, à faire relire avant toute vraie mise en ligne
-const pages: Record<string, { titre: string; sections: [string, string][] }> = {
-  mentions: {
-    titre: 'Mentions légales',
-    sections: [
-      ['Éditeur', 'Lucas TERNEL — BUT MMI 3, parcours Développement web (WEB).\nResponsable de la publication : Lucas TERNEL.'],
-      ['Cadre du projet', 'Scent Back est réalisé dans le cadre d\'une SAE (situation d\'apprentissage et d\'évaluation) de 3ᵉ année de BUT Métiers du Multimédia et de l\'Internet.\n\nLe projet imagine une collaboration fictive entre Ubisoft (Assassin\'s Creed × The Lapins Crétins) et la marque de bougies La Belle Mèche : une identité de marque (Scent Back), des bougies et coffrets, un pop-up store parisien, et cette application de chasse urbaine où les joueurs retrouvent des statuettes équipées de puces NFC.\n\nProjet pédagogique, non commercial.'],
-      ['Équipe projet', 'Lucas TERNEL — MMI3 WEB\nRobin BRIDOUX — MMI3 MUL\nMathis BRIANCHON — MMI3 MUL\nEthan HELDEBAUME — MMI3 MUL\nAdrien POUILLART — MMI3 MUL\nClémentine JASIAK — MMI3 COM\nKenza SALMI — MMI3 COM\nCandice DECROIX — MMI3 COM\n\nWEB : développement web · MUL : création multimédia · COM : stratégie de communication.'],
-      ['Hébergement', 'Application hébergée sur un serveur privé loué par Lucas TERNEL auprès de :\nHostinger International Ltd.\n61 Lordou Vironos, 6023 Larnaca, Chypre\nhttps://www.hostinger.fr'],
-      ['Base de données et authentification', 'Comptes, photos de capture et points sont gérés par :\nSupabase\n65 Chulia Street, OCBC Centre, Singapour 049513\nhttps://supabase.com'],
-      ['Cartographie', 'Fond de carte © les contributeurs OpenStreetMap (licence ODbL) — https://www.openstreetmap.org/copyright'],
-      ['Propriété intellectuelle', 'Les marques Assassin\'s Creed et The Lapins Crétins appartiennent à Ubisoft. Elles sont utilisées ici à titre pédagogique uniquement.'],
-    ],
-  },
-  conditions: {
-    titre: 'Conditions d\'utilisation',
-    sections: [
-      ['Objet', 'Les présentes conditions encadrent l\'utilisation de Scent Back, application de chasse urbaine réalisée dans le cadre d\'une SAE du BUT MMI. En créant un compte, tu les acceptes.'],
-      ['Compte', 'L\'inscription se fait par e-mail ou avec un compte Google. Tu choisis un nom de code : il doit rester correct (pas d\'insulte, pas d\'usurpation d\'identité). Tu es responsable de la confidentialité de ton mot de passe.'],
-      ['Le jeu', 'Le but est de trouver les statuettes cachées, de scanner leur puce NFC sur place et de prendre une photo. Chaque capture rapporte des points, visibles dans ton profil et dans le classement.'],
-      ['Règles de bonne conduite', 'Interdit : tricher (fausse position GPS, partage des liens des puces, comptes multiples), dégrader ou déplacer une statuette, publier des photos de personnes sans leur accord ou des contenus choquants.\nEn cas d\'abus, l\'équipe peut retirer des points ou supprimer le compte.'],
-      ['Sécurité', 'Reste attentif à ton environnement : respecte le code de la route, les propriétés privées et les horaires des lieux. Ne joue jamais en conduisant. L\'équipe ne peut être tenue responsable d\'un accident survenu pendant la chasse.'],
-      ['Points et lots', 'Les points n\'ont aucune valeur monétaire. Ils peuvent servir lors d\'événements du pop-up store, dans la limite des lots disponibles. Le projet étant pédagogique et fictif, aucun lot réel n\'est garanti.'],
-      ['Disponibilité', 'L\'application est un prototype étudiant : elle peut être modifiée, interrompue ou fermée à tout moment, notamment à la fin de la SAE.'],
-      ['Données personnelles', 'Leur traitement est décrit dans la politique de confidentialité, accessible en bas de la page de connexion et du profil.'],
-      ['Contact', 'Pour toute question : Lucas TERNEL, éditeur de l\'application (voir les mentions légales).'],
-    ],
-  },
-  confidentialite: {
-    titre: 'Politique de confidentialité',
-    sections: [
-      ['Données collectées', 'E-mail, pseudo, prénom et nom (facultatifs), photos de capture, points gagnés, et position GPS au moment d\'une capture uniquement.'],
-      ['Position en temps réel', 'Si tu l\'autorises, ta position est lue en continu pendant que l\'appli est ouverte pour faire fonctionner le radar. Elle est traitée sur ton téléphone et n\'est jamais envoyée ni enregistrée.'],
-      ['Finalité', 'Faire fonctionner le jeu : vérifier les captures, afficher ta collection et le classement (seuls ton pseudo et tes points y apparaissent).'],
-      ['Durée', 'Tes données sont conservées tant que ton compte existe et supprimées avec lui.'],
-      ['Tes droits', 'Tu peux consulter et modifier tes infos depuis ton profil. Pour supprimer ton compte et toutes tes données, contacte l\'équipe projet (RGPD, art. 15 à 21).'],
-    ],
-  },
-  cookies: {
-    titre: 'Gestion des cookies',
-    sections: [
-      ['Ce qu\'on utilise', 'Aucun cookie publicitaire ni outil de mesure d\'audience. Seulement un stockage local strictement nécessaire : ta session de connexion et tes préférences (dont ce choix).'],
-      ['Position en temps réel', 'Utilisée pour le radar, seulement si tu l\'autorises. Tu peux changer d\'avis ci-dessous. Pense aussi à vérifier l\'autorisation dans les réglages de ton navigateur.'],
-    ],
-  },
-}
 
 export default function Legal() {
   const { page = '' } = useParams()
