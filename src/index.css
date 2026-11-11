@@ -21,7 +21,7 @@
 html, body { background: var(--color-creme); }
 /* Pas de défilement horizontal parasite ni d'effet élastique (web app iOS / Android) */
 html, body { overflow-x: clip; overscroll-behavior: none; }
-html.sans-defilement, html.sans-defilement body { overflow: hidden; height: 100%; }
+html.sans-defilement, html.sans-defilement body { overflow: hidden; height: 100%; background: #F2EAD8; } /* = fond de carte : bandeaux Safari raccord */
 body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--color-flamme); outline-offset: 2px; }
 .titre { font-family: var(--font-serif); font-weight: 900; letter-spacing: -.01em; line-height: 1; }

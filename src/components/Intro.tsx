@@ -9,6 +9,14 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
   const [phase, setPhase] = useState<'logo' | 'fuite' | 'iris' | 'fondu'>('logo')
   const [cible, setCible] = useState({ x: '50%', y: '45%' })
 
+  // iPhone (Safari) : les bandeaux sous l'heure et sous la barre d'outils affichent le fond de la PAGE,
+  // pas le loader → on met la page au même bleu le temps du loader (fini le flou crème et la marge)
+  useEffect(() => {
+    const h = document.documentElement, meta = document.querySelector('meta[name=theme-color]')
+    h.style.backgroundColor = document.body.style.backgroundColor = '#023341'
+    return () => { h.style.backgroundColor = document.body.style.backgroundColor = ''; meta?.setAttribute('content', '#023341') }
+  }, [])
+
   useEffect(() => {
     if (!ready) return
     const t1 = setTimeout(() => setPhase('fuite'), 1300)
@@ -17,7 +25,7 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const r = document.getElementById('scan-core')?.getBoundingClientRect()
         if (!r) return setPhase('fondu') // pas de rond cible (ex. écran de connexion) : simple fondu
-        setCible({ x: `${r.left + r.width / 2}px`, y: `${r.top + r.height / 2}px` })
+        setCible({ x: `${r.left + r.width / 2}px`, y: `${r.top + r.height / 2 + 48}px` })
         setPhase('iris')
       }))
     }, 1750)
@@ -27,7 +35,7 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
 
   const iris = phase === 'iris'
   return (
-    <div role="status" aria-label="Chargement" className="fixed inset-0 z-50 grid place-items-center"
+    <div role="status" aria-label="Chargement" className="fixed inset-x-0 -top-12 -bottom-12 z-50 grid place-items-center"
       style={{
         background: iris ? 'var(--color-flamme)' : 'var(--color-encre)',
         clipPath: `circle(${iris ? '32px' : '150vmax'} at ${cible.x} ${cible.y})`,
