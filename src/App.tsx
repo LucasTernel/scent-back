@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import Scan from './pages/Scan'
 import Gallery, { GalleryCollection } from './pages/Gallery'
 import Account from './pages/Account'
@@ -19,7 +19,11 @@ import { useAuth } from './lib/useAuth'
 function Layout({ admin }: { admin?: boolean }) {
   return (
     <div className="mx-auto min-h-dvh max-w-md">
-      <main className="px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-36"><Outlet /></main>
+      {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
+      <header className="sticky top-0 z-30 flex justify-center bg-creme/75 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+        <img src="/logo-bleu.png" alt="Scent Back" className="-my-5 h-[92px] w-auto" />
+      </header>
+      <main className="px-5 pt-4 pb-36"><Outlet /></main>
       <TabBar tabs={admin ? tabsAdmin : undefined} />
     </div>
   )
@@ -32,9 +36,22 @@ export default function App() {
   const reveal = useCallback(() => setShown(true), [])
   const done = useCallback(() => setIntro(false), [])
 
+  // Connexion (ou déconnexion) : on repart toujours de l'accueil, pas de la dernière page visitée
+  const navigate = useNavigate()
+  const avant = useRef(session)
+  useEffect(() => {
+    if (avant.current !== undefined && !!avant.current !== !!session) navigate('/', { replace: true })
+    avant.current = session
+  }, [session, navigate])
+
   return (
     <>
-      {shown && (!MOCK && !session ? <Login /> : !MOCK && session && !username ? <NomDeCode userId={session.user.id} onDone={refresh} /> : role === 'admin' ? (
+      {shown && (!MOCK && !session ? (
+        <Routes>
+          <Route path="legal/:page" element={<div className="mx-auto min-h-dvh max-w-md px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-10"><Legal /></div>} />
+          <Route path="*" element={<Login />} />
+        </Routes>
+      ) : !MOCK && session && !username ? <NomDeCode userId={session.user.id} onDone={refresh} /> : role === 'admin' ? (
         // Admin : même interface que le joueur, mais avec ses propres onglets (pas de chasse ni de scan)
         <Routes>
           <Route element={<Layout admin />}>

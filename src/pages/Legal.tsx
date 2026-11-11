@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ecrireConsent, lireConsent } from '../lib/consent'
 import { useState } from 'react'
 import { Icon } from '../ui'
@@ -34,6 +34,7 @@ const pages: Record<string, { titre: string; sections: [string, string][] }> = {
 
 export default function Legal() {
   const { page = '' } = useParams()
+  const navigate = useNavigate()
   const p = pages[page]
   const [choix, setChoix] = useState(lireConsent)
   if (!p) return null
@@ -41,7 +42,7 @@ export default function Legal() {
   return (
     <div className="flex flex-col gap-5">
       <header className="monte">
-        <Link viewTransition data-dir="arriere" to="/compte" className="-ml-1 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-doux"><Icon name="retour" size={18} />Profil</Link>
+        <button onClick={() => (history.length > 1 ? navigate(-1) : navigate('/'))} className="-ml-1 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-doux"><Icon name="retour" size={18} />Retour</button>
         <h1 className="titre text-[26px] leading-tight">{p.titre}</h1>
       </header>
       {p.sections.map(([h, txt]) => (

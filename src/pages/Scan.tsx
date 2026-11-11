@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getCaptures, getProfile, getStatues, getWallet } from '../lib/api'
@@ -8,7 +8,6 @@ import { distance, ecouterNfc, nfcDispo, secouer, vibrer } from '../lib/haptique
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
 
-const DEMO = import.meta.env.VITE_DEMO_MODE === 'true'
 const COUL = { commune: '#8A7660', rare: '#2F7FB5', legendaire: '#B3121B' }
 const icone = (html: string, w: number, h = w) => L.divIcon({ html, className: '', iconSize: [w, h], iconAnchor: [w / 2, h] })
 
@@ -50,6 +49,9 @@ export default function Scan() {
     ecouterNfc((code) => { vibrer([100, 50, 200]); secouer(); setTimeout(() => navigate(`/s/${code}`, { viewTransition: true }), 350) }, ctrl.signal).catch(() => setNfc(false))
     return () => ctrl.abort()
   }, [nfc, navigate])
+
+  // La carte occupe tout l'écran : la page elle-même ne doit pas défiler
+  useEffect(() => { document.documentElement.classList.add('sans-defilement'); return () => document.documentElement.classList.remove('sans-defilement') }, [])
 
   // Carte Leaflet (OpenStreetMap), recolorée façon jeu en CSS
   const boite = useRef<HTMLDivElement>(null)
@@ -107,7 +109,7 @@ export default function Scan() {
     <>
       <div className="carte-chasse fixed inset-0 z-0"><div ref={boite} className="size-full" aria-label="Carte de chasse" /></div>
 
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-10 mx-auto flex max-w-md items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      <header className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.5rem)] z-10 mx-auto flex max-w-md items-center justify-between px-4 pt-2">
         <span className="pointer-events-auto rounded-full bg-papier/95 px-4 py-2 text-sm font-bold shadow-md">{profile?.username ?? '…'} · {found.size}/{statues.length}</span>
         <span className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-encre py-2 pr-3.5 pl-3 text-[15px] font-bold text-creme shadow-md"><Flamme />{wallet?.total ?? 0}</span>
       </header>
@@ -139,14 +141,6 @@ export default function Scan() {
           {nfcDispo
             ? <button onClick={() => setNfc(!nfc)} aria-pressed={nfc} className={`btn min-h-12 text-sm ${nfc ? 'bg-flamme text-encre' : 'bg-creme text-encre'}`}><Icon name="nfc" size={18} />{nfc ? 'Approche la puce…' : 'Scanner la puce NFC'}</button>
             : <p className="text-center text-xs text-trait">Approche ton téléphone de la puce sous la statuette.</p>}
-          {DEMO && (
-            // ponytail: faux scans tant qu'on n'a pas de puces ; retirer avant la mise en ligne
-            <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
-              {['DEMO-1', 'DEMO-2', 'DEMO-3', 'LOUVRE-7Q2'].map((c) => (
-                <Link viewTransition key={c} to={`/s/${c}`} className="shrink-0 rounded-full border border-doux px-3 py-1.5 text-[11px] font-bold">{c}</Link>
-              ))}
-            </div>
-          )}
         </div>
       </section>
     </>

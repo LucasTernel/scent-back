@@ -67,9 +67,9 @@ export function GalleryCollection() {
   return (
     <div className="flex flex-col gap-4">
       {col?.image_url ? (
-        <div className="monte relative -mx-5 -mt-[max(1.25rem,env(safe-area-inset-top))] overflow-hidden rounded-b-[32px] border-b-[1.5px] border-trait bg-papier px-4 pt-[max(4.5rem,calc(env(safe-area-inset-top)+3.5rem))] pb-5">
+        <div className="monte relative -mx-5 -mt-4 overflow-hidden rounded-b-[32px] border-b-[1.5px] border-trait bg-papier px-4 pt-16 pb-5">
           <img src={col.image_url} alt="" className="mx-auto max-h-56 w-full object-contain" />
-          <Link viewTransition data-dir="arriere" to="/galerie" aria-label="Retour aux collections" className="absolute top-[max(1rem,env(safe-area-inset-top))] left-4 grid size-11 place-items-center rounded-full bg-creme-2 text-encre"><Icon name="retour" size={20} /></Link>
+          <Link viewTransition data-dir="arriere" to="/galerie" aria-label="Retour aux collections" className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme-2 text-encre"><Icon name="retour" size={20} /></Link>
         </div>
       ) : (
         <Link viewTransition data-dir="arriere" to="/galerie" className="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm font-bold text-doux"><Icon name="retour" size={18} />Collections</Link>

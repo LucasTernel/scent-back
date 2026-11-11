@@ -19,7 +19,7 @@ export default function Detail() {
   const coul = `var(--color-${s.rarity})`
 
   return (
-    <div className="-mx-5 -mt-[max(1.25rem,env(safe-area-inset-top))] flex flex-col">
+    <div className="-mx-5 -mt-4 flex flex-col">
       <div className="relative grid aspect-square place-items-center overflow-hidden rounded-b-[36px] bg-encre" style={{ viewTransitionName: `c-${s.id}` }}>
         {ok && s.model
           ? <model-viewer src={s.model} camera-controls auto-rotate alt={s.name} style={{ width: '100%', height: '100%' }} />
@@ -27,7 +27,7 @@ export default function Detail() {
             ? <img src={s.image ?? c.photo} alt={s.name} className="absolute inset-0 size-full object-cover" />
             : ok ? <Lapin className="w-1/2" /> : <Icon name="cadenas" size={44} className="text-doux" />}
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-encre/80 to-transparent" />
-        <Link viewTransition data-vt="zoom" data-dir="arriere" to={`/galerie/c/${s.collectionId ?? 'aucune'}`} aria-label="Retour à la collection" className="absolute top-[max(1rem,env(safe-area-inset-top))] left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre">
+        <Link viewTransition data-vt="zoom" data-dir="arriere" to={`/galerie/c/${s.collectionId ?? 'aucune'}`} aria-label="Retour à la collection" className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre">
           <Icon name="retour" size={20} />
         </Link>
       </div>

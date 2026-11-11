@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { getStatues, supabase, type Statue } from '../lib/api'
 import { useData } from '../lib/useData'
@@ -91,6 +92,13 @@ export default function Login() {
           {busy ? 'Un instant…' : mode === 'signup' ? 'Rejoindre la Confrérie' : 'Se connecter'}
         </button>
       </form>
+      <footer className="mt-auto flex flex-wrap justify-center pt-2 text-xs text-doux">
+        {[['mentions', 'Mentions légales'], ['confidentialite', 'Politique de confidentialité'], ['cookies', 'Gestion des cookies']].map(([k, l], i) => (
+          <span key={k} className="flex items-center">{i > 0 && <span aria-hidden className="px-1">·</span>}
+            <Link viewTransition to={`/legal/${k}`} className="inline-flex min-h-10 items-center px-1 underline-offset-2 hover:underline">{l}</Link>
+          </span>
+        ))}
+      </footer>
     </div>
   )
 }

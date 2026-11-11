@@ -96,7 +96,7 @@ export default function Account() {
 
       <footer className="flex flex-col items-center gap-1 pt-2 text-xs text-doux">
         <div className="flex flex-wrap justify-center">
-          {[['mentions', 'Mentions légales'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']].map(([k, t], i) => (
+          {[['mentions', 'Mentions légales'], ['confidentialite', 'Politique de confidentialité'], ['cookies', 'Gestion des cookies']].map(([k, t], i) => (
             <span key={k} className="flex items-center">{i > 0 && <span aria-hidden className="px-1">·</span>}
               <Link viewTransition to={`/legal/${k}`} className="inline-flex min-h-10 items-center px-1 underline-offset-2 hover:underline">{t}</Link>
             </span>

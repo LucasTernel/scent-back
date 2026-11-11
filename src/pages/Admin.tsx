@@ -265,12 +265,12 @@ export function AdminCollection() {
   return (
     <div className="flex flex-col gap-5">
       {col?.image_url && (
-        <div className="monte relative -mx-5 -mt-[max(1.25rem,env(safe-area-inset-top))]">
-          <div className="overflow-hidden rounded-b-[32px] border-b-[1.5px] border-trait bg-papier px-4 pt-[max(4.5rem,calc(env(safe-area-inset-top)+3.5rem))] pb-5">
+        <div className="monte relative -mx-5 -mt-4">
+          <div className="overflow-hidden rounded-b-[32px] border-b-[1.5px] border-trait bg-papier px-4 pt-16 pb-5">
             {col.image_url && <img src={col.image_url} alt="" className="mx-auto max-h-64 w-full object-contain" />}
           </div>
-          <Link viewTransition data-dir="arriere" to="/collections" aria-label="Retour" className="absolute top-[max(1rem,env(safe-area-inset-top))] left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
-          <div className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4"><BoutonAjout to={`/collections/${id}/ajouter`} label="Statuette" /></div>
+          <Link viewTransition data-dir="arriere" to="/collections" aria-label="Retour" className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
+          <div className="absolute top-4 right-4"><BoutonAjout to={`/collections/${id}/ajouter`} label="Statuette" /></div>
         </div>
       )}
       <Tete retour={col?.image_url ? undefined : '/collections'} titre={col?.name ?? '…'} desc={col?.description || undefined} action={col?.image_url ? undefined : <BoutonAjout to={`/collections/${id}/ajouter`} label="Statuette" />} />
@@ -361,11 +361,11 @@ export function AdminStatue() {
   const n = st?.captures ?? 0
   const taux = joueurs ? Math.round((n / joueurs) * 100) : 0
   return (
-    <div className="-mx-5 -mt-[max(1.25rem,env(safe-area-inset-top))] flex flex-col">
+    <div className="-mx-5 -mt-4 flex flex-col">
       <div className="relative grid aspect-square place-items-center overflow-hidden rounded-b-[36px] bg-encre" style={{ viewTransitionName: `c-${s.id}` }}>
         {s.image_url ? <img src={s.image_url} alt={s.name} className="absolute inset-0 size-full object-cover" /> : <Lapin className="w-1/2" />}
         <Link viewTransition data-vt="zoom" data-dir="arriere" to={s.collection_id ? `/collections/${s.collection_id}` : '/collections'} aria-label="Retour"
-          className="absolute top-[max(1rem,env(safe-area-inset-top))] left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
+          className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
       </div>
       <div className="flex flex-col gap-5 px-5 pt-5">
         <div className="monte">
