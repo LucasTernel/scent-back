@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+/* Charte « Cire & Capuche » (= variables Figma). Modifier ici, tout suit. */
+@theme static {
+  --color-creme: #FCF5E3;
+  --color-creme-2: #F2E7CB;
+  --color-papier: #FFFCF4;
+  --color-encre: #023341;
+  --color-doux: #5B6F7A;
+  --color-trait: #DCD2BA;
+  --color-sceau: #B3121B;
+  --color-flamme: #FF7722;
+  --color-or: #D9A441;
+  --color-commune: #8A7660;
+  --color-rare: #2F7FB5;
+  --color-legendaire: #B3121B;
+  --font-serif: 'Orbitron', system-ui, sans-serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
+}
+
+html, body { background: var(--color-creme); }
+body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--color-flamme); outline-offset: 2px; }
+.titre { font-family: var(--font-serif); font-weight: 900; letter-spacing: -.01em; line-height: 1; }
+
+@utility btn { @apply inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-bold transition active:scale-[.97] disabled:opacity-50; }
+.btn-encre { @apply btn bg-encre text-creme; }
+.btn-ligne { @apply btn border-[1.5px] border-encre bg-papier text-encre; }
+.champ { @apply min-h-13 w-full rounded-2xl border-[1.5px] border-trait bg-papier px-4 text-base outline-none transition placeholder:text-doux/60 focus:border-encre; }
+.cq { container-type: inline-size; }
+.arche { border-radius: 50cqw 50cqw var(--bas, 16px) var(--bas, 16px); }
+
+/* Animations */
+@keyframes monte { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+@keyframes onde { from { transform: scale(.55); opacity: .7 } to { transform: scale(1.35); opacity: 0 } }
+@keyframes revele { 0% { transform: perspective(900px) rotateY(160deg) scale(.6) rotate(-4deg); opacity: 0 } 60% { opacity: 1 } 100% { transform: perspective(900px) rotateY(0) scale(1) rotate(-4deg) } }
+@keyframes pop { 0% { transform: scale(.4); opacity: 0 } 70% { transform: scale(1.06) } 100% { transform: scale(1); opacity: 1 } }
+@keyframes desagrege { to { opacity: 0; filter: blur(6px); transform: translateY(-6px) scale(1.15) } }
+.monte { animation: monte .6s cubic-bezier(.2,.8,.2,1) both }
+.onde { animation: onde 2.4s cubic-bezier(.2,.6,.3,1) infinite }
+.revele { animation: revele 1s cubic-bezier(.2,.9,.25,1) both }
+.pop { animation: pop .6s cubic-bezier(.3,1.4,.5,1) both }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+/* Barre d'onglets à encoche : --x = position de l'encoche, animée */
+@property --x { syntax: '<percentage>'; inherits: true; initial-value: 16.666%; }
+.barre { transition: --x .55s cubic-bezier(.5,1.6,.4,.85); }
+.barre-fond { -webkit-mask: radial-gradient(circle 41px at var(--x) -8px, #0000 40px, #000 41px); mask: radial-gradient(circle 41px at var(--x) -8px, #0000 40px, #000 41px); }
+.bulle { left: var(--x); }
+
+/* ---------- Transitions de page façon TCG (View Transitions natives) ---------- */
+/* Onglets / liens : la page se retourne comme une carte, avec un éclat holo. */
+::view-transition-old(root) { animation: carte-sort .32s cubic-bezier(.55,0,.8,.3) both; }
+::view-transition-new(root) { animation: carte-entre .5s cubic-bezier(.15,.85,.25,1.1) .12s both; }
+::view-transition-image-pair(root) { perspective: 1400px; }
+@keyframes carte-sort { to { transform: rotateY(calc(var(--s) * 82deg)) scale(.86); opacity: 0; filter: brightness(1.5) saturate(1.3); } }
+@keyframes carte-entre { from { transform: rotateY(calc(var(--s) * -82deg)) scale(.86); opacity: 0; filter: brightness(1.8) saturate(1.5) hue-rotate(-20deg); } }
+:root { --s: 1; }
+:root[data-dir='arriere'] { --s: -1; }
+
+/* Carte → fiche : la carte s'agrandit en visuel de la fiche, le reste fond. */
+:root[data-vt='zoom']::view-transition-old(root) { animation: fondu .2s ease both; }
+:root[data-vt='zoom']::view-transition-new(root) { animation: monte-fiche .4s cubic-bezier(.2,.8,.2,1) .1s both; }
+::view-transition-group(*) { animation-duration: .45s; animation-timing-function: cubic-bezier(.2,.9,.25,1); }
+@keyframes fondu { to { opacity: 0; } }
+@keyframes monte-fiche { from { opacity: 0; transform: translateY(24px); } }
+
+/* La barre d'onglets ne bouge pas : son encoche glisse en direct. */
+::view-transition-old(tabbar) { display: none; }
+::view-transition-new(tabbar) { animation: none; }
+::view-transition-group(tabbar) { animation: none; z-index: 10; }
+
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+
+/* Secousses d'écran (avec les vibrations) */
+@keyframes secoue { 10%,90% { translate: -1px 0 } 20%,80% { translate: 3px 1px } 30%,50%,70% { translate: -5px -1px } 40%,60% { translate: 5px 1px } }
+@keyframes secoue-leger { 25% { translate: -2px 0 } 75% { translate: 2px 0 } }
+.secoue { animation: secoue .5s cubic-bezier(.36,.07,.19,.97); }
+.secoue-leger { animation: secoue-leger .25s ease; }
+@media (prefers-reduced-motion: reduce) { .secoue, .secoue-leger { animation: none; } }
+
+/* Apparition de la statuette au scan */
+@keyframes invoque { 0% { transform: scale(0) rotate(-200deg); filter: brightness(3); } 60% { transform: scale(1.25) rotate(10deg); } 100% { transform: none; filter: none; } }
+.invoque { animation: invoque .8s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes flash { from { opacity: .9 } to { opacity: 0 } }
+.flash { animation: flash .7s ease-out forwards; }
+
+/* ---------- Carte de chasse (façon Pokémon GO) ---------- */
+.carte-chasse { background: #BFE3A4; }
+/* tuiles OSM recolorées : verts saturés, eau turquoise, look jeu */
+.carte-chasse .leaflet-tile-pane { filter: saturate(1.6) hue-rotate(-25deg) contrast(.95) brightness(1.05); }
+.carte-chasse .leaflet-top.leaflet-right { top: max(4.2rem, calc(env(safe-area-inset-top) + 3.2rem)); }
+.carte-chasse .leaflet-bar { border: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 12px #02334133; }
+.carte-chasse .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; background: #FFFCF4; color: #023341; font: 700 22px var(--font-sans); }
+.credits summary::-webkit-details-marker { display: none; }
+.joueur { position: relative; width: var(--taille, 120px); height: var(--taille, 120px); translate: calc(60px - var(--taille, 120px) / 2) calc(60px - var(--taille, 120px) / 2); display: grid; place-items: center; pointer-events: none; transform: rotateX(55deg); }
+.joueur::before { content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, #FF772200 0deg, #FF772277 50deg, #FF772200 60deg); animation: balaye var(--vitesse, 3s) linear infinite; }
+.joueur::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #FF772266; }
+.joueur span { width: 22px; height: 22px; border-radius: 50%; background: #FF7722; border: 3px solid #FCF5E3; box-shadow: 0 0 0 6px #FF772244, 0 2px 6px #02334155; z-index: 1; }
+@keyframes balaye { to { transform: rotate(1turn); } }
+.pin-zone { display: grid; justify-items: center; }
+.pin-zone::after { content: ''; width: 34px; height: 10px; margin-top: -4px; border-radius: 50%; background: radial-gradient(#02334155, transparent 70%); }
+.pin-lapin { width: 40px; height: 40px; border-radius: 50% 50% 50% 6px; rotate: -45deg; background: var(--c); border: 3px solid #FCF5E3;
+  display: grid; place-items: center; color: #FCF5E3; font: 900 17px var(--font-serif); box-shadow: 0 4px 10px #02334155; animation: flotte 2.4s ease-in-out infinite; }
+.pin-lapin b { rotate: 45deg; }
+.pin-ok { width: 26px; height: 26px; border-radius: 50%; background: #023341; color: #FCF5E3; display: grid; place-items: center; font-weight: 900; font-size: 13px; border: 2px solid #FCF5E3; }
+@keyframes flotte { 50% { translate: 0 -6px; } }
