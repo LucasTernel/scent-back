@@ -18,7 +18,7 @@ export default defineConfig({
         short_name: 'Scent Back',
         description: 'Chasse aux Lapins Crétins dans Paris',
         lang: 'fr',
-        theme_color: '#023341',
+        theme_color: '#FCF5E3',
         background_color: '#023341',
         display: 'standalone',
         start_url: '/',
