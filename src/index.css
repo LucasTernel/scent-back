@@ -107,7 +107,7 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .carte-chasse { background: #BFE3A4; }
 /* tuiles OSM recolorées : verts saturés, eau turquoise, look jeu */
 .carte-chasse .leaflet-tile-pane { filter: saturate(1.6) hue-rotate(-25deg) contrast(.95) brightness(1.05); }
-.carte-chasse .leaflet-top.leaflet-right { top: calc(env(safe-area-inset-top) + 6.5rem); }
+.carte-chasse .leaflet-top.leaflet-right { top: calc(env(safe-area-inset-top) + 8.5rem); }
 .carte-chasse .leaflet-bar { border: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 12px #02334133; }
 .carte-chasse .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; background: #FFFCF4; color: #023341; font: 700 22px var(--font-sans); }
 .credits summary::-webkit-details-marker { display: none; }
