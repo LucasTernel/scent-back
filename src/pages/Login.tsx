@@ -94,7 +94,7 @@ export default function Login() {
         </button>
       </form>
       <footer className="mt-auto flex flex-wrap justify-center pt-2 text-xs text-doux">
-        {[['mentions', 'Mentions légales'], ['confidentialite', 'Politique de confidentialité'], ['cookies', 'Gestion des cookies']].map(([k, l], i) => (
+        {[['mentions', 'Mentions légales'], ['conditions', 'Conditions d\'utilisation'], ['confidentialite', 'Politique de confidentialité'], ['cookies', 'Gestion des cookies']].map(([k, l], i) => (
           <span key={k} className="flex items-center">{i > 0 && <span aria-hidden className="px-1">·</span>}
             <Link viewTransition to={`/legal/${k}`} className="inline-flex min-h-10 items-center px-1 underline-offset-2 hover:underline">{l}</Link>
           </span>

@@ -17,6 +17,20 @@ const pages: Record<string, { titre: string; sections: [string, string][] }> = {
       ['Propriété intellectuelle', 'Les marques Assassin\'s Creed et The Lapins Crétins appartiennent à Ubisoft. Elles sont utilisées ici à titre pédagogique uniquement.'],
     ],
   },
+  conditions: {
+    titre: 'Conditions d\'utilisation',
+    sections: [
+      ['Objet', 'Les présentes conditions encadrent l\'utilisation de Scent Back, application de chasse urbaine réalisée dans le cadre d\'une SAE du BUT MMI. En créant un compte, tu les acceptes.'],
+      ['Compte', 'L\'inscription se fait par e-mail ou avec un compte Google. Tu choisis un nom de code : il doit rester correct (pas d\'insulte, pas d\'usurpation d\'identité). Tu es responsable de la confidentialité de ton mot de passe.'],
+      ['Le jeu', 'Le but est de trouver les statuettes cachées, de scanner leur puce NFC sur place et de prendre une photo. Chaque capture rapporte des points, visibles dans ton profil et dans le classement.'],
+      ['Règles de bonne conduite', 'Interdit : tricher (fausse position GPS, partage des liens des puces, comptes multiples), dégrader ou déplacer une statuette, publier des photos de personnes sans leur accord ou des contenus choquants.\nEn cas d\'abus, l\'équipe peut retirer des points ou supprimer le compte.'],
+      ['Sécurité', 'Reste attentif à ton environnement : respecte le code de la route, les propriétés privées et les horaires des lieux. Ne joue jamais en conduisant. L\'équipe ne peut être tenue responsable d\'un accident survenu pendant la chasse.'],
+      ['Points et lots', 'Les points n\'ont aucune valeur monétaire. Ils peuvent servir lors d\'événements du pop-up store, dans la limite des lots disponibles. Le projet étant pédagogique et fictif, aucun lot réel n\'est garanti.'],
+      ['Disponibilité', 'L\'application est un prototype étudiant : elle peut être modifiée, interrompue ou fermée à tout moment, notamment à la fin de la SAE.'],
+      ['Données personnelles', 'Leur traitement est décrit dans la politique de confidentialité, accessible en bas de la page de connexion et du profil.'],
+      ['Contact', 'Pour toute question : Lucas TERNEL, éditeur de l\'application (voir les mentions légales).'],
+    ],
+  },
   confidentialite: {
     titre: 'Politique de confidentialité',
     sections: [
