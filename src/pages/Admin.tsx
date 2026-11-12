@@ -1,8 +1,8 @@
-import { useCallback, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue,
-  getCollections, getProfile, uploadMedia, type Rarity,
+  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity,
 } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
@@ -262,6 +262,7 @@ export function AdminCollection() {
   const cols = useData(getCollections)
   const col = id === 'aucune' ? { name: 'Sans collection', description: '', image_url: undefined, logo_url: undefined } : cols?.find((c) => c.id === id)
   const statues = (useData(adminStatues) ?? []).filter((s) => (s.collection_id ?? 'aucune') === id)
+    .sort((a, b) => rangRarete(a.rarity) - rangRarete(b.rarity) || a.name.localeCompare(b.name))
   const stats = useData(adminStatuesStats) ?? []
   return (
     <div className="flex flex-col gap-5">
@@ -282,11 +283,18 @@ export function AdminCollection() {
         {id !== 'aucune' && <Link viewTransition to={`/collections/${id}/modifier`} className="ml-auto rounded-full border-[1.5px] border-trait bg-papier px-3.5 py-1.5 text-xs font-bold">Modifier la collection</Link>}
       </div>
       <ul className="grid grid-cols-2 gap-3">
-        {statues.map((s, i) => (
-          <li key={s.id} className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
+        {statues.map((s, i) => (<Fragment key={s.id}>
+          {(i === 0 || statues[i - 1].rarity !== s.rarity) && (
+                <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
+                  <span aria-hidden className="size-3 rounded-full" style={{ background: HEX_RARETE[s.rarity] }} />
+                  <h2 className="font-serif text-sm font-bold">{rarityLabel[s.rarity]}</h2>
+                  <span className="text-xs text-doux">{statues.filter((x) => x.rarity === s.rarity).length}</span>
+                  <span aria-hidden className="h-px flex-1 bg-trait" />
+                </li>
+              )}
+          <li className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
             <Link viewTransition data-vt="zoom" to={`/statuette/${s.id}`} className="flex flex-col gap-2 rounded-[22px] border-[1.5px] border-trait bg-papier p-2 pb-3 active:scale-[.98] transition">
               <Scene3D mini rarity={s.rarity} nom={s.name} model={s.model_url} image={s.image_url} vt={`c-${s.id}`} className="aspect-square rounded-[16px]">
-                {s.model_url && <span className="absolute top-2 right-2 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/25">3D</span>}
               </Scene3D>
               <span className="line-clamp-2 px-1 font-serif text-[13px] leading-snug font-bold">{s.name}</span>
               <span className="flex items-center justify-between px-1 text-[11px] text-doux">
@@ -295,7 +303,7 @@ export function AdminCollection() {
               </span>
             </Link>
           </li>
-        ))}
+        </Fragment>))}
       </ul>
       {statues.length === 0 && <p className="text-center text-sm text-doux">Aucune statuette. Ajoute-en une avec le bouton en haut.</p>}
     </div>
@@ -355,7 +363,7 @@ export function AdminFormStatue() {
         )}
         <div className="grid grid-cols-2 gap-2.5">
           <label className="flex flex-col gap-1 text-xs font-bold text-doux">Rareté
-            <select name="rarity" className="champ" defaultValue={s?.rarity ?? 'commune'}><option value="commune">Commune</option><option value="rare">Rare</option><option value="legendaire">Légendaire</option></select>
+            <select name="rarity" className="champ" defaultValue={s?.rarity ?? 'commune'}>{RARETES.map((r) => <option key={r} value={r}>{rarityLabel[r]}</option>)}</select>
           </label>
           <Champ label="Points" name="points" type="number" min={1} defaultValue={s?.points ?? 30} required />
           <Champ label="Latitude" name="lat" required inputMode="decimal" value={lat} onChange={(e) => setPos({ lat: e.target.value, lng })} />

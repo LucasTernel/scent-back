@@ -51,8 +51,8 @@ export function Lapin({ className = '' }: { className?: string }) {
   )
 }
 
-export const rarityLabel: Record<Rarity, string> = { commune: 'Commune', rare: 'Rare', legendaire: 'Légendaire' }
-const glyph: Record<Rarity, string> = { commune: '●', rare: '◆', legendaire: '★' }
+export const rarityLabel: Record<Rarity, string> = { commune: 'Commune', rare: 'Rare', superrare: 'Super rare', epique: 'Épique', legendaire: 'Légendaire' }
+const glyph: Record<Rarity, string> = { commune: '●', rare: '◆', superrare: '◆◆', epique: '✦', legendaire: '★' }
 
 /** Sceau de cire = rareté. */
 export function Sceau({ rarity, size = 44, className = '' }: { rarity: Rarity; size?: number; className?: string }) {

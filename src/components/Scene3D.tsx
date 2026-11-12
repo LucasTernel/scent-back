@@ -7,7 +7,8 @@ declare module 'react' {
   namespace JSX { interface IntrinsicElements { 'model-viewer': React.HTMLAttributes<HTMLElement> & Record<string, unknown> } }
 }
 
-export const HEX: Record<Rarity, string> = { commune: '#8A7660', rare: '#2F7FB5', legendaire: '#B3121B' }
+export { HEX_RARETE as HEX } from '../lib/api'
+import { HEX_RARETE as HEX } from '../lib/api'
 
 /** Scène sombre (halo + rayons + socle de la couleur de rareté) avec le modèle 3D qui tourne, l'image, ou le lapin.
  *  mini = vignette de grille (pas de contrôle à la souris/au doigt). debloque = false → silhouette noire. */

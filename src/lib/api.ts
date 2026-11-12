@@ -1,7 +1,12 @@
 // Couche de données : Supabase si VITE_SUPABASE_URL est défini, sinon fausses données (localStorage).
 import { createClient } from '@supabase/supabase-js'
 
-export type Rarity = 'commune' | 'rare' | 'legendaire'
+export type Rarity = 'commune' | 'rare' | 'superrare' | 'epique' | 'legendaire'
+/** Ordre des raretés (de la plus courante à la plus rare), couleurs et points de base. */
+export const RARETES: Rarity[] = ['commune', 'rare', 'superrare', 'epique', 'legendaire']
+export const HEX_RARETE: Record<Rarity, string> = { commune: '#8A7660', rare: '#2F7FB5', superrare: '#1E9E8A', epique: '#7B3FB8', legendaire: '#B3121B' }
+export const POINTS_RARETE: Record<Rarity, number> = { commune: 30, rare: 60, superrare: 100, epique: 150, legendaire: 200 }
+export const rangRarete = (r: Rarity) => RARETES.indexOf(r)
 export type Statue = { id: string; name: string; description: string; hint: string; district: string; rarity: Rarity; points: number; lat: number; lng: number; image?: string; model?: string; collectionId?: string }
 export type Collection = { id: string; name: string; description?: string; image_url?: string; logo_url?: string }
 export type Capture = { statueId: string; photo?: string; createdAt: string }
@@ -54,20 +59,20 @@ const sb = {
 /* ---------- Fausses données ---------- */
 
 const S = (id: string, name: string, district: string, hint: string, rarity: Rarity, lat: number, lng: number): Statue =>
-  ({ id, name, district, hint, rarity, lat, lng, collectionId: id.startsWith('DEMO') ? 'demo' : 'paris', description: 'Description lore à venir. BWAAAH !', points: { commune: 30, rare: 80, legendaire: 150 }[rarity] })
+  ({ id, name, district, hint, rarity, lat, lng, collectionId: id.startsWith('DEMO') ? 'demo' : 'paris', description: 'Description lore à venir. BWAAAH !', points: POINTS_RARETE[rarity] })
 
 const statues: Statue[] = [
-  S('LOUVRE-7Q2', 'Lapin de la Pyramide', 'Louvre', 'Là où le verre fait des triangles…', 'legendaire', 48.8606, 2.3376),
+  S('LOUVRE-7Q2', 'Lapin de la Pyramide', 'Louvre', 'Là où le verre fait des triangles…', 'epique', 48.8606, 2.3376),
   S('NDAME-K8P', 'Lapin Gargouille', 'Île de la Cité', 'Il guette depuis une cathédrale célèbre…', 'rare', 48.853, 2.3499),
-  S('MONTM-3XR', 'Lapin du Sacré-Cœur', 'Montmartre', 'Tout en haut de la butte…', 'rare', 48.8867, 2.3431),
+  S('MONTM-3XR', 'Lapin du Sacré-Cœur', 'Montmartre', 'Tout en haut de la butte…', 'superrare', 48.8867, 2.3431),
   S('MARAIS-9TB', 'Lapin Falafel', 'Le Marais', 'Entre les hôtels particuliers et les falafels…', 'commune', 48.8575, 2.359),
   S('CANAL-5MZ', 'Lapin Éclusier', 'Canal Saint-Martin', 'Au bord de l\'eau, près des passerelles vertes…', 'commune', 48.871, 2.365),
   S('EIFFEL-2WD', 'Lapin Saut de la Foi', 'Tour Eiffel', 'Sous la Dame de fer…', 'legendaire', 48.8584, 2.2945),
   S('PNEUF-6HC', 'Lapin du Pont-Neuf', 'Pont-Neuf', 'Près d\'un pont célèbre…', 'commune', 48.8572, 2.3414),
   S('BASTI-4GN', 'Lapin Révolutionnaire', 'Bastille', 'Là où une colonne remplace une forteresse…', 'commune', 48.8532, 2.3691),
-  S('OPERA-8LV', 'Lapin Fantôme', 'Opéra', 'Sous les dorures d\'un palais de la musique…', 'rare', 48.872, 2.3316),
-  S('LUXEM-1SJ', 'Lapin Sénateur', 'Luxembourg', 'Dans un jardin royal plein de chaises vertes…', 'commune', 48.8462, 2.3372),
-  S('PANTH-7EF', 'Lapin Grand Homme', 'Panthéon', 'Au sommet de la montagne Sainte-Geneviève…', 'rare', 48.8462, 2.3464),
+  S('OPERA-8LV', 'Lapin Fantôme', 'Opéra', 'Sous les dorures d\'un palais de la musique…', 'superrare', 48.872, 2.3316),
+  S('LUXEM-1SJ', 'Lapin Sénateur', 'Luxembourg', 'Dans un jardin royal plein de chaises vertes…', 'rare', 48.8462, 2.3372),
+  S('PANTH-7EF', 'Lapin Grand Homme', 'Panthéon', 'Au sommet de la montagne Sainte-Geneviève…', 'epique', 48.8462, 2.3464),
   S('ARC-5YK', 'Lapin Point de Vue', 'Arc de Triomphe', 'Au centre de l\'étoile…', 'legendaire', 48.8738, 2.295),
   { ...S('ULTIME-AC', 'Lapin Ultimate', 'Hôtel de Ville', 'Là où Paris garde ses archives…', 'legendaire', 48.8566, 2.3522), points: 250, model: '/models/lapin-ultimate.glb', description: 'Le maître de la Confrérie. Capuche bleu nuit, épée au poing et sourire de dément.' },
   S('DEMO-1', 'Lapin Démo Commun', 'Salle de l\'oral', 'Dans la salle !', 'commune', 48.8566, 2.3522),
@@ -189,13 +194,8 @@ export async function createStatue(v: Record<string, unknown>) {
   if (error) throw error
 }
 
-// mode démo : un modèle 3D par statuette, comme la migration 0011
-{
-  const n = { commune: 0, rare: 0, legendaire: 0 }
-  const m = { commune: ['novice', 'eclaireur'], rare: ['templier', 'ombre'], legendaire: ['maitre', 'maitre'] }
-  const revo = statues.find((s) => s.id === 'BASTI-4GN'); if (revo) revo.model = '/models/lapin-revolutionnaire.glb'
-  for (const s of statues) if (!s.model) s.model = `/models/lapin-${m[s.rarity][n[s.rarity]++ % 2]}.glb`
-}
+// mode démo : un modèle 3D unique par statuette (mêmes fichiers que la base)
+for (const s of statues) if (!s.model) s.model = `/models/lapin-${s.id === 'BASTI-4GN' ? 'revolutionnaire' : s.id.startsWith('DEMO') ? s.id.toLowerCase() : s.id.split('-')[0].toLowerCase()}.glb`
 
 /* ---------- Boutique ---------- */
 export type Lot = { id: string; name: string; cost: number; stock: number; image_url: string | null }

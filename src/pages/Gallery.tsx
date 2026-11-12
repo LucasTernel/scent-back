@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getCaptures, getCollections, getStatues } from '../lib/api'
+import { getCaptures, getCollections, getStatues, HEX_RARETE, rangRarete } from '../lib/api'
 import { useData } from '../lib/useData'
-import { Icon, Lapin } from '../ui'
+import { Icon, Lapin, rarityLabel } from '../ui'
 
 const Barre = ({ v, max }: { v: number; max: number }) => (
   <span className="block h-1.5 overflow-hidden rounded-full bg-creme/20"><span className="block h-full rounded-full bg-flamme transition-all duration-700" style={{ width: `${max ? (v / max) * 100 : 0}%` }} /></span>
@@ -62,7 +62,7 @@ export function GalleryCollection() {
   const nb = siennes.filter((s) => trouve(s.id)).length
   const liste = siennes
     .filter((s) => !q || (trouve(s.id) && s.name.toLowerCase().includes(q.toLowerCase())))
-    .sort((a, b) => Number(!!trouve(b.id)) - Number(!!trouve(a.id)))
+    .sort((a, b) => rangRarete(a.rarity) - rangRarete(b.rarity) || Number(!!trouve(b.id)) - Number(!!trouve(a.id)))
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,8 +90,16 @@ export function GalleryCollection() {
         {liste.map((s, i) => {
           const c = trouve(s.id)
           const img = c?.photo ?? s.image
-          return (
-            <li key={s.id} className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
+          return (<Fragment key={s.id}>
+              {(i === 0 || liste[i - 1].rarity !== s.rarity) && (
+                <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
+                  <span aria-hidden className="size-3 rounded-full" style={{ background: HEX_RARETE[s.rarity] }} />
+                  <h2 className="font-serif text-sm font-bold">{rarityLabel[s.rarity]}</h2>
+                  <span className="text-xs text-doux">{liste.filter((x) => x.rarity === s.rarity).length}</span>
+                  <span aria-hidden className="h-px flex-1 bg-trait" />
+                </li>
+              )}
+            <li className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
               <Link viewTransition data-vt="zoom" to={`/galerie/${s.id}`} className={`flex flex-col gap-2 rounded-[22px] border-[1.5px] p-2 pb-3 transition active:scale-[.98] ${c ? 'border-trait bg-papier' : 'border-dashed border-trait bg-creme-2/60'}`}>
                 <span style={{ viewTransitionName: `c-${s.id}` }} className={`relative grid aspect-square place-items-center overflow-hidden rounded-[16px] ${c ? 'bg-creme-2' : 'bg-creme-2/70'}`}>
                   {c
@@ -103,7 +111,7 @@ export function GalleryCollection() {
                 <span className="px-1 text-[11px] text-doux">{s.district} · {s.points} pts</span>
               </Link>
             </li>
-          )
+          </Fragment>)
         })}
       </ul>
       {liste.length === 0 && <p className="text-center text-sm text-doux">Aucun lapin trouvé.</p>}

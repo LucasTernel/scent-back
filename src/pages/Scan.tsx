@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { getCaptures, getProfile, getStatues, getWallet } from '../lib/api'
+import { HEX_RARETE, getCaptures, getProfile, getStatues, getWallet } from '../lib/api'
 import { lireConsent } from '../lib/consent'
 import { distance, ecouterNfc, nfcDispo, secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
 
-const COUL = { commune: '#8A7660', rare: '#2F7FB5', legendaire: '#B3121B' }
+const COUL = HEX_RARETE
 const icone = (html: string, w: number, h = w) => L.divIcon({ html, className: '', iconSize: [w, h], iconAnchor: [w / 2, h] })
 
 /** Chasse façon Pokémon GO : carte plein écran, radar toujours actif, scan NFC. */

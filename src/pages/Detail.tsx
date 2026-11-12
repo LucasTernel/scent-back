@@ -1,10 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
-import { getCaptures, getCollections, getStatues } from '../lib/api'
+import { getCaptures, getCollections, getStatues, rangRarete } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, rarityLabel } from '../ui'
 import Scene3D, { HEX } from '../components/Scene3D'
 
-const NIVEAU = { commune: 1, rare: 2, legendaire: 3 } as const
 const POINTS_MAX = 250
 
 /** Fiche statuette façon fiche de héros : scène 3D sombre qui tourne, atouts, stats lumineuses. */
@@ -26,7 +25,7 @@ export default function Detail() {
   ]
   const stats: [string, number, string][] = [
     ['Valeur', s.points / POINTS_MAX, `${s.points} / ${POINTS_MAX}`],
-    ['Rareté', NIVEAU[s.rarity] / 3, `${NIVEAU[s.rarity]} / 3`],
+    ['Rareté', (rangRarete(s.rarity) + 1) / 5, `${rangRarete(s.rarity) + 1} / 5`],
   ]
 
   return (
