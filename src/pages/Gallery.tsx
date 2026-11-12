@@ -93,7 +93,7 @@ export function GalleryCollection() {
           const img = c?.photo ?? s.image
           return (<Fragment key={s.id}>
               {(i === 0 || liste[i - 1].rarity !== s.rarity) && (
-                <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
+                <li className="col-span-full mt-2 flex items-center gap-2 first:mt-0">
                   <span aria-hidden className="size-3 rounded-full" style={{ background: HEX_RARETE[s.rarity] }} />
                   <h2 className="font-serif text-sm font-bold">{rarityLabel[s.rarity]}</h2>
                   <span className="text-xs text-doux">{liste.filter((x) => x.rarity === s.rarity).length}</span>

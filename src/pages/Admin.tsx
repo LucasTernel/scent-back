@@ -295,7 +295,7 @@ export function AdminCollection() {
       <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
         {statues.map((s, i) => (<Fragment key={s.id}>
           {(i === 0 || statues[i - 1].rarity !== s.rarity) && (
-                <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
+                <li className="col-span-full mt-2 flex items-center gap-2 first:mt-0">
                   <span aria-hidden className="size-3 rounded-full" style={{ background: HEX_RARETE[s.rarity] }} />
                   <h2 className="font-serif text-sm font-bold">{rarityLabel[s.rarity]}</h2>
                   <span className="text-xs text-doux">{statues.filter((x) => x.rarity === s.rarity).length}</span>
@@ -621,7 +621,7 @@ function AdminPermanente() {
         {edition === 'nouveau' && <Carton><FormProduit ordre={produits.length + 1} fini={fini} /></Carton>}
         <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {produits.map((p) => (
-            <li key={p.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === p.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
+            <li key={p.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === p.id ? 'col-span-full border-flamme' : 'border-trait'}`}>
               <div className="relative">
                 <ImageProduit src={p.image} alt="" className="aspect-[4/3] w-full" />
                 {!p.dispo && <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-[11px] font-bold text-[#FCF5E3]">Prochainement</span>}
@@ -718,7 +718,7 @@ export function AdminBoutique() {
           {lots.map((l) => {
             const max = Math.max(...lots.map((x) => x.stock), 1)
             return (
-              <li key={l.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === l.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
+              <li key={l.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === l.id ? 'col-span-full border-flamme' : 'border-trait'}`}>
                 <div className="relative aspect-[4/3] bg-creme-2">
                   {l.image_url ? <img src={l.image_url} alt="" className="size-full object-cover" /> : <span className="grid size-full place-items-center text-doux"><Icon name="boutique" size={36} /></span>}
                   <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">{l.cost} pts</span>
