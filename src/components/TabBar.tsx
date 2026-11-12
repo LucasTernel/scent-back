@@ -21,7 +21,7 @@ const tabsJoueur: Onglet[] = [
 /** Barre noire à encoche + bulle orange qui glisse vers l'onglet actif. */
 export default function TabBar({ tabs = tabsJoueur, fondu = true }: { tabs?: Onglet[]; fondu?: boolean }) {
   const { pathname } = useLocation()
-  const p = pathname === '/classement' || pathname.startsWith('/legal') ? '/compte' : pathname.startsWith('/galerie') ? '/galerie' : /^\/(collections|statuette)/.test(pathname) ? '/collections' : pathname
+  const p = pathname === '/classement' || pathname.startsWith('/legal') ? '/compte' : pathname.startsWith('/galerie') ? '/galerie' : pathname.startsWith('/boutique') ? '/boutique' : /^\/(collections|statuette)/.test(pathname) ? '/collections' : pathname
   const i = Math.max(0, tabs.findIndex((t) => t.to === p))
   const nbDemandes = useDemandes()
   return (

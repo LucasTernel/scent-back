@@ -15,7 +15,7 @@ import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, A
 import Claim from './pages/Claim'
 import Login from './pages/Login'
 import Landing, { SiteDesktop } from './pages/Landing'
-import BoutiqueSite, { CommandeOk, PanierSite } from './pages/BoutiqueSite'
+import BoutiqueSite, { CommandeOk, FicheProduit, PanierSite } from './pages/BoutiqueSite'
 import Boutique from './pages/Boutique'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
@@ -78,7 +78,7 @@ export default function App() {
     avant.current = session
   }, [session, navigate])
 
-  const pageBoutique = { '/boutique': BoutiqueSite, '/panier': PanierSite, '/commande': CommandeOk }[location.pathname]
+  const pageBoutique = location.pathname.startsWith('/produit/') ? FicheProduit : { '/boutique': BoutiqueSite, '/panier': PanierSite, '/commande': CommandeOk }[location.pathname]
   if (bureau && pageBoutique) { const Page = pageBoutique; return boutique === false ? <Navigate to="/" replace /> : <SiteDesktop>{boutique && <Page />}</SiteDesktop> }
   if (bureau) return location.pathname.startsWith('/legal')
     ? <div className="bg-creme"><SiteDesktop><main id="contenu" className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop></div>
@@ -120,6 +120,7 @@ export default function App() {
             <Route path="galerie" element={<Gallery />} />
             <Route path="compte" element={<Account />} />
             <Route path="boutique" element={<Boutique />} />
+            <Route path="boutique/:id" element={<FicheProduit mobile />} />
             <Route path="classement" element={<Classement />} />
             <Route path="amis" element={<Amis />} />
             <Route path="amis/:pseudo" element={<ProfilAmi />} />

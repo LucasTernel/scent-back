@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import ImageProduit from '../components/ImageProduit'
 import { useState } from 'react'
 import { dateLivraison, echangerLot, getBons, getBoutiqueOuverte, getProduitsVente, type Categorie, getLots, getWallet, type Lot } from '../lib/api'
@@ -61,12 +62,12 @@ export default function Boutique() {
           <FiltreCategories valeur={cat} choisir={setCat} />
           <div className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
             {PRODUITS.map((p) => (
-              <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
+              <Link key={p.id} to={`/boutique/${p.id}`} viewTransition className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
                 <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full" />
                 {p.epuise && <span className="absolute inset-0 grid place-items-center bg-[#011A22]/70"><span className="-rotate-6 rounded-[10px] bg-flamme px-3 py-1.5 text-center font-bold text-[#023341] shadow-xl"><span className="titre block text-base leading-none">Sold out</span><span className="text-xs">Victime de son succès</span></span></span>}
                 {<BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="absolute top-2 right-2" />}
                 <div className="p-3">{p.licence && <p className="mb-0.5 text-[10px] font-bold tracking-[.14em] text-flamme uppercase">{p.licence}</p>}<p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.epuise ? 'Victime de son succès' : p.dispo ? euros(p.prix) : 'Prochainement'}</p>{p.precommande && !p.epuise && <p className="mt-0.5 text-[11px] font-bold text-doux">Précommande · livraison le {dateLivraison(p.precommande)}</p>}</div>
-              </a>
+              </Link>
             ))}
           </div>
           <p className="text-xs text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche.</p>

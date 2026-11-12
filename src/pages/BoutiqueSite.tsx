@@ -1,6 +1,6 @@
 import ImageProduit from '../components/ImageProduit'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
 import { dateLivraison, getProduitsVente, type Categorie, type Produit } from '../lib/api'
@@ -73,7 +73,7 @@ export default function BoutiqueSite() {
       {/* Mise en avant : le bundle */}
       {vedette && (
         <section aria-label="À la une" className="relative grid overflow-hidden rounded-[28px] bg-[#023341] text-[#FCF5E3] md:grid-cols-[1.1fr_1fr]">
-          <ImageProduit src={vedette.image} alt={vedette.nom} className="aspect-[16/10] h-full max-h-[460px] w-full" />
+          <Link to={`/produit/${vedette.id}`} className="contents"><ImageProduit src={vedette.image} alt={vedette.nom} className="aspect-[16/10] h-full max-h-[460px] w-full" /></Link>
           <div className="flex flex-col justify-center gap-4 p-8 md:p-12">
             <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">À la une · {vedette.licence === 'All Stars' ? 'Édition limitée' : 'Bundle'}</p>
             {vedette.licence === 'All Stars' && <p className="w-fit rounded-full border-2 border-flamme px-3 py-1 text-sm font-bold text-flamme">Dans la limite des 1 000 premières commandes</p>}
@@ -125,7 +125,7 @@ export default function BoutiqueSite() {
             {liste.map((p) => (
               <li key={p.id} className="group flex flex-col overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="relative overflow-hidden">
-                  <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full" />
+                  <Link to={`/produit/${p.id}`} aria-label={`Fiche produit : ${p.nom}`}><ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full" /></Link>
                   {<BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="absolute top-3 right-3" />}
                   {p.epuise && <span className="absolute inset-0 grid place-items-center bg-[#011A22]/70"><span className="-rotate-6 rounded-[10px] bg-flamme px-4 py-2 text-center font-bold text-[#023341] shadow-xl"><span className="titre block text-lg leading-none">Sold out</span><span className="text-xs">Victime de son succès</span></span></span>}
                   {p.precommande && !p.epuise && <span className="absolute top-3 left-3 rounded-[8px] bg-flamme px-2.5 py-1 text-xs font-bold text-[#023341]">Précommande</span>}
@@ -133,7 +133,7 @@ export default function BoutiqueSite() {
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   {p.licence && <p className="mb-1 text-[11px] font-bold tracking-[.18em] text-flamme uppercase">{p.licence}</p>}
-                  <h3 className="titre text-lg leading-tight">{p.nom}</h3>
+                  <h3 className="titre text-lg leading-tight"><Link to={`/produit/${p.id}`} className="hover:text-flamme">{p.nom}</Link></h3>
                   <p className="mt-2 line-clamp-2 flex-1 text-sm text-doux">{p.detail}</p>
                   {p.precommande && <p className="mt-2 text-xs font-bold text-flamme">Livraison prévue le {dateLivraison(p.precommande)}</p>}
                   <div className="mt-4 flex items-center justify-between gap-3">
@@ -219,6 +219,45 @@ export function CommandeOk() {
         <p className="w-full rounded-[16px] bg-creme-2 px-5 py-4"><span className="block text-xs text-doux">Numéro de commande (fictif)</span><span className="titre text-3xl tracking-widest">{num}</span></p>
         <p className="text-xs text-doux">Démonstration : aucun paiement n'a été effectué.</p>
         <Link to="/boutique" className="min-h-12 content-center rounded-[10px] bg-[#023341] px-6 font-bold text-[#FCF5E3]">Retour à la boutique</Link>
+      </div>
+    </main>
+  )
+}
+
+/* ---------- Fiche produit (site et appli) ---------- */
+export function FicheProduit({ mobile = false }: { mobile?: boolean }) {
+  const params = useParams(), { pathname } = useLocation()
+  const id = params.id ?? pathname.split('/').pop() // site : rendu hors <Routes>
+  const tous = useData(getProduitsVente)
+  const { panier, changer } = usePanier()
+  const p = tous?.find((x) => x.id === id)
+  const retour = mobile ? '/boutique' : '/boutique'
+  if (!tous) return null
+  if (!p) return <main id="contenu" className="mx-auto max-w-6xl px-5 py-12"><p className="text-doux">Ce produit n'existe pas (ou plus).</p><Link to={retour} className="font-bold underline">Retour à la boutique</Link></main>
+  const statut = p.epuise ? 'Sold out · victime de son succès' : !p.dispo ? 'Prochainement' : p.precommande ? `Précommande · livraison prévue le ${dateLivraison(p.precommande)}` : 'En stock · retrait au pop-up store, Paris'
+  return (
+    <main id="contenu" className={mobile ? 'flex flex-col gap-5' : 'mx-auto max-w-6xl px-5 py-12 md:px-8'}>
+      <Link to={retour} viewTransition className="inline-flex min-h-10 w-fit items-center gap-1 text-sm font-bold text-doux"><Icon name="retour" size={18} />Boutique</Link>
+      <div className={mobile ? 'flex flex-col gap-5' : 'mt-4 grid items-start gap-12 lg:grid-cols-[1.2fr_1fr]'}>
+        <div className="relative">
+          <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[24px]" />
+          {p.epuise && <span className="absolute inset-0 grid place-items-center rounded-[24px] bg-[#011A22]/60"><span className="titre -rotate-6 rounded-[12px] bg-flamme px-5 py-3 text-2xl text-[#023341]">Sold out</span></span>}
+        </div>
+        <div className="flex flex-col gap-4">
+          {p.licence && <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">{p.licence} · {CATEGORIES.find(([k]) => k === p.categorie)?.[1]}</p>}
+          <h1 className="titre text-[clamp(2rem,4vw,3.4rem)] leading-[1]">{p.nom}</h1>
+          <p className="titre text-3xl">{euros(p.prix)}</p>
+          <p className={`w-fit rounded-full px-4 py-2 text-sm font-bold ${p.dispo && !p.epuise ? 'bg-flamme/15' : 'bg-creme-2 text-doux'}`}>{statut}</p>
+          {p.licence === 'All Stars' && <p className="w-fit rounded-full border-2 border-flamme px-3 py-1 text-sm font-bold text-flamme">Dans la limite des 1 000 premières commandes</p>}
+          <p className="text-lg leading-relaxed text-doux">{p.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            {!mobile && p.dispo && !p.epuise && (panier[p.id]
+              ? <><Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} /><Link to="/panier" className="min-h-12 content-center rounded-[10px] bg-[#023341] px-6 font-bold text-[#FCF5E3]">Voir le panier</Link></>
+              : <button onClick={() => changer(p.id, 1)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">{p.precommande ? 'Précommander' : 'Ajouter au panier'}</button>)}
+            <BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="!min-h-12 !px-5 !text-sm" />
+          </div>
+          {mobile && <p className="text-sm text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche, Paris.</p>}
+        </div>
       </div>
     </main>
   )
