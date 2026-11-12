@@ -115,7 +115,7 @@ export function SiteDesktop({ children, sansEntete = false }: { children: React.
         </div>
       </header>}
       <div className="flex-1">{children}</div>
-      <footer className={`relative z-10 overflow-hidden ${sansEntete ? "text-creme" : "text-[#FCF5E3]"} ${sansEntete ? "bg-encre" : "bg-[#023341]"}`}>
+      <footer className="relative z-10 overflow-hidden bg-[#023341] text-[#FCF5E3]">
         <div className="mx-auto grid max-w-6xl gap-12 px-8 pt-20 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <img src="/logo-orange.png" alt="Scent Back" className="-ml-6 -mt-6 w-56" />
