@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getLots } from '../lib/api'
+import { getLots, type Lot } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, LogoMarque } from '../ui'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
@@ -102,8 +102,8 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-creme text-encre">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 md:px-8">
-        <a href="/" aria-label="Accueil Scent Back"><LogoMarque className="-my-6 -ml-4 h-24 w-auto md:h-28" /></a>
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-5 pb-1 md:px-8">
+        <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><LogoMarque className="h-full w-full scale-[2] object-contain" /></a>
         <div className="flex items-center gap-2">
         <Accessibilite />
         <button onClick={() => setTuto(true)} className="flex items-center gap-2 rounded-full bg-[#023341] px-4 py-2.5 text-sm font-bold text-[#FCF5E3] shadow-md transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
@@ -126,6 +126,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
 /** Accueil sur ordinateur : Scent Back se joue dans la rue, donc on invite à passer sur mobile. */
 export default function Landing() {
   const lots = useData(getLots) ?? []
+  const [demo, setDemo] = useState<Lot>()
   const etapes = [
     ['01', 'Traque', 'Un radar suit ta position et fait vibrer ton téléphone de plus en plus vite quand une statuette est proche.'],
     ['02', 'Scanne', 'Approche ton téléphone de la puce NFC cachée sous la statuette : elle apparaît dans un flash.'],
@@ -200,12 +201,56 @@ export default function Landing() {
                 {l.image_url ? <img src={l.image_url} alt="" className="absolute inset-0 size-full object-cover" /> : <Icon name="boutique" size={56} className="text-doux" />}
                 <span className="absolute top-3 right-3 rounded-full bg-[#023341] px-3 py-1.5 text-sm font-bold text-[#FCF5E3]">{l.cost} pts</span>
               </div>
-              <p className="px-1 font-serif text-base leading-snug font-bold">{l.name}</p>
+              <p className="min-h-[2.6em] px-1 font-serif text-base leading-snug font-bold">{l.name}</p>
+              <button onClick={() => setDemo(l)} disabled={l.stock === 0} className="btn btn-encre !min-h-11 text-sm disabled:opacity-40">
+                {l.stock === 0 ? 'Rupture de stock' : 'Réserver (démo)'}
+              </button>
             </li>
           ))}
         </ul>
       </section>
 
+      {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}
     </SiteDesktop>
+  )
+}
+
+/** Réservation fictive : aucun paiement, aucune donnée bancaire, juste un numéro de commande de démonstration. */
+function AchatDemo({ lot, fermer }: { lot: Lot; fermer: () => void }) {
+  const [etape, setEtape] = useState<'panier' | 'ok'>('panier')
+  const [num] = useState(() => 'SB-' + Math.random().toString(36).slice(2, 7).toUpperCase())
+  const bouton = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    bouton.current?.focus()
+    const echap = (e: KeyboardEvent) => e.key === 'Escape' && fermer()
+    addEventListener('keydown', echap); return () => removeEventListener('keydown', echap)
+  }, [fermer, etape])
+  return (
+    <div role="dialog" aria-modal="true" aria-labelledby="demo-titre" className="fixed inset-0 z-50 grid place-items-center bg-[#023341]/70 p-5 backdrop-blur-sm" onClick={fermer}>
+      <div className="pop relative flex w-full max-w-md flex-col gap-4 rounded-[32px] bg-papier p-7 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <p className="w-fit rounded-full bg-creme-2 px-3 py-1 text-xs font-bold text-doux">Mode démonstration · aucun paiement</p>
+        {etape === 'panier' ? <>
+          <h2 id="demo-titre" className="titre text-2xl">Réserver ce lot</h2>
+          <div className="flex items-center gap-4 rounded-[20px] border-[1.5px] border-trait p-3">
+            <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-[14px] bg-creme-2">
+              {lot.image_url ? <img src={lot.image_url} alt="" className="size-full object-cover" /> : <Icon name="boutique" size={28} className="text-doux" />}
+            </span>
+            <div className="min-w-0 flex-1"><p className="font-serif font-bold leading-snug">{lot.name}</p><p className="text-sm text-doux">Retrait au pop-up store</p></div>
+            <p className="titre text-xl">{lot.cost}<span className="text-xs"> pts</span></p>
+          </div>
+          <p className="text-sm text-doux">Dans le vrai jeu, les points se gagnent en capturant des lapins dans l'appli mobile. Ici, la réservation est simulée.</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={fermer} className="btn-ligne">Annuler</button>
+            <button ref={bouton} onClick={() => setEtape('ok')} className="btn btn-encre">Réserver</button>
+          </div>
+        </> : <>
+          <span className="pop grid size-14 place-items-center rounded-full bg-flamme text-2xl text-[#023341]">✓</span>
+          <h2 id="demo-titre" className="titre text-2xl">Réservation confirmée !</h2>
+          <p className="text-doux"><b className="text-encre">{lot.name}</b> t'attend au pop-up store Ubisoft × La Belle Mèche.</p>
+          <p className="rounded-2xl bg-creme-2 px-4 py-3 text-center"><span className="block text-xs text-doux">Numéro de commande (fictif)</span><span className="titre text-2xl tracking-widest">{num}</span></p>
+          <button ref={bouton} onClick={fermer} className="btn btn-encre">Fermer</button>
+        </>}
+      </div>
+    </div>
   )
 }
