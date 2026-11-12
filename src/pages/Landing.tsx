@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getLots, type Lot } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, LogoMarque } from '../ui'
+import SceneBougie from '../components/SceneBougie'
 import { PRODUITS, euros } from './BoutiqueSite'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
@@ -136,7 +137,7 @@ function useApparition() {
   })
 }
 /** Progression (0 → 1) du défilement à travers un élément. */
-function useProgression() {
+export function useProgression() {
   const ref = useRef<HTMLDivElement>(null)
   const [p, setP] = useState(0)
   useEffect(() => {
@@ -236,98 +237,6 @@ function LoaderBougie() {
   )
 }
 
-/** 03 — Le défi : la cire fond pendant qu'on défile. Composant isolé : lui seul se redessine au défilement. */
-function Defi() {
-  const [refDefi, p] = useProgression()
-  const etapesDefi = [
-    ['Allumez', 'Installez-vous dans une lumière douce, allumez la mèche et respirez : l\'ambiance revient avant même que l\'écran s\'allume.'],
-    ['Jouez', 'Elle compte le temps avec vous. Plus la cire fond, plus la fin approche.'],
-    ['Sauvegardez', 'Éteignez-la à la fin de chaque partie et rallumez-la à la suivante : elle vous attend comme une sauvegarde.'],
-    ['Gagnez', 'Si vous finissez l\'aventure avant la dernière goutte de cire, c\'est gagné.'],
-  ]
-  const etape = Math.min(etapesDefi.length - 1, Math.floor(p * etapesDefi.length))
-  return (
-        <section id="defi" ref={refDefi} className="relative h-[300vh] bg-creme" aria-labelledby="titre-defi">
-          <div className="sticky top-0 flex h-dvh flex-col justify-center overflow-hidden">
-            <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
-              <Chapitre n="03" titre="Le défi" />
-              <div className="mt-10 grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr]">
-                <div className="flex flex-col">
-                  <p className="text-xs font-bold tracking-[.22em] text-doux uppercase">Cire restante</p>
-                  <p className="titre text-[min(14vw,26vh)] leading-[.85] tabular-nums" aria-live="off">{Math.round((1 - p) * 140)}<span className="text-[.35em] text-flamme">g</span></p>
-                  <div className="mt-6 h-3 w-full max-w-sm overflow-hidden border-2 border-encre" aria-hidden><div className="h-full bg-encre" style={{ width: `${(1 - p) * 100}%` }} /></div>
-                  <p className="mt-3 text-sm text-doux">Rhum Marin · 140 g de cire 100 % végétale</p>
-                </div>
-                <div>
-                  <h2 id="titre-defi" className="titre text-[min(3.4rem,4vw,6.5vh)] leading-[1.02]">Finirez-vous le jeu avant la dernière goutte ?</h2>
-                  <p className="mt-4 max-w-xl text-lg leading-relaxed text-doux">Le poids de la bougie est calculé au plus juste pour brûler pendant toute la durée du jeu.</p>
-                  <ol className="mt-8 border-t-2 border-encre">
-                    {etapesDefi.map(([t, d], i) => (
-                      <li key={t} className={`border-b border-trait py-4 transition-opacity duration-500 ${i === etape ? '' : 'opacity-35'}`}>
-                        <p className="flex items-baseline gap-4"><span className="font-serif text-sm font-bold text-flamme">0{i + 1}</span><span className="titre text-2xl">{t}</span></p>
-                        <p className={`overflow-hidden pl-9 leading-relaxed text-doux transition-all duration-500 ${i === etape ? 'mt-2 max-h-24' : 'max-h-0'}`}>{d}</p>
-                      </li>
-                    ))}
-                  </ol>
-                  {/* règle graduée : heures de jeu */}
-                  <div className="mt-8" aria-label={`Temps de jeu : ${Math.round(p * 30)} heures sur 30`}>
-                    <div className="relative h-2 bg-creme-2"><div className="absolute inset-y-0 left-0 bg-flamme" style={{ width: `${p * 100}%` }} /></div>
-                    <div className="mt-2 flex justify-between font-mono text-xs text-doux" aria-hidden>{[0, 5, 10, 15, 20, 25, 30].map((h) => <span key={h}>{h}h</span>)}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-  )
-}
-
-/** Anatomie de la bougie (réf. Opal Tadpole) : la bougie 3D reste à l'écran, la caméra va d'un détail à l'autre
- *  au fil du défilement, et une étiquette accrochée au modèle pointe la partie décrite. */
-const ETAPES_ANATOMIE: { titre: string; texte: string; orbite: string; cible: string; point?: string }[] = [
-  { titre: 'Une bougie, un monde.', texte: 'Rhum Marin, la bougie d\'Assassin\'s Creed IV Black Flag : l\'odeur des Caraïbes, du bois des navires et des embruns.', orbite: '20deg 72deg 235%', cible: '0m 0.05m 0m' },
-  { titre: 'La mèche.', texte: 'En coton. Une fois allumée, elle compte le temps avec vous : la bougie est pensée pour brûler toute la durée du jeu.', orbite: '10deg 30deg 135%', cible: '0m 0.075m 0m', point: '0m 0.085m 0m' },
-  { titre: 'L\'étiquette.', texte: 'En arche, comme toutes les bougies Scent Back. Un nom de parfum par licence, le logo de la collab, et le grammage.', orbite: '0deg 84deg 140%', cible: '0m 0.047m 0m', point: '0m 0.06m 0.039m' },
-  { titre: 'La cire.', texte: '140 g de cire 100 % végétale, coulée en France par La Belle Mèche, dans un verre épais à garder une fois la partie terminée.', orbite: '70deg 64deg 195%', cible: '0m 0.05m 0m', point: '0.034m 0.07m 0m' },
-]
-function Anatomie() {
-  const [ref, p] = useProgression()
-  const n = Math.min(ETAPES_ANATOMIE.length - 1, Math.floor(p * ETAPES_ANATOMIE.length))
-  const e = ETAPES_ANATOMIE[n]
-  return (
-    <section ref={ref} className="relative h-[400vh] bg-creme" aria-label="Anatomie de la bougie Rhum Marin">
-      <div className="sticky top-0 grid h-dvh grid-cols-[1.25fr_1fr] items-center overflow-hidden">
-        <div className="relative h-full">
-          <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Rhum Marin en 3D, vue détail par détail" camera-orbit={e.orbite} camera-target={e.cible}
-            field-of-view="26deg" exposure="1.1" shadow-intensity="1" interaction-prompt="none" disable-zoom interpolation-decay="160"
-            style={{ width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
-            <div slot="progress-bar" />
-            <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
-            {ETAPES_ANATOMIE.map((x, i) => x.point && (
-              <div key={x.titre} slot={`hotspot-${i}`} data-position={x.point} aria-hidden className={`repere ${i === n ? 'repere-actif' : ''}`}>
-                <span className="repere-point" /><span className="repere-texte">{x.titre.replace('.', '')}</span>
-              </div>
-            ))}
-          </model-viewer>
-        </div>
-        <div className="pr-[max(2rem,calc((100vw-72rem)/2+2rem))]">
-          <Chapitre n="✦" titre="Anatomie" />
-          <ol className="mt-10 flex flex-col gap-1" aria-live="polite">
-            {ETAPES_ANATOMIE.map((x, i) => (
-              <li key={x.titre} className={`border-l-2 py-4 pl-6 transition-all duration-500 ${i === n ? 'border-flamme' : 'border-trait opacity-30'}`}>
-                <p className="font-serif text-xs font-bold text-flamme">0{i + 1}</p>
-                <h3 className={`titre leading-[.95] transition-all duration-500 ${i === n ? 'text-[clamp(3rem,5.2vw,5.2rem)]' : 'text-3xl'}`}>{x.titre}</h3>
-                <p className={`overflow-hidden text-xl leading-relaxed text-doux transition-all duration-500 ${i === n ? 'mt-4 max-h-48' : 'max-h-0'}`}>{x.texte}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
   useApparition()
@@ -335,7 +244,6 @@ export default function Landing() {
   const lots = useData(getLots) ?? []
   const [demo, setDemo] = useState<Lot>()
   const racine = useRef<HTMLElement>(null)
-  const [loaderAffiche] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches)
   useEffect(() => {
     import('@google/model-viewer')
     let stop = () => {}
@@ -347,55 +255,41 @@ export default function Landing() {
     <SiteDesktop>
       <LoaderBougie />
       <main id="contenu" ref={racine} data-curseur>
-        {/* Ouverture : « FERMEZ » en haut à gauche, « LES YEUX. » en bas à droite, la bougie 3D en grand entre les deux */}
-        <section data-ouverture className="relative h-[calc(100dvh-5.5rem)] min-h-[640px] overflow-hidden bg-creme text-encre">
-          <p className="absolute top-8 left-8 text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
-          <p className="absolute top-8 right-8 text-xs font-bold tracking-[.22em] text-doux uppercase">Collection All Stars · N°1</p>
-          <h1 className="titre pointer-events-none absolute inset-x-8 top-[12%] bottom-[16%] flex flex-col justify-between text-[clamp(4.6rem,13vw,15rem)] leading-[.82] tracking-tight">
-            <span data-split={loaderAffiche ? 'loader' : ''}>Fermez</span>
-            <span data-split={loaderAffiche ? 'loader' : ''} className="self-end">les yeux<span className="text-flamme">.</span></span>
-          </h1>
-          <model-viewer data-bougie-hero src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D, 140 g de cire 100 % végétale"
-            interaction-prompt="none" disable-zoom camera-orbit="20deg 72deg 175%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1.2"
-            style={{ position: 'absolute', left: '50%', top: '50%', translate: '-50% -50%', width: 'min(32vw, 460px)', height: '64%', pointerEvents: 'none', ['--poster-color' as string]: 'transparent' }}>
-            <div slot="progress-bar" />
-            <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
-          </model-viewer>
-          <div className="absolute inset-x-8 bottom-8 flex items-end justify-between gap-8">
-            <p className="max-w-sm leading-relaxed text-doux">Une box, un jeu culte d'Ubisoft, une bougie La Belle Mèche qui a l'odeur de son monde.</p>
-            <div className="flex gap-3">
-              <a href="#manifeste" className="min-h-12 content-center rounded-[10px] border-2 border-encre px-6 font-bold transition hover:bg-encre hover:text-creme">L'histoire ↓</a>
-              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>
-            </div>
-          </div>
-        </section>
-
-        {/* Manifeste : le texte s'allume mot par mot */}
-        <section id="manifeste" className="bg-encre px-8 py-36 text-creme">
-          <p data-mots className="mx-auto max-w-5xl text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.18] font-medium">Fermez les yeux. Ces mondes, vous les avez parcourus pendant des heures, vous les connaissez par cœur… et pourtant, vous ne les avez jamais sentis. Ubisoft fait voyager par l'image et le son, La Belle Mèche par l'odeur et la lumière. Ensemble, nous ajoutons le sens qui manquait : l'odorat.</p>
-        </section>
-
-        {/* 01 — Le sens manquant : un tableau, pas des cartes */}
-        <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
-          <Chapitre n="01" titre="Le sens manquant" />
-          <h2 className="apparait titre mt-10 max-w-4xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Dans un jeu, on voit et on entend le monde. On ne le sent jamais.</h2>
-          <dl className="mt-16 border-t-2 border-encre">
-            {[['Voir', 'L\'image', 'Ubisoft', true], ['Entendre', 'Le son', 'Ubisoft', true], ['Sentir', 'L\'odeur', 'La Belle Mèche', false]].map(([verbe, sens, qui, deja], i) => (
-              <div key={verbe as string} className={`apparait grid grid-cols-[1fr_auto] items-baseline gap-6 border-b border-trait py-7 md:grid-cols-[180px_1fr_auto] ${deja ? '' : 'bg-flamme/10 px-4 -mx-4'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
-                <dt className="titre text-4xl md:text-5xl">{verbe as string}</dt>
-                <dd className="hidden text-lg text-doux md:block">{sens as string}</dd>
-                <dd className={`text-right text-sm font-bold tracking-[.16em] uppercase ${deja ? 'text-doux' : 'text-flamme'}`}>{deja ? `✓ ${qui}` : `Le sens manquant — ${qui}`}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="apparait mt-12 ml-auto max-w-xl text-xl leading-relaxed">Ubisoft fait voyager par l'image et le son. La Belle Mèche, par l'odeur et la lumière. Scent Back réunit les deux et ajoute ce qui manquait : <b>l'odorat.</b></p>
-        </section>
-
-
-        <Anatomie />
+        {/* L'expérience : la bougie 3D dans le noir (canvas fixe), le récit défile par-dessus */}
+        <SceneBougie />
+        <div data-experience className="relative text-encre">
+          <section className="relative z-10 flex min-h-dvh items-center justify-center px-[8vw] text-center"><div>
+            <p className="text-xs font-bold tracking-[.22em] text-doux uppercase">Ubisoft × La Belle Mèche</p>
+            <h1 className="titre mt-4 text-[clamp(4rem,10vw,10rem)] leading-[.85]">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+            <p data-mots className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-snug font-medium">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… et pourtant, vous ne les avez jamais sentis.</p>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl">
+            <p className="titre text-[clamp(3rem,6vw,6rem)] leading-[.95]">Voir.<br />Entendre.<br /><span className="text-flamme">Sentir.</span></p>
+            <p className="mt-6 text-xl text-doux">Ubisoft fait voyager par l'image et le son. La Belle Mèche ajoute le sens qui manquait : l'odorat.</p>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+            <p className="font-serif text-sm font-bold text-flamme">La mèche</p>
+            <h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">Elle compte le temps avec vous.</h2>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl">
+            <p className="font-serif text-sm font-bold text-flamme">Rhum Marin</p>
+            <h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">140 g de cire végétale, coulée en France.</h2>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+            <p className="font-serif text-sm font-bold text-flamme">Le défi</p>
+            <h2 className="titre mt-3 text-[clamp(2.4rem,4.6vw,4.6rem)] leading-[.95]">Finirez-vous le jeu avant la dernière goutte ?</h2>
+            <p className="titre mt-6 text-7xl tabular-nums"><span data-cire-g>140</span><span className="text-3xl text-flamme"> g</span></p>
+          </div></section>
+          <section className="relative z-10 flex min-h-dvh items-center justify-center px-[8vw] text-center"><div>
+            <p className="chiffre-contour titre text-[clamp(5rem,12vw,11rem)] leading-none whitespace-nowrap">3–4h</p>
+            <p className="mx-auto mt-6 max-w-xl text-xl text-doux">Jamais plus de 3 à 4 heures d'affilée. Éteignez-la, elle vous attend comme une sauvegarde.</p>
+          </div></section>
+        </div>
 
         {/* La box : photo plein cadre, titre posé dessus */}
-        <section id="box" className="relative bg-encre text-creme">
+        <section id="box" className="relative z-10 bg-encre text-creme">
           <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="h-[92vh] w-full object-cover" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pt-40 pb-12 text-[#FCF5E3]">
             <div className="mx-auto grid max-w-6xl items-end gap-8 px-8 md:grid-cols-[1.4fr_1fr]">
@@ -405,21 +299,8 @@ export default function Landing() {
           </div>
         </section>
 
-        <Defi />
-
-        {/* Règle d'or : chiffre géant en contour */}
-        <section className="border-y-2 border-encre bg-papier">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-[1.3fr_1fr]">
-            <p className="apparait chiffre-contour titre text-[clamp(5rem,12vw,11rem)] leading-[.85] whitespace-nowrap text-encre">3–4h</p>
-            <div className="apparait" style={{ ['--d' as string]: '.12s' }}>
-              <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">La règle d'or</p>
-              <p className="mt-4 text-xl leading-relaxed">Comme dans tout bon jeu, il y a une règle : ne laissez jamais votre bougie allumée plus de 3 à 4 heures d'affilée.</p>
-              <p className="mt-3 leading-relaxed text-doux">Au-delà, la mèche s'abîme et la cire peut brûler. Faites des pauses, c'est bon pour la flamme et pour les yeux. Laissez-la refroidir, puis rallumez-la à la session suivante.</p>
-            </div>
-          </div>
-        </section>
         {/* Le pop-up store */}
-        <section id="popup" className="bg-encre text-creme">
+        <section id="popup" className="relative z-10 bg-encre text-creme">
           <div className="mx-auto max-w-6xl px-8 pt-28">
             <Chapitre n="04" titre="Le pop-up store" clair />
             <h2 className="apparait titre mt-10 text-[clamp(3rem,8vw,7rem)] leading-[.88]">Paris.<br /><span className="text-flamme">En vrai.</span></h2>
@@ -437,7 +318,7 @@ export default function Landing() {
           </div>
         </section>
         {/* L'appli */}
-        <section id="chasse" className="bg-creme">
+        <section id="chasse" className="relative z-10 bg-creme">
           <div className="mx-auto grid max-w-6xl items-center gap-14 px-8 py-28 lg:grid-cols-[1.1fr_.9fr]">
             <div className="flex flex-col gap-8">
               <Chapitre n="05" titre="L'application" />
@@ -467,7 +348,7 @@ export default function Landing() {
           </div>
         </section>
         {/* Shop (réf.) : rangée de produits + lots en points */}
-        <section id="boutique" className="bg-encre py-28 text-creme">
+        <section id="boutique" className="relative z-10 bg-encre py-28 text-creme">
           <div className="mx-auto max-w-6xl px-8">
             <div className="flex items-end justify-between gap-6 border-b border-creme/20 pb-6">
               <h2 className="titre text-[clamp(3rem,7vw,6rem)] leading-[.88]">Shop<span className="text-flamme">.</span></h2>
@@ -489,7 +370,7 @@ export default function Landing() {
           </div>
         </section>
         {/* Fin : la phrase signature dans une grande étiquette */}
-        <section className="bg-encre px-5 py-28">
+        <section className="relative z-10 bg-encre px-5 py-28">
           <Etiquette className="apparait mx-auto max-w-3xl" corps="flex flex-col items-center gap-6 px-8 py-14 text-center text-encre" larg="30%" arche="3.4rem">
             <Bougie className="w-20" />
             <p className="titre text-[clamp(2.4rem,5vw,4.4rem)] leading-none">Scent Back.</p>
