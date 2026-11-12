@@ -1,4 +1,5 @@
 import { getBoutiqueOuverte } from './lib/api'
+import Amis, { ProfilAmi } from './pages/Amis'
 import { useData } from './lib/useData'
 import { LogoMarque } from './ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -112,6 +113,8 @@ export default function App() {
             <Route path="compte" element={<Account />} />
             <Route path="boutique" element={<Boutique />} />
             <Route path="classement" element={<Classement />} />
+            <Route path="amis" element={<Amis />} />
+            <Route path="amis/:pseudo" element={<ProfilAmi />} />
             <Route path="legal/:page" element={<Legal />} />
             <Route path="galerie/c/:id" element={<GalleryCollection />} />
             <Route path="galerie/:id" element={<Detail />} />

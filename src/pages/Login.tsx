@@ -40,7 +40,7 @@ export default function Login() {
     setBusy(true); setError(''); setInfo('')
     const { data, error } = mode === 'login'
       ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password, options: { data: { username: String(f.get('username')).trim() } } })
+      : await supabase.auth.signUp({ email, password, options: { data: { username: String(f.get('username')).trim(), parrain: String(f.get('parrain') ?? '').trim().toUpperCase() } } })
     setBusy(false)
     if (error) setError(
       error.message.includes('Invalid login') ? 'E-mail ou mot de passe incorrect.'
@@ -89,6 +89,11 @@ export default function Login() {
         {mode === 'signup' && (
           <label className="flex flex-col gap-1 text-[13px] font-medium">Nom de code
             <input name="username" required maxLength={20} placeholder="ezio_cretin" autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false} data-1p-ignore className="champ !min-h-12" />
+          </label>
+        )}
+        {mode === 'signup' && (
+          <label className="flex flex-col gap-1 text-[13px] font-medium">Code de parrainage <span className="font-normal text-doux">(facultatif · +50 pts pour toi et ton parrain)</span>
+            <input name="parrain" defaultValue={new URLSearchParams(location.search).get('parrain') ?? ''} maxLength={6} placeholder="K7Q2AB" autoComplete="off" autoCapitalize="characters" className="champ !min-h-12 font-mono tracking-[.2em] uppercase" />
           </label>
         )}
         <label className="flex flex-col gap-1 text-[13px] font-medium">E-mail

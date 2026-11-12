@@ -294,3 +294,36 @@ export async function setBoutiqueOuverte(v: boolean) {
   const { error } = await supabase.from('reglages').upsert({ cle: 'boutique_ouverte', valeur: v })
   if (error) throw error
 }
+
+/* ---------- Amis ---------- */
+export type Joueur = { username: string; avatar_url: string | null; friend_code?: string; ami?: boolean }
+export type Ami = { username: string; avatar_url: string | null; total: number; lapins: number }
+export type ProfilAmi = { username: string; avatar_url: string | null; depuis: string; total: number; captures: { id: string; nom: string; rarete: Rarity; model?: string; date: string }[] }
+const AMIS_DEMO: Ami[] = [{ username: 'altair_bwaah', avatar_url: 'lapin:ultimate', total: 620, lapins: 9 }, { username: 'lapin_furtif', avatar_url: 'jeu:farcry', total: 180, lapins: 3 }]
+
+export async function chercherJoueurs(q: string): Promise<Joueur[]> {
+  if (MOCK) return [...AMIS_DEMO, { username: 'edward_kenway', avatar_url: 'jeu:ac', total: 0, lapins: 0 }].filter((a) => a.username.startsWith(q.toLowerCase())).map((a) => ({ ...a, ami: AMIS_DEMO.includes(a) }))
+  const { data, error } = await supabase.rpc('chercher_joueurs', { q })
+  if (error) throw new Error('Recherche impossible pour le moment.')
+  return data ?? []
+}
+export async function getAmis(): Promise<Ami[]> {
+  if (MOCK) return AMIS_DEMO
+  const { data } = await supabase.rpc('mes_amis')
+  return data ?? []
+}
+export async function ajouterAmi(pseudoOuCode: string) {
+  if (MOCK) return
+  const { error } = await supabase.rpc('add_friend', { code: pseudoOuCode })
+  if (error) throw new Error('Joueur introuvable. Vérifie le pseudo ou le code ami.')
+}
+export async function retirerAmi(pseudo: string) {
+  if (MOCK) return
+  const { error } = await supabase.rpc('retirer_ami', { pseudo })
+  if (error) throw new Error('Impossible de retirer cet ami pour le moment.')
+}
+export async function getProfilAmi(pseudo: string): Promise<ProfilAmi | null> {
+  if (MOCK) { const a = AMIS_DEMO.find((x) => x.username === pseudo); return a ? { ...a, depuis: '2026-09-01', captures: [{ id: 'BASTI-4GN', nom: 'Lapin Révolutionnaire', rarete: 'commune', model: '/models/lapin-revolutionnaire.glb', date: '2026-10-21' }, { id: 'X', nom: 'Lapin Ultimate', rarete: 'legendaire', model: '/models/lapin-ultimate.glb', date: '2026-10-25' }] } : null }
+  const { data } = await supabase.rpc('profil_ami', { pseudo })
+  return data ?? null
+}

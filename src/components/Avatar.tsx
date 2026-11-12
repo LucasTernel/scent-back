@@ -25,7 +25,7 @@ export function Avatar({ id, className = 'size-16' }: { id: string; className?: 
   const [type, cle] = id.split(':')
   if (type === 'lapin') return <span className={`block overflow-hidden rounded-[22%] bg-[radial-gradient(circle_at_50%_35%,#0E5A70,#023341)] ${className}`}><img src={`/avatars/lapin-${cle}.png`} alt="" className="size-full object-cover" /></span>
   const j = JEUX.find((x) => x[0] === cle) ?? JEUX[0]
-  return <span className={`grid place-items-center overflow-hidden rounded-[22%] p-[12%] ${className}`} style={{ background: j[2] }}><img src={`/avatars/jeux/${j[0]}.png`} alt="" className="max-h-full max-w-full object-contain" /></span>
+  return <span className={`grid place-items-center overflow-hidden rounded-[22%] ${className}`} style={{ background: j[2] }}><img src={`/avatars/jeux/${j[0]}.png`} alt="" className="size-[76%] object-contain" /></span>
 }
 const nomDe = (id: string) => { const [t, c] = id.split(':'); return t === 'lapin' ? `Lapin ${c}` : JEUX.find((x) => x[0] === c)?.[1] ?? c }
 
