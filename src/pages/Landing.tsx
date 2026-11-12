@@ -382,7 +382,7 @@ export default function Landing() {
               <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique →</a>
             </div>
             <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {(produits ?? []).slice(0, 3).map((p) => (
+              {(produits ?? []).filter((p) => p.categorie === 'bundle').slice(0, 3).map((p) => (
                 <a key={p.id} href="/boutique" className="group block">
                   <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[14px]" />
                   <p className="mt-3 flex justify-between gap-3"><span className="titre">{p.nom}</span><span className="font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Bientôt'}</span></p>
