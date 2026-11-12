@@ -139,3 +139,8 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .rayons { background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 35%, transparent) 0deg 6deg, transparent 6deg 24deg);
   mask: radial-gradient(circle, #000 0%, transparent 62%); animation: tourne 40s linear infinite; opacity: .55; }
 @keyframes tourne { to { rotate: 1turn; } }
+
+/* Socle lumineux accroché aux pieds du modèle 3D (hotspot model-viewer) */
+.socle { width: 58cqw; height: 13cqw; border-radius: 50%; border: 2px solid var(--c); pointer-events: none;
+  box-shadow: 0 0 34px 6px color-mix(in srgb, var(--c) 55%, transparent), inset 0 0 18px color-mix(in srgb, var(--c) 70%, transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 35%, transparent), transparent); }

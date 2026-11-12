@@ -32,7 +32,7 @@ export default function Detail() {
     <div className="-mx-5 -mt-4 flex flex-col">
       {/* Scène : fond sombre + halo de la couleur de rareté + socle lumineux */}
       <Scene3D rarity={s.rarity} nom={s.name} model={s.model} image={visuel} debloque={ok} vt={`c-${s.id}`} className="h-[min(62dvh,520px)]">
-        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-creme to-transparent" />
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-10 bg-gradient-to-t from-creme to-transparent" />
         <Link viewTransition data-vt="zoom" data-dir="arriere" to={`/galerie/c/${s.collectionId ?? 'aucune'}`} aria-label="Retour à la collection"
           className="absolute top-4 left-4 z-10 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md"><Icon name="retour" size={20} /></Link>
         {s.model && <p className="pointer-events-none absolute top-6 right-4 z-10 rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-bold text-white/85 ring-1 ring-white/20">↻ Fais-le tourner</p>}

@@ -20,10 +20,10 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
   useEffect(() => { if (model) import('@google/model-viewer').then(() => setPret(true)) }, [model])
 
   return (
-    <div className={`relative overflow-hidden bg-[#011A22] ${className}`} style={vt ? { viewTransitionName: vt } : undefined}>
+    <div className={`cq relative overflow-hidden bg-[#011A22] ${className}`} style={vt ? { viewTransitionName: vt } : undefined}>
       <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(60% 55% at 50% 42%, ${hex}cc 0%, ${hex}33 45%, transparent 75%)` }} />
       {!mini && <div aria-hidden className="rayons absolute top-[38%] left-1/2 size-[140%] -translate-x-1/2 -translate-y-1/2" style={{ ['--c' as string]: hex }} />}
-      <div aria-hidden className="absolute bottom-[13%] left-1/2 h-[7%] w-[62%] -translate-x-1/2 rounded-[50%] border-2" style={{ borderColor: hex, boxShadow: `0 0 40px 8px ${hex}88, inset 0 0 24px ${hex}aa` }} />
+      {!model && <div aria-hidden className="absolute bottom-[13%] left-1/2 h-[7%] w-[62%] -translate-x-1/2 rounded-[50%] border-2" style={{ borderColor: hex, boxShadow: `0 0 40px 8px ${hex}88, inset 0 0 24px ${hex}aa` }} />}
 
       {model ? (
         pret && (
@@ -33,7 +33,10 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
             disable-zoom disable-pan shadow-intensity="1.2" shadow-softness=".8" exposure="1.15"
             camera-orbit="0deg 80deg 145%" camera-target="0m auto 0m" field-of-view="30deg" loading={mini ? 'lazy' : 'eager'}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: mini ? 'none' : undefined, cursor: mini ? undefined : 'grab', zIndex: 1, ['--poster-color' as string]: 'transparent',
-              filter: debloque ? `drop-shadow(0 18px 30px ${hex}66)` : 'brightness(0) drop-shadow(0 0 18px #ffffff40)' }} />
+              filter: debloque ? `drop-shadow(0 18px 30px ${hex}66)` : 'brightness(0) drop-shadow(0 0 18px #ffffff40)' }}>
+            <div slot="hotspot-socle" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-hidden className="socle"
+              style={{ ['--c' as string]: hex, filter: debloque ? undefined : 'brightness(0) invert(1) opacity(.35)' }} />
+          </model-viewer>
         )
       ) : image ? (
         <img src={image} alt={nom} className="absolute inset-0 size-full object-cover" />

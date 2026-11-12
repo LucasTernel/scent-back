@@ -2,7 +2,8 @@ import { Fragment, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCaptures, getCollections, getStatues, HEX_RARETE, rangRarete } from '../lib/api'
 import { useData } from '../lib/useData'
-import { Icon, Lapin, rarityLabel } from '../ui'
+import { Icon, rarityLabel } from '../ui'
+import Scene3D from '../components/Scene3D'
 
 const Barre = ({ v, max }: { v: number; max: number }) => (
   <span className="block h-1.5 overflow-hidden rounded-full bg-creme/20"><span className="block h-full rounded-full bg-flamme transition-all duration-700" style={{ width: `${max ? (v / max) * 100 : 0}%` }} /></span>
@@ -101,12 +102,9 @@ export function GalleryCollection() {
               )}
             <li className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
               <Link viewTransition data-vt="zoom" to={`/galerie/${s.id}`} className={`flex flex-col gap-2 rounded-[22px] border-[1.5px] p-2 pb-3 transition active:scale-[.98] ${c ? 'border-trait bg-papier' : 'border-dashed border-trait bg-creme-2/60'}`}>
-                <span style={{ viewTransitionName: `c-${s.id}` }} className={`relative grid aspect-square place-items-center overflow-hidden rounded-[16px] ${c ? 'bg-creme-2' : 'bg-creme-2/70'}`}>
-                  {c
-                    ? img ? <img src={img} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" /> : <Lapin className="w-[64%]" />
-                    : <Icon name="cadenas" size={26} className="text-doux" />}
-                  {c && <span className="absolute top-2 left-2 size-3 rounded-full ring-2 ring-papier" style={{ background: `var(--color-${s.rarity})` }} />}
-                </span>
+                <Scene3D mini rarity={s.rarity} nom={s.name} model={s.model} image={s.model ? undefined : img} debloque={!!c} vt={`c-${s.id}`} className="aspect-square rounded-[16px]">
+                  {!c && <Icon name="cadenas" size={18} className="absolute top-2 right-2 z-10 text-white/70" />}
+                </Scene3D>
                 <span className={`line-clamp-2 px-1 font-serif text-[13px] leading-snug font-bold ${c ? '' : 'text-doux'}`}>{c ? s.name : '? ? ?'}</span>
                 <span className="px-1 text-[11px] text-doux">{s.district} · {s.points} pts</span>
               </Link>
