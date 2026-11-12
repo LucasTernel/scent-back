@@ -160,16 +160,16 @@ function Bougie({ cire = 1, className = '' }: { cire?: number; className?: strin
       </defs>
       <rect x="30" y="300 " width="160" height="6" rx="3" fill="#000" opacity=".25" />
       <rect x="40" y={300 - h} width="140" height={h} fill="url(#cire)" />
-      {!eteinte && <g transform={`translate(110 ${300 - h})`}>
-        <line x1="0" y1="0" x2="0" y2="-14" stroke="#2A1D12" strokeWidth="3" strokeLinecap="round" />
-        <path className="flamme-vive" d="M0 -12 C 14 -30, 10 -52, 0 -72 C -10 -52, -14 -30, 0 -12 Z" fill="url(#flamme)" />
-      </g>}
-      {eteinte && <path d={`M110 ${286} q 6 -20 -2 -40 q -8 -18 4 -36`} stroke="#ffffff55" strokeWidth="3" fill="none" strokeLinecap="round" />}
       <rect x="34" y="96" width="152" height="208" rx="18" fill="url(#verre)" stroke="#ffffff40" strokeWidth="2" />
       <rect x="62" y="170" width="96" height="86" rx="10" fill="#FCF5E3" stroke="#023341" strokeWidth="4" />
       <text x="110" y="205" textAnchor="middle" fontFamily="Outfit, sans-serif" fontSize="15" fill="#023341">RHUM</text>
       <text x="110" y="225" textAnchor="middle" fontFamily="Outfit, sans-serif" fontSize="15" fill="#023341">MARIN</text>
       <rect x="96" y="236" width="28" height="3" rx="1.5" fill="#023341" />
+      {!eteinte && <g transform={`translate(110 ${300 - h})`}>
+        <line x1="0" y1="0" x2="0" y2="-14" stroke="#2A1D12" strokeWidth="3" strokeLinecap="round" />
+        <path className="flamme-vive" d="M0 -12 C 14 -30, 10 -52, 0 -72 C -10 -52, -14 -30, 0 -12 Z" fill="url(#flamme)" />
+      </g>}
+      {eteinte && <path d={`M110 ${286} q 6 -20 -2 -40 q -8 -18 4 -36`} stroke="#ffffff55" strokeWidth="3" fill="none" strokeLinecap="round" />}
     </svg>
   )
 }
@@ -191,11 +191,36 @@ const Chapitre = ({ n, titre, clair = false }: { n: string; titre: string; clair
     <span className="font-serif text-flamme">{n}</span><span aria-hidden className={`h-px flex-1 ${clair ? 'bg-[#FCF5E3]/25' : 'bg-trait'}`} /><span>{titre}</span>
   </div>
 )
-const Bandeau = ({ mots }: { mots: string[] }) => (
-  <div aria-hidden className="overflow-hidden border-y-2 border-[#023341] bg-flamme py-3 text-[#023341]">
-    <div className="defile">{[0, 1].map((k) => <span key={k} className="flex shrink-0">{mots.map((m) => <span key={m} className="titre px-6 text-xl whitespace-nowrap">{m} <span className="pl-6">✦</span></span>)}</span>)}</div>
-  </div>
-)
+/** Loader du site : la cire fond en ~2 s, la flamme s'éteint, puis fondu vers le site. Une fois par session. */
+function LoaderBougie() {
+  const [cire, setCire] = useState(1)
+  const [fini, setFini] = useState(() => {
+    try { return sessionStorage.getItem('loader-vu') === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches } catch { return false }
+  })
+  const [parti, setParti] = useState(fini)
+  useEffect(() => {
+    if (fini) return
+    let raf = 0; const debut = performance.now(), duree = 2200
+    const pas = (now: number) => {
+      const t = Math.min(1, (now - debut) / duree)
+      setCire(1 - (1 - (1 - t) ** 2)) // fonte qui ralentit vers la fin
+      if (t < 1) raf = requestAnimationFrame(pas)
+      else setTimeout(() => { setFini(true); try { sessionStorage.setItem('loader-vu', '1') } catch { /* rien */ } setTimeout(() => setParti(true), 700) }, 450)
+    }
+    raf = requestAnimationFrame(pas)
+    return () => cancelAnimationFrame(raf)
+  }, [fini])
+  if (parti) return null
+  return (
+    <div role="status" aria-label="Chargement de Scent Back" className="fixed inset-0 z-[60] grid place-items-center bg-[#011A22] transition-opacity duration-700" style={{ opacity: fini ? 0 : 1 }}>
+      <div className="flex flex-col items-center gap-6">
+        <Bougie cire={Math.max(cire, .015)} className="w-36" />
+        <img src="/logo-orange.png" alt="" className="-my-8 w-44" />
+        <p className="font-mono text-sm text-[#FCF5E3]/50" aria-hidden>{Math.round(cire * 140)} g</p>
+      </div>
+    </div>
+  )
+}
 
 /** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
@@ -215,6 +240,7 @@ export default function Landing() {
 
   return (
     <SiteDesktop>
+      <LoaderBougie />
       <main id="contenu">
         {/* Ouverture : grand titre + sommaire à gauche, la box dans une arche à droite */}
         <section className="mx-auto grid max-w-6xl gap-12 px-5 pt-10 pb-20 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-end">
@@ -240,7 +266,6 @@ export default function Landing() {
           </div>
         </section>
 
-        <Bandeau mots={['Rhum Marin', 'Assassin\'s Creed IV', '140 g', 'Cire 100 % végétale', 'Coulée en France', 'Pop-up Paris']} />
 
         {/* 01 — Le sens manquant : un tableau, pas des cartes */}
         <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
@@ -336,7 +361,6 @@ export default function Landing() {
           </div>
         </section>
 
-        <Bandeau mots={['La chasse est ouverte', 'Radar', 'Puces NFC', 'Lapins encapuchonnés', 'Pop-up Paris']} />
 
         {/* 04 — La chasse : texte + QR dans une étiquette, aperçu de l'appli */}
         <section id="chasse" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
