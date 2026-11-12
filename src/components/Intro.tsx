@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Logo } from '../ui'
 import { couleurBarre } from '../lib/theme'
 
 /**
@@ -48,11 +47,7 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
         transition: 'clip-path 1s cubic-bezier(.75,0,.2,1), background-color .9s ease-in .1s, opacity .6s ease',
       }}>
       <div className="flex flex-col items-center text-center" style={phase !== 'logo' ? { animation: 'desagrege .45s ease-in forwards' } : undefined}>
-        <div className="pop grid size-40 place-items-center rounded-full bg-flamme shadow-[0_0_0_14px_#FCF5E314]">
-          <Logo className="w-24 text-white" />
-        </div>
-        <img src="/logo-orange.png" alt="Scent Back" className="monte -my-6 w-64" style={{ animationDelay: '.25s' }} />
-        <p className="monte mt-3 text-[11px] font-medium tracking-[.14em] text-creme/70" style={{ animationDelay: '.4s' }}>UBISOFT × LA BELLE MÈCHE</p>
+        <img src="/logo-orange.png" alt="Scent Back" className="pop w-72" />
       </div>
     </div>
   )
