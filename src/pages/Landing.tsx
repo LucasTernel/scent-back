@@ -3,6 +3,7 @@ import { type Lot } from '../lib/api'
 import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
 import Compteur from '../components/Compteur'
+import BoiteOuverture from '../components/BoiteOuverture'
 import Scene3D from '../components/Scene3D'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
@@ -310,16 +311,19 @@ export default function Landing() {
 
         {/* La suite : un chapitre = un écran, chacun avec sa propre animation */}
         <div className="relative z-10 bg-creme">
-          <section className="relative h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
-            <img data-parallax="-.1" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 h-[115%] w-full object-cover opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#011A22] via-[#011A22]/70 to-transparent" />
-            <div className="relative flex h-full max-w-[min(60rem,55vw)] flex-col justify-center px-[8vw]">
+          <section data-boite className="relative h-[260vh] bg-[#011A22] text-[#FCF5E3]" aria-label="La box Assassin's Creed IV en 3D">
+            <div className="sticky top-0 grid h-dvh grid-cols-[1fr_1.15fr] items-center overflow-hidden">
+              <div aria-hidden className="pointer-events-none absolute top-1/2 right-[20%] size-[60vh] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#FF772230,transparent_65%)]" />
+              <div className="relative flex flex-col justify-center pl-[8vw]">
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 01 · La première collection</p>
               <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">Assassin's<br />Creed IV<span className="text-flamme">.</span></h2>
               <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-[#FCF5E3]/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
               <div className="mt-8 flex gap-10 border-t border-[#FCF5E3]/20 pt-6">
                 {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
               </div>
+            </div>
+          
+              <div className="relative h-[85vh]"><BoiteOuverture /></div>
             </div>
           </section>
           <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-encre text-creme"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</p></div>
