@@ -3,6 +3,7 @@ import { type Lot } from '../lib/api'
 import { Icon, LogoMarque } from '../ui'
 import SceneBougie from '../components/SceneBougie'
 import Compteur from '../components/Compteur'
+import Scene3D from '../components/Scene3D'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
@@ -330,17 +331,25 @@ export default function Landing() {
             </div>
           </section>
           <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-flamme text-[#023341]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Et en attendant le jour J ? <span className="text-[#FCF5E3]">La chasse commence déjà</span>, dans les rues de Paris.</p></div>
-          <section data-croise className="relative grid min-h-dvh items-center gap-12 overflow-hidden bg-creme px-[8vw] py-24 text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)] lg:grid-cols-[1.1fr_.9fr]">
+          <section data-croise className="relative grid h-dvh grid-cols-[1fr_auto_auto] items-center gap-[3vw] overflow-hidden bg-creme px-[6vw] text-encre">
             <div>
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 03 · L'application</p>
-              <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">La chasse<br />est ouverte<span className="text-flamme">.</span></h2>
-              <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-doux">Des lapins encapuchonnés cachés dans Paris : un radar qui vibre, une puce NFC à scanner, des points à échanger au pop-up.</p>
-              <div className="mt-8 flex items-center gap-5"><img src="/qr-app.svg" alt="QR code de l'appli Scent Back" className="size-28 rounded-xl border-2 border-encre bg-[#FCF5E3] p-2" /><button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] bg-encre px-6 font-bold text-creme">Installer l'appli</button></div>
+              <h2 className="titre mt-4 text-[min(4.4vw,10vh)] leading-[.9]">La chasse<br />est ouverte<span className="text-flamme">.</span></h2>
+              <p className="mt-5 max-w-[30vw] text-[clamp(1rem,1.1vw,1.5rem)] leading-relaxed text-doux">Des lapins encapuchonnés cachés dans Paris : un radar qui vibre, une puce NFC à scanner, des points à échanger au pop-up.</p>
+              <div className="mt-6 flex items-center gap-5"><img src="/qr-app.svg" alt="QR code de l'appli Scent Back" className="size-[min(7rem,12vh)] rounded-xl border-2 border-encre bg-[#FCF5E3] p-2" /><button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] bg-encre px-6 font-bold text-creme">Installer l'appli</button></div>
             </div>
-            <div className="mx-auto hidden lg:block" aria-hidden>
-              <div className="rounded-[54px] border-4 border-encre bg-[#023341] p-2.5">
-                <div className="relative h-[620px] w-[286px] overflow-hidden rounded-[44px] bg-creme">
-                  <iframe src="/?mobile=1" title="Aperçu de l'appli" tabIndex={-1} loading="lazy" className="pointer-events-none absolute top-0 left-0 h-[844px] w-[390px] origin-top-left scale-[.733] border-0" />
+            <ul className="flex h-[80vh] flex-col justify-center gap-2" aria-label="Quelques lapins à capturer">
+              {([['lapin-revolutionnaire', 'Le Révolutionnaire', 'Bastille', 'commune'], ['lapin-ultimate', 'L\'Ultimate', 'Hôtel de Ville', 'legendaire'], ['lapin-opera', 'Le Fantôme', 'Opéra', 'superrare']] as const).map(([m, nom, lieu, r]) => (
+                <li key={m} className="flex items-center gap-3">
+                  <Scene3D mini rarity={r} nom={nom} model={`/models/${m}.glb`} className="size-[24vh] rounded-[18px]" />
+                  <p><span className="titre block text-[clamp(.9rem,1.1vw,1.4rem)]">{nom}</span><span className="text-sm text-doux">{lieu}</span></p>
+                </li>
+              ))}
+            </ul>
+            <div aria-hidden className="h-[82vh] w-[calc(82vh*.462)]">
+              <div className="size-full rounded-[3.2vh] border-4 border-encre bg-[#023341] p-[1.2vh]">
+                <div className="relative size-full overflow-hidden rounded-[2.6vh] bg-creme">
+                  <iframe src="/?mobile=1" title="Aperçu de l'appli" tabIndex={-1} loading="lazy" className="pointer-events-none absolute top-0 left-0 h-[844px] w-[390px] origin-top-left border-0" style={{ scale: String((innerHeight * .82 - 30) / 844), width: 390 }} />
                 </div>
               </div>
             </div>
