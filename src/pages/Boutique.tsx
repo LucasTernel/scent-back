@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { echangerLot, getBons, getBoutiqueOuverte, getProduits, getLots, getWallet, type Lot } from '../lib/api'
+import { echangerLot, getBons, getBoutiqueOuverte, getProduits, type Categorie, getLots, getWallet, type Lot } from '../lib/api'
 import { secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
 import QrCode from '../components/QrCode'
-import { euros } from './BoutiqueSite'
+import { euros, FiltreCategories } from './BoutiqueSite'
 
 /** Boutique : on échange ses points contre des lots, récupérés au pop-up store avec un bon. */
 export default function Boutique() {
@@ -14,7 +14,9 @@ export default function Boutique() {
   const lots = useData(getLots, v) ?? []
   const bons = useData(getBons, v) ?? []
   const ouverte = useData(getBoutiqueOuverte) ?? false
-  const PRODUITS = useData(getProduits) ?? []
+  const tous = useData(getProduits) ?? []
+  const [cat, setCat] = useState<Categorie | 'tout'>('tout')
+  const PRODUITS = cat === 'tout' ? tous : tous.filter((p) => p.categorie === cat)
   const [choixOnglet, setOnglet] = useState<'boutique' | 'recompenses'>()
   const onglet = ouverte ? choixOnglet ?? 'boutique' : 'recompenses'
   const [qr, setQr] = useState<{ code: string; lot: string }>()
@@ -35,7 +37,7 @@ export default function Boutique() {
     <div className="flex flex-col gap-5">
       <header className="monte flex items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-doux">{onglet === 'boutique' ? 'Box et bougies, retrait au pop-up' : 'Tes points contre des récompenses'}</p>
+          <p className="text-sm font-medium text-doux">{onglet === 'boutique' ? 'Bundles, bougies et savons, retrait au pop-up' : 'Tes points contre des récompenses'}</p>
           <h1 className="titre text-[30px]">{onglet === 'boutique' ? 'Boutique' : 'Récompenses'}</h1>
         </div>
         <p className="flex items-center gap-1.5 rounded-full bg-encre py-2 pr-3.5 pl-3 text-[15px] font-bold text-creme" aria-label={`Solde : ${solde} points`}><Flamme />{solde}</p>
@@ -55,11 +57,12 @@ export default function Boutique() {
       {onglet === 'boutique' ? (
         <section aria-labelledby="produits" className="flex flex-col gap-2.5">
           <h2 id="produits" className="sr-only">La boutique</h2>
+          <FiltreCategories valeur={cat} choisir={setCat} />
           <div className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
             {PRODUITS.map((p) => (
               <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
-                <img src={p.image} alt={p.nom} className={`aspect-square w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-4'}`} />
-                <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-1.5 right-1.5 size-16" />
+                <img src={p.image} alt={p.nom} className="aspect-square w-full object-cover" />
+                {p.categorie !== 'savon' && <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-1.5 right-1.5 size-14" />}
                 <div className="p-3"><p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
               </a>
             ))}

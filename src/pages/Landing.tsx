@@ -381,7 +381,7 @@ export default function Landing() {
             <div className="mt-12 grid gap-6 md:grid-cols-3">
               {(produits ?? []).slice(0, 3).map((p) => (
                 <a key={p.id} href="/boutique" className="group block">
-                  <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]"><img src={p.image} alt={p.nom} className={`aspect-[4/3] w-full transition duration-700 group-hover:scale-105 ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-5'}`} /></div>
+                  <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]"><img src={p.image} alt={p.nom} className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" /></div>
                   <p className="mt-3 flex justify-between gap-3"><span className="titre">{p.nom}</span><span className="font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Bientôt'}</span></p>
                 </a>
               ))}

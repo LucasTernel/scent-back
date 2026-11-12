@@ -2,20 +2,34 @@ import { useEffect, useRef, useState } from 'react'
 import { Etiquette } from './Landing'
 import { Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
-import { getProduits } from '../lib/api'
+import { getProduits, type Categorie } from '../lib/api'
 import { useData } from '../lib/useData'
 
 /** Boutique du site (ordinateur) — démonstration : panier + commande fictive, aucun paiement, aucune donnée bancaire. */
+export const CATEGORIES: [Categorie | 'tout', string][] = [['tout', 'Tout'], ['bundle', 'Bundles'], ['bougie', 'Bougies seules'], ['savon', 'Savons']]
+/** Puces de filtre par catégorie (site et appli). */
+export function FiltreCategories({ valeur, choisir }: { valeur: Categorie | 'tout'; choisir: (c: Categorie | 'tout') => void }) {
+  return (
+    <div role="group" aria-label="Catégories" className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
+      {CATEGORIES.map(([k, l]) => (
+        <button key={k} aria-pressed={valeur === k} onClick={() => choisir(k)}
+          className={`min-h-11 shrink-0 rounded-full border-[1.5px] px-4 text-sm font-bold transition ${valeur === k ? 'border-flamme bg-flamme text-[#023341]' : 'border-trait text-doux hover:border-encre'}`}>{l}</button>
+      ))}
+    </div>
+  )
+}
 export const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 type Panier = Record<string, number>
 const lirePanier = (): Panier => { try { return JSON.parse(localStorage.getItem('panier') || '{}') } catch { return {} } }
 
 export default function BoutiqueSite() {
-  const PRODUITS = useData(getProduits) ?? []
+  const tous = useData(getProduits) ?? []
+  const [cat, setCat] = useState<Categorie | 'tout'>('tout')
+  const PRODUITS = cat === 'tout' ? tous : tous.filter((p) => p.categorie === cat)
   const [panier, setPanier] = useState<Panier>(lirePanier)
   const [commande, setCommande] = useState<{ num: string; total: number }>()
   useEffect(() => { try { localStorage.setItem('panier', JSON.stringify(panier)) } catch { /* rien */ } }, [panier])
-  const lignes = PRODUITS.filter((p) => panier[p.id])
+  const lignes = tous.filter((p) => panier[p.id])
   const total = lignes.reduce((s, p) => s + p.prix * panier[p.id], 0)
   const nb = lignes.reduce((s, p) => s + panier[p.id], 0)
   const changer = (id: string, d: number) => setPanier((pa) => { const q = Math.max(0, Math.min(9, (pa[id] ?? 0) + d)); const n = { ...pa, [id]: q }; if (!q) delete n[id]; return n })
@@ -31,14 +45,15 @@ export default function BoutiqueSite() {
         <p className="rounded-[10px] border-2 border-dashed border-trait px-4 py-2 text-sm text-doux">Boutique de démonstration · aucun paiement</p>
       </div>
 
-      <div className="mt-12 grid items-start gap-10 lg:grid-cols-[1fr_340px]">
+      <div className="mt-8"><FiltreCategories valeur={cat} choisir={setCat} /></div>
+      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_340px]">
         <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2">
           {PRODUITS.map((p) => (
             <li key={p.id}>
               <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="30%" arche="1.7rem">
                 <div className="relative overflow-hidden rounded-[10px] bg-white">
-                  <img src={p.image} alt={p.nom} loading="lazy" className={`aspect-[4/3] w-full ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
-                  <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-3 right-3 size-20" />
+                  <img src={p.image} alt={p.nom} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+                  {p.categorie !== 'savon' && <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-3 right-3 size-20" />}
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
                 </div>
                 <h2 className="titre mt-4 text-xl leading-tight">{p.nom}</h2>

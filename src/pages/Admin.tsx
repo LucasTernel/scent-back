@@ -1,5 +1,5 @@
 import ScanQr from '../components/ScanQr'
-import { euros } from './BoutiqueSite'
+import { CATEGORIES, euros } from './BoutiqueSite'
 import QrCode from '../components/QrCode'
 import { renderSVG } from 'uqr'
 import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
@@ -537,7 +537,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
     try {
       const image = img?.size ? await uploadMedia(img) : p?.image ?? ''
       const id = p?.id ?? nom.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre })
+      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'] })
       fini()
     } catch (err) { alert((err as Error).message) }
     setBusy(false)
@@ -550,6 +550,11 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
         <Champ label="Prix (€)" name="prix" type="number" step="0.01" min="0" defaultValue={p?.prix} required />
         <Champ label="Ordre d'affichage" name="ordre" type="number" min="1" defaultValue={ordre} />
       </div>
+      <label className="flex flex-col gap-1 text-xs font-bold text-doux">Catégorie
+        <select name="categorie" defaultValue={p?.categorie ?? 'bougie'} className="champ">
+          {CATEGORIES.filter(([k]) => k !== 'tout').map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+        </select>
+      </label>
       <Champ label={p?.image ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" required={!p} />
       <label className="flex items-center justify-between gap-3 rounded-2xl bg-creme-2 px-4 py-3 text-sm font-bold">Disponible à la commande<input type="checkbox" name="dispo" defaultChecked={p?.dispo ?? true} className="size-6" /></label>
       <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
@@ -591,7 +596,7 @@ function AdminPermanente() {
           {produits.map((p) => (
             <li key={p.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === p.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
               <div className="relative">
-                <img src={p.image} alt="" className={`aspect-[4/3] w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
+                <img src={p.image} alt="" className="aspect-[4/3] w-full object-cover" />
                 {!p.dispo && <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-[11px] font-bold text-[#FCF5E3]">Prochainement</span>}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-3">
