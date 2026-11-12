@@ -103,7 +103,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-creme text-encre">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b-2 border-encre px-5 py-3 md:px-8">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b border-trait px-5 py-3 md:px-8">
         <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><LogoMarque className="h-full w-full scale-[2] object-contain" /></a>
         <div className="flex items-center gap-2">
         <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-encre px-4 text-sm font-bold transition hover:bg-[#023341] hover:text-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>
@@ -177,7 +177,7 @@ function Bougie({ cire = 1, className = '' }: { cire?: number; className?: strin
 }
 
 /** Cadre en forme d'étiquette Scent Back (arche en haut, contour épais). */
-export function Etiquette({ children, couleur = '#023341', fond = '#FCF5E3', larg = '38%', arche = '2.6rem', className = '', corps = '' }: {
+export function Etiquette({ children, couleur = 'var(--color-encre)', fond = 'var(--color-papier)', larg = '38%', arche = '2.6rem', className = '', corps = '' }: {
   children: React.ReactNode; couleur?: string; fond?: string; larg?: string; arche?: string; className?: string; corps?: string
 }) {
   return (
@@ -196,7 +196,8 @@ const Chapitre = ({ n, titre, clair = false }: { n: string; titre: string; clair
 /** Loader : la vraie bougie 3D tourne, flamme allumée ; la barre suit le chargement réel du modèle.
  *  Se ferme quand c'est prêt (min 1,6 s), au plus tard après 5 s, au clic ou avec Échap. Une fois par session. */
 function LoaderBougie() {
-  const [fini, setFini] = useState(() => { try { return sessionStorage.getItem('loader-vu') === '1' } catch { return false } })
+  // affiché à chaque arrivée sur le site (sauf si l'utilisateur réduit les animations)
+  const [fini, setFini] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [parti, setParti] = useState(fini)
   const [prog, setProg] = useState(0)
   const mv = useRef<HTMLElement>(null)
@@ -251,12 +252,14 @@ function Defi() {
             <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
               <Chapitre n="03" titre="Le défi" />
               <div className="mt-10 grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr]">
-                <Etiquette className="mx-auto w-full max-w-[300px]" corps="p-6 pt-4" larg="44%">
-                  <Bougie cire={1 - p} className="mx-auto w-44" />
-                  <p className="mt-3 text-center text-xs font-bold tracking-[.18em] text-doux uppercase">Rhum Marin — {Math.round((1 - p) * 140)} g</p>
-                </Etiquette>
+                <div className="flex flex-col">
+                  <p className="text-xs font-bold tracking-[.22em] text-doux uppercase">Cire restante</p>
+                  <p className="titre text-[min(14vw,26vh)] leading-[.85] tabular-nums" aria-live="off">{Math.round((1 - p) * 140)}<span className="text-[.35em] text-flamme">g</span></p>
+                  <div className="mt-6 h-3 w-full max-w-sm overflow-hidden border-2 border-encre" aria-hidden><div className="h-full bg-encre" style={{ width: `${(1 - p) * 100}%` }} /></div>
+                  <p className="mt-3 text-sm text-doux">Rhum Marin · 140 g de cire 100 % végétale</p>
+                </div>
                 <div>
-                  <h2 id="titre-defi" className="titre text-[clamp(2rem,4vw,3.4rem)] leading-[1.02]">Finirez-vous le jeu avant la dernière goutte ?</h2>
+                  <h2 id="titre-defi" className="titre text-[min(3.4rem,4vw,6.5vh)] leading-[1.02]">Finirez-vous le jeu avant la dernière goutte ?</h2>
                   <p className="mt-4 max-w-xl text-lg leading-relaxed text-doux">Le poids de la bougie est calculé au plus juste pour brûler pendant toute la durée du jeu.</p>
                   <ol className="mt-8 border-t-2 border-encre">
                     {etapesDefi.map(([t, d], i) => (
@@ -287,7 +290,7 @@ export default function Landing() {
   const lots = useData(getLots) ?? []
   const [demo, setDemo] = useState<Lot>()
   const racine = useRef<HTMLElement>(null)
-  const [loaderAffiche] = useState(() => { try { return sessionStorage.getItem('loader-vu') !== '1' } catch { return true } })
+  const [loaderAffiche] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches)
   useEffect(() => {
     import('@google/model-viewer')
     let stop = () => {}
@@ -300,40 +303,40 @@ export default function Landing() {
       <LoaderBougie />
       <main id="contenu" ref={racine} data-curseur>
         {/* Ouverture en grille de blocs (réf. August & Piers) : titre + arche « Boutique » | bougie 3D | box + « Installer l'appli » */}
-        <section data-ouverture className="grid min-h-[calc(100dvh-5.5rem)] grid-cols-[1.15fr_1fr_.85fr] grid-rows-[1fr_auto] bg-[#011A22] text-[#FCF5E3]">
-          <div className="relative row-span-2 flex flex-col justify-between gap-8 border-r border-[#FCF5E3]/15 p-10 pb-0">
+        <section data-ouverture className="grid min-h-[calc(100dvh-5.5rem)] grid-cols-[1.15fr_1fr_.85fr] grid-rows-[1fr_auto] border-b border-trait bg-creme text-encre">
+          <div className="relative row-span-2 flex flex-col justify-between gap-8 border-r border-trait p-10 pb-0">
             <p className="text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
             <div>
               <h1 data-split={loaderAffiche ? 'loader' : ''} className="titre text-[clamp(3rem,6.4vw,6.4rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
-              <p className="mt-6 max-w-sm leading-relaxed text-[#FCF5E3]/75">Ces mondes, vous les avez parcourus pendant des heures… mais vous ne les avez jamais sentis. Une box, un jeu culte, une bougie qui a l'odeur de son monde.</p>
+              <p className="mt-6 max-w-sm leading-relaxed text-doux">Ces mondes, vous les avez parcourus pendant des heures… mais vous ne les avez jamais sentis. Une box, un jeu culte, une bougie qui a l'odeur de son monde.</p>
             </div>
-            <a href="/boutique" className="grid h-28 place-items-center rounded-t-[999px] border-x border-t border-[#FCF5E3]/30 transition hover:bg-flamme hover:text-[#023341]">
+            <a href="/boutique" className="grid h-28 place-items-center rounded-t-[999px] border-x border-t border-encre/30 transition hover:bg-flamme hover:text-[#023341]">
               <span className="titre text-2xl tracking-wide">Boutique →</span>
             </a>
           </div>
-          <div className="relative row-span-2 overflow-hidden border-r border-[#FCF5E3]/15 bg-[radial-gradient(circle_at_50%_45%,#16323d,#011A22_70%)]">
+          <div className="relative row-span-2 overflow-hidden border-r border-trait bg-[radial-gradient(circle_at_50%_45%,var(--color-creme-2),var(--color-creme)_70%)]">
             <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D" auto-rotate auto-rotate-delay="0" rotation-per-second="12deg" interaction-prompt="none" disable-zoom
-                camera-orbit="20deg 72deg 150%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" data-bougie-hero
+                camera-orbit="20deg 72deg 210%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" data-bougie-hero
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
                 <div slot="progress-bar" />
                 <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
               </model-viewer>
-            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.2em] text-[#FCF5E3]/60 uppercase">Rhum Marin · 140 g</p>
+            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.2em] text-doux uppercase">Rhum Marin · 140 g</p>
           </div>
           <img src="/site/box.webp" alt="La box Assassin's Creed IV Black Flag" className="size-full min-h-0 object-cover object-[30%_50%]" />
-          <button onClick={ouvrirTuto} className="flex items-center justify-between gap-4 border-t border-[#FCF5E3]/15 p-8 text-left transition hover:bg-flamme hover:text-[#023341]">
+          <button onClick={ouvrirTuto} className="flex items-center justify-between gap-4 border-t border-trait p-8 text-left transition hover:bg-flamme hover:text-[#023341]">
             <span><span className="block text-xs font-bold tracking-[.2em] uppercase opacity-70">L'appli de chasse</span><span className="titre mt-1 block text-2xl">Installer l'appli</span></span>
             <Icon name="nfc" size={28} />
           </button>
         </section>
 
         {/* La collab (réf. « Our philosophy ») : mots géants, la bougie 3D penchée en travers */}
-        <section className="relative overflow-hidden bg-[#011A22] py-28 text-[#FCF5E3]">
+        <section className="relative overflow-hidden bg-encre py-28 text-creme">
           <div className="relative mx-auto max-w-6xl px-8">
-            <p data-glisse className="titre text-[clamp(4rem,11vw,10rem)] leading-[.88]">UBISOFT</p>
-            <p data-glisse className="titre texte-contour text-right text-[clamp(4rem,11vw,10rem)] leading-[.88]">× LA BELLE</p>
-            <p data-glisse className="titre text-[clamp(4rem,11vw,10rem)] leading-[.88]">MÈCHE</p>
-            <div className="pointer-events-none absolute top-1/2 left-[52%] h-[420px] w-[340px] -translate-1/2 rotate-[-14deg]">
+            <p className="titre text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">UBISOFT</p>
+            <p className="titre texte-contour text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">× LA BELLE</p>
+            <p className="titre text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">MÈCHE<span className="text-flamme">.</span></p>
+            <div className="pointer-events-none absolute top-1/2 -right-6 h-[380px] w-[260px] -translate-y-1/2 rotate-[-12deg]">
               <model-viewer src="/models/bougie-rhum-marin.glb" alt="" auto-rotate auto-rotate-delay="0" rotation-per-second="0deg" interaction-prompt="none" disable-zoom
                 camera-orbit="-10deg 70deg 150%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" 
                 style={{ width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
@@ -344,12 +347,12 @@ export default function Landing() {
           </div>
           <div className="mx-auto mt-16 grid max-w-6xl gap-10 px-8 md:grid-cols-2">
             <p className="apparait text-xl leading-relaxed">La Belle Mèche coule des bougies parfumées naturelles en France. Ubisoft crée des mondes. Les deux font voyager : l'un par l'image et le son, l'autre par l'odeur et la lumière.</p>
-            <p className="apparait leading-relaxed text-[#FCF5E3]/70" style={{ ['--d' as string]: '.12s' }}>Notre collaboration remet au goût du jour les jeux cultes d'Ubisoft : chaque box réunit un jeu et une bougie au parfum de son univers, calculée pour brûler le temps de l'aventure. Premier pack : Assassin's Creed. Ensuite, chaque grande licence aura le sien dans la collection All Stars.</p>
+            <p className="apparait leading-relaxed text-creme/70" style={{ ['--d' as string]: '.12s' }}>Notre collaboration remet au goût du jour les jeux cultes d'Ubisoft : chaque box réunit un jeu et une bougie au parfum de son univers, calculée pour brûler le temps de l'aventure. Premier pack : Assassin's Creed. Ensuite, chaque grande licence aura le sien dans la collection All Stars.</p>
           </div>
         </section>
 
         {/* Photo plein cadre */}
-        <figure className="bg-[#011A22]">
+        <figure className="bg-encre">
           <img src="/site/box.webp" alt="La box Scent Back sur un bureau de joueur : l'écrin Assassin's Creed, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="h-[88vh] w-full object-cover" />
         </figure>
 
@@ -375,7 +378,7 @@ export default function Landing() {
         {/* Règle d'or : chiffre géant en contour */}
         <section className="border-y-2 border-encre bg-papier">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-[1.3fr_1fr]">
-            <p className="apparait chiffre-contour titre text-[clamp(6rem,16vw,13rem)] leading-[.85] text-encre">3–4h</p>
+            <p className="apparait chiffre-contour titre text-[clamp(5rem,12vw,11rem)] leading-[.85] whitespace-nowrap text-encre">3–4h</p>
             <div className="apparait" style={{ ['--d' as string]: '.12s' }}>
               <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">La règle d'or</p>
               <p className="mt-4 text-xl leading-relaxed">Comme dans tout bon jeu, il y a une règle : ne laissez jamais votre bougie allumée plus de 3 à 4 heures d'affilée.</p>
@@ -385,19 +388,19 @@ export default function Landing() {
         </section>
 
         {/* Le pop-up store */}
-        <section id="popup" className="bg-[#011A22] text-[#FCF5E3]">
+        <section id="popup" className="bg-encre text-creme">
           <div className="mx-auto max-w-6xl px-8 pt-28">
             <Chapitre n="04" titre="Le pop-up store" clair />
             <h2 className="apparait titre mt-10 text-[clamp(3rem,8vw,7rem)] leading-[.88]">Paris.<br /><span className="text-flamme">En vrai.</span></h2>
           </div>
-          <div className="mx-auto mt-16 grid max-w-6xl border-t border-[#FCF5E3]/15 md:grid-cols-3">
+          <div className="mx-auto mt-16 grid max-w-6xl border-t border-creme/15 md:grid-cols-3">
             {[['Sentir', 'Toutes les bougies de la collection, à respirer avant de choisir. Le rhum marin, la figue tabacée… et les surprises à venir.'],
               ['Jouer', 'Les box Scent Back à manipuler, les jeux en démo, et les statuettes des lapins encapuchonnés à retrouver dans Paris.'],
               ['Récupérer', 'Vos commandes de la boutique et les lots gagnés dans l\'appli, avec votre bon. La communauté se retrouve ici.']].map(([t, d], i) => (
-              <div key={t} className={`apparait p-10 ${i ? 'md:border-l border-[#FCF5E3]/15' : ''}`} style={{ ['--d' as string]: `${i * .1}s` }}>
+              <div key={t} className={`apparait p-10 ${i ? 'md:border-l border-creme/15' : ''}`} style={{ ['--d' as string]: `${i * .1}s` }}>
                 <p className="font-serif text-sm font-bold text-flamme">0{i + 1}</p>
                 <h3 className="titre mt-3 text-4xl">{t}</h3>
-                <p className="mt-4 leading-relaxed text-[#FCF5E3]/70">{d}</p>
+                <p className="mt-4 leading-relaxed text-creme/70">{d}</p>
               </div>
             ))}
           </div>
@@ -435,9 +438,9 @@ export default function Landing() {
         </section>
 
         {/* Shop (réf.) : rangée de produits + lots en points */}
-        <section id="boutique" className="bg-[#011A22] py-28 text-[#FCF5E3]">
+        <section id="boutique" className="bg-encre py-28 text-creme">
           <div className="mx-auto max-w-6xl px-8">
-            <div className="flex items-end justify-between gap-6 border-b border-[#FCF5E3]/20 pb-6">
+            <div className="flex items-end justify-between gap-6 border-b border-creme/20 pb-6">
               <h2 className="titre text-[clamp(3rem,7vw,6rem)] leading-[.88]">Shop<span className="text-flamme">.</span></h2>
               <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique et commander →</a>
             </div>
@@ -445,7 +448,7 @@ export default function Landing() {
               {PRODUITS.map((pr, i) => (
                 <li key={pr.id} className="apparait group" style={{ ['--d' as string]: `${i * .08}s` }}>
                   <a href="/boutique" className="block">
-                    <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]">
+                    <div className="overflow-hidden rounded-[14px] bg-creme">
                       <img src={pr.image} alt={pr.nom} loading="lazy" className={`aspect-[4/5] w-full transition duration-700 group-hover:scale-105 ${pr.id === 'box-ac4' ? 'object-cover' : 'object-contain p-6'}`} />
                     </div>
                     <div className="mt-4 flex items-baseline justify-between gap-3"><p className="titre text-lg">{pr.nom}</p><p className="font-bold text-flamme">{pr.dispo ? euros(pr.prix) : 'Bientôt'}</p></div>
@@ -453,20 +456,20 @@ export default function Landing() {
                 </li>
               ))}
             </ul>
-            <p className="mt-12 border-t border-[#FCF5E3]/20 pt-6 text-sm text-[#FCF5E3]/60">Et dans l'appli : les points de la chasse s'échangent contre des lots ({lots.map((l) => l.name).join(', ')}) à récupérer au pop-up.</p>
+            <p className="mt-12 border-t border-creme/20 pt-6 text-sm text-creme/60">Et dans l'appli : les points de la chasse s'échangent contre des lots ({lots.map((l) => l.name).join(', ')}) à récupérer au pop-up.</p>
           </div>
         </section>
 
         {/* Fin : la phrase signature dans une grande étiquette */}
-        <section className="bg-[#011A22] px-5 py-28">
-          <Etiquette className="apparait mx-auto max-w-3xl" corps="flex flex-col items-center gap-6 px-8 py-14 text-center text-[#023341]" larg="30%" arche="3.4rem">
+        <section className="bg-encre px-5 py-28">
+          <Etiquette className="apparait mx-auto max-w-3xl" corps="flex flex-col items-center gap-6 px-8 py-14 text-center text-encre" larg="30%" arche="3.4rem">
             <Bougie className="w-20" />
             <p className="titre text-[clamp(2.4rem,5vw,4.4rem)] leading-none">Scent Back.</p>
-            <span aria-hidden className="block h-[3px] w-12 bg-[#023341]" />
+            <span aria-hidden className="block h-[3px] w-12 bg-encre" />
             <p className="max-w-lg text-xl leading-relaxed">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
-              <a href="#box" className="min-h-12 content-center rounded-[10px] bg-[#023341] px-7 font-bold text-[#FCF5E3]">Voir la box</a>
-              <button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-[#023341] px-7 font-bold">Installer l'appli</button>
+              <a href="#box" className="min-h-12 content-center rounded-[10px] bg-encre px-7 font-bold text-creme">Voir la box</a>
+              <button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-encre px-7 font-bold">Installer l'appli</button>
             </div>
           </Etiquette>
         </section>

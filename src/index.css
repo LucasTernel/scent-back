@@ -166,7 +166,8 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 /* bandeau qui défile */
 .defile { display: flex; width: max-content; animation: defile 38s linear infinite; }
 @keyframes defile { to { translate: -50% 0; } }
-.chiffre-contour { color: transparent; -webkit-text-stroke: 2px currentColor; }
+/* contour : la couleur du trait est explicite (currentColor vaudrait « transparent ») */
+.chiffre-contour { color: transparent; -webkit-text-stroke: 2px var(--color-encre); }
 @media (prefers-reduced-motion: reduce) { .defile { animation: none; } }
 
 /* Curseur personnalisé du site vitrine */
@@ -174,7 +175,7 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
   mix-blend-mode: difference; opacity: 0; transition: width .25s, height .25s, margin .25s, opacity .3s; }
 .curseur.curseur-vu { opacity: 1; }
 .curseur.curseur-actif { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
-.texte-contour { color: transparent; -webkit-text-stroke: 2px #FCF5E3; }
+.texte-contour { color: transparent; -webkit-text-stroke: 2px var(--color-creme); }
 
 /* Flamme accrochée à la mèche de la bougie 3D (hotspot model-viewer) */
 .flamme-3d { pointer-events: none; width: 1px; height: 1px; }

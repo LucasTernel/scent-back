@@ -87,7 +87,7 @@ export async function lancerAnimations(racine: HTMLElement) {
     const ouverture = racine.querySelector<HTMLElement>('[data-ouverture]')
     if (bougie && ouverture) {
       const etat = { x: 0, y: 0 }
-      const vers = gsap.quickTo(etat, 'x', { duration: 1.2, ease: 'power3', onUpdate: () => bougie.setAttribute('camera-orbit', `${20 + etat.x * 40}deg ${74 - etat.y * 10}deg 165%`) })
+      const vers = gsap.quickTo(etat, 'x', { duration: 1.2, ease: 'power3', onUpdate: () => bougie.setAttribute('camera-orbit', `${20 + etat.x * 40}deg ${72 - etat.y * 10}deg 210%`) })
       const versY = gsap.quickTo(etat, 'y', { duration: 1.2, ease: 'power3' })
       ouverture.addEventListener('pointermove', (e) => { const r = ouverture.getBoundingClientRect(); vers((e.clientX - r.left) / r.width - .5); versY((e.clientY - r.top) / r.height - .5) })
       bougie.removeAttribute('auto-rotate')

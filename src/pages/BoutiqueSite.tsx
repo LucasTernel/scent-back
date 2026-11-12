@@ -37,7 +37,7 @@ export default function BoutiqueSite() {
         <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2">
           {PRODUITS.map((p) => (
             <li key={p.id}>
-              <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="30%" arche="1.7rem" fond="#FFFCF4">
+              <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="30%" arche="1.7rem">
                 <div className="relative overflow-hidden rounded-[10px] bg-white">
                   <img src={p.image} alt={p.nom} loading="lazy" className={`aspect-[4/3] w-full ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
@@ -59,7 +59,7 @@ export default function BoutiqueSite() {
 
         {/* Panier */}
         <aside aria-labelledby="titre-panier" className="lg:sticky lg:top-6">
-          <Etiquette corps="p-5" larg="34%" arche="1.6rem" fond="#FFFCF4">
+          <Etiquette corps="p-5" larg="34%" arche="1.6rem">
             <h2 id="titre-panier" className="titre flex items-center justify-between text-xl">Panier <span className="font-sans text-sm font-bold text-doux">{nb} article{nb > 1 ? 's' : ''}</span></h2>
             {lignes.length === 0
               ? <p className="mt-4 text-sm text-doux">Ton panier est vide. Ajoute une box ou une bougie.</p>
@@ -106,7 +106,7 @@ function Confirmation({ num, total, fermer }: { num: string; total: number; ferm
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="cmd-titre" className="fixed inset-0 z-50 grid place-items-center bg-[#023341]/70 p-5" onClick={fermer}>
       <div onClick={(e) => e.stopPropagation()} className="pop w-full max-w-md">
-        <Etiquette corps="flex flex-col items-center gap-4 p-8 text-center" larg="30%" arche="2rem" fond="#FFFCF4">
+        <Etiquette corps="flex flex-col items-center gap-4 p-8 text-center" larg="30%" arche="2rem">
           <span className="grid size-14 place-items-center rounded-full bg-flamme text-2xl text-[#023341]"><Icon name="boutique" size={26} /></span>
           <h2 id="cmd-titre" className="titre text-2xl">Commande confirmée</h2>
           <p className="text-doux">Ta commande de <b className="text-encre">{euros(total)}</b> t'attend au pop-up store.</p>
