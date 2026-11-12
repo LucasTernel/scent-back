@@ -2,20 +2,19 @@ import { useEffect, useRef } from 'react'
 
 /** Catalogue d'avatars : têtes de Lapins Crétins (rendus des modèles 3D) et jeux Ubisoft. L'id est stocké dans profiles.avatar_url. */
 const LAPINS = ['revolutionnaire', 'ultimate', 'opera', 'louvre', 'eiffel', 'ndame', 'marais', 'montm', 'arc', 'canal', 'luxem', 'panth', 'pneuf']
-// ponytail: tuiles typographiques aux couleurs des jeux ; remplacer par les vrais logos (public/avatars/jeux/<id>.png) si on les a
-const JEUX: [id: string, nom: string, court: string, fond: string, texte: string][] = [
-  ['ac', 'Assassin\'s Creed', 'AC', '#7A1F1F', '#F2E6D0'],
-  ['farcry', 'Far Cry', 'FC', '#E8501C', '#1A1A1A'],
-  ['rayman', 'Rayman', 'RAY', '#5B3AA8', '#FFD23F'],
-  ['pop', 'Prince of Persia', 'PoP', '#1C3F7A', '#E9C46A'],
-  ['watchdogs', 'Watch Dogs', 'WD', '#101820', '#21D07A'],
-  ['r6', 'Rainbow Six', 'R6', '#2B2D42', '#EDF2F4'],
-  ['justdance', 'Just Dance', 'JD', '#E0218A', '#FFFFFF'],
-  ['splinter', 'Splinter Cell', 'SC', '#0B3D0B', '#7CFC00'],
-  ['anno', 'Anno', 'ANNO', '#C8A15A', '#2B1B0E'],
-  ['crew', 'The Crew', 'CREW', '#D7263D', '#FFFFFF'],
-  ['forhonor', 'For Honor', 'FH', '#3D3D3D', '#C9A227'],
-  ['lapins', 'The Lapins Crétins', 'BWAAH', '#F7B32B', '#023341'],
+// Logos officiels (Wikimedia Commons) dans public/avatars/jeux/<id>.png, posés sur un fond qui les fait ressortir
+const JEUX: [id: string, nom: string, fond: string][] = [
+  ['ac', 'Assassin\'s Creed IV Black Flag', '#FFFFFF'],
+  ['farcry', 'Far Cry', '#E8501C'],
+  ['rayman', 'Rayman', '#3B2A7A'],
+  ['pop', 'Prince of Persia', '#E9C46A'],
+  ['watchdogs', 'Watch Dogs', '#21D07A'],
+  ['r6', 'Rainbow Six', '#EDF2F4'],
+  ['justdance', 'Just Dance', '#FF4FA3'],
+  ['splinter', 'Splinter Cell', '#4A4A4A'],
+  ['crew', 'The Crew', '#F2C14E'],
+  ['bge', 'Beyond Good & Evil', '#1B2A1B'],
+  ['ubisoft', 'Ubisoft', '#FFFFFF'],
 ]
 export const AVATARS = [...LAPINS.map((l) => `lapin:${l}`), ...JEUX.map((j) => `jeu:${j[0]}`)]
 
@@ -26,11 +25,7 @@ export function Avatar({ id, className = 'size-16' }: { id: string; className?: 
   const [type, cle] = id.split(':')
   if (type === 'lapin') return <span className={`block overflow-hidden rounded-[22%] bg-[radial-gradient(circle_at_50%_35%,#0E5A70,#023341)] ${className}`}><img src={`/avatars/lapin-${cle}.png`} alt="" className="size-full object-cover" /></span>
   const j = JEUX.find((x) => x[0] === cle) ?? JEUX[0]
-  return (
-    <span className={`grid place-items-center overflow-hidden rounded-[22%] [container-type:inline-size] ${className}`} style={{ background: j[3], color: j[4] }}>
-      <span className="titre leading-none" style={{ fontSize: `${j[2].length > 4 ? 18 : j[2].length > 3 ? 22 : 30}cqw` }}>{j[2]}</span>
-    </span>
-  )
+  return <span className={`grid place-items-center overflow-hidden rounded-[22%] p-[12%] ${className}`} style={{ background: j[2] }}><img src={`/avatars/jeux/${j[0]}.png`} alt="" className="max-h-full max-w-full object-contain" /></span>
 }
 const nomDe = (id: string) => { const [t, c] = id.split(':'); return t === 'lapin' ? `Lapin ${c}` : JEUX.find((x) => x[0] === c)?.[1] ?? c }
 
