@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getBoutiqueOuverte, type Lot } from '../lib/api'
+import { getBoutiqueOuverte, getPopup, type Lot } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
@@ -261,6 +261,7 @@ function LoaderBougie() {
 /** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
   const boutique = useBoutique()
+  const popup = useData(getPopup)
   useApparition()
   useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
   const [demo, setDemo] = useState<Lot>()
@@ -335,9 +336,12 @@ export default function Landing() {
           <section data-cercle className="relative grid min-h-dvh place-items-center bg-flamme px-[8vw] py-24 text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div>
               <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
-              <h2 className="titre mt-4 text-[clamp(3.4rem,8vw,11rem)] leading-[.85]">13 novembre 2027<span className="text-[#FCF5E3]">.</span></h2>
-              <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>
-              <div className="mt-10"><Compteur /></div>
+              <h2 className="titre mt-4 text-[clamp(3.4rem,8vw,11rem)] leading-[.85]">{new Date(popup?.date ?? '2027-11-13T10:00:00+01:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<span className="text-[#FCF5E3]">.</span></h2>
+              {popup?.annonce
+                ? <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(popup.adresse)}`} target="_blank" rel="noopener" className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#023341] px-5 py-2.5 text-[clamp(1rem,1.4vw,1.6rem)] font-bold text-[#FCF5E3]"><Icon name="lieu" size={20} />{popup.adresse}</a>
+                : <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>}
+              <div className="mt-10"><Compteur date={popup?.date ?? '2027-11-13T10:00:00+01:00'} /></div>
+              {popup?.affiche && <img src={popup.affiche} alt="Affiche du pop-up store Scent Back" className="mx-auto mt-10 max-h-[60vh] rounded-[18px] shadow-2xl" />}
               <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>
           </section>

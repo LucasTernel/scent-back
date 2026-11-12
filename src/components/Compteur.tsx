@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 
 /** Compte à rebours en volets (flip clock) jusqu'au pop-up. */
-const CIBLE = new Date('2027-11-13T10:00:00+01:00').getTime()
-const reste = () => {
-  const s = Math.max(0, Math.floor((CIBLE - Date.now()) / 1000))
+const reste = (cible: number) => {
+  const s = Math.max(0, Math.floor((cible - Date.now()) / 1000))
   return { jours: Math.floor(s / 86400), heures: Math.floor(s / 3600) % 24, minutes: Math.floor(s / 60) % 60, secondes: s % 60 }
 }
 
@@ -24,9 +23,10 @@ function Volet({ valeur, label }: { valeur: number; label: string }) {
   )
 }
 
-export default function Compteur() {
-  const [r, setR] = useState(reste)
-  useEffect(() => { const id = setInterval(() => setR(reste()), 1000); return () => clearInterval(id) }, [])
+export default function Compteur({ date }: { date: string }) {
+  const cible = new Date(date).getTime()
+  const [r, setR] = useState(() => reste(cible))
+  useEffect(() => { setR(reste(cible)); const id = setInterval(() => setR(reste(cible)), 1000); return () => clearInterval(id) }, [cible])
   return (
     <div role="timer" aria-label={`Ouverture dans ${r.jours} jours, ${r.heures} heures, ${r.minutes} minutes`} className="flex flex-wrap justify-center gap-[clamp(.75rem,1.5vw,1.5rem)]">
       <Volet valeur={r.jours} label="Jours" /><Volet valeur={r.heures} label="Heures" /><Volet valeur={r.minutes} label="Minutes" /><Volet valeur={r.secondes} label="Secondes" />

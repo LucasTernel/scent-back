@@ -340,3 +340,17 @@ export async function getProfilAmi(pseudo: string): Promise<ProfilAmi | null> {
   const { data } = await supabase.rpc('profil_ami', { pseudo })
   return data ?? null
 }
+
+/** Pop-up store : date, lieu (affiché seulement une fois annoncé), affiche. */
+export type Popup = { annonce: boolean; adresse: string; date: string; affiche: string | null }
+const POPUP_DEFAUT: Popup = { annonce: false, adresse: '23 Rue de Bretagne, 75003 Paris', date: '2027-11-13T10:00:00+01:00', affiche: null }
+export async function getPopup(): Promise<Popup> {
+  if (MOCK) return { ...POPUP_DEFAUT, ...JSON.parse(localStorage.getItem('popup') ?? '{}') }
+  const { data } = await supabase.from('reglages').select('valeur').eq('cle', 'popup').maybeSingle()
+  return { ...POPUP_DEFAUT, ...(data?.valeur ?? {}) }
+}
+export async function setPopup(p: Popup) {
+  if (MOCK) return localStorage.setItem('popup', JSON.stringify(p))
+  const { error } = await supabase.from('reglages').upsert({ cle: 'popup', valeur: p })
+  if (error) throw error
+}

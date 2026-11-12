@@ -5,7 +5,7 @@ import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue, enregistrerLot, getLots, supprimerLot, validerBon, type Lot,
-  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte } from '../lib/api'
+  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte, getPopup, setPopup } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
@@ -476,6 +476,46 @@ function FormLot({ lot, fini }: { lot?: Lot; fini: () => void }) {
   )
 }
 
+/** Pop-up store : date, lieu (annoncé ou non), affiche PNG. */
+function AdminPopup() {
+  const [v, setV] = useState(0)
+  const p = useData(getPopup, v)
+  const [busy, setBusy] = useState(false)
+  const [ok, setOk] = useState('')
+  if (!p) return null
+  async function enregistrer(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); setBusy(true); setOk('')
+    const f = new FormData(e.currentTarget), img = f.get('affiche') as File
+    try {
+      const affiche = f.get('sansAffiche') ? null : img?.size ? await uploadMedia(img) : p!.affiche
+      const date = String(f.get('date'))
+      await setPopup({ annonce: f.get('annonce') === 'on', adresse: String(f.get('adresse')).trim(), date: date ? new Date(date).toISOString() : p!.date, affiche })
+      setV(v + 1); setOk('Pop-up enregistré ✓')
+    } catch (err) { setOk((err as Error).message) }
+    setBusy(false)
+  }
+  const local = new Date(new Date(p.date).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+  return (
+    <Carton className="p-4">
+      <h2 className="titre text-xl">Pop-up store</h2>
+      <p className="mb-3 text-xs text-doux">Affiché sur la page d'accueil du site, avec le compte à rebours.</p>
+      <form onSubmit={enregistrer} className="flex flex-col gap-3">
+        <Champ label="Date et heure d'ouverture" name="date" type="datetime-local" defaultValue={local} />
+        <Champ label="Adresse" name="adresse" defaultValue={p.adresse} />
+        <label className="flex items-center justify-between gap-3 rounded-2xl bg-creme-2 px-4 py-3 text-sm font-bold">
+          Lieu annoncé (adresse visible sur le site)
+          <input type="checkbox" name="annonce" defaultChecked={p.annonce} className="size-6 accent-[var(--color-flamme)]" />
+        </label>
+        {p.affiche && <img src={p.affiche} alt="Affiche actuelle" className="max-h-56 self-start rounded-xl" />}
+        <Champ label={p.affiche ? 'Nouvelle affiche (PNG, laisser vide pour garder)' : 'Affiche (PNG)'} name="affiche" type="file" accept="image/png,image/jpeg,image/webp" />
+        {p.affiche && <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="sansAffiche" /> Retirer l'affiche</label>}
+        <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
+        {ok && <p role="status" className="text-sm font-bold">{ok}</p>}
+      </form>
+    </Carton>
+  )
+}
+
 export function AdminBoutique() {
   const [v, setV] = useState(0)
   const lots = useData(getLots, v) ?? []
@@ -525,6 +565,8 @@ export function AdminBoutique() {
           ))}
         </dl>
       </section>
+
+      <AdminPopup />
 
       {/* Valider un bon : format ticket */}
       <section className="monte relative rounded-[24px] bg-flamme p-5 text-[#023341]">
