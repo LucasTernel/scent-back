@@ -15,16 +15,16 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 // Points de vue (unités de la scène : la bougie fait ~0,93 de haut). cible.x décale la bougie à l'écran.
 // Caméra presque toujours de face : seul le cadrage glisse (cible.x), peu de rotation → pas de tournis
-// Bougie fixe au centre : la caméra ne fait que s'approcher / reculer (aucun mouvement latéral)
+// Cadrage doux : la bougie glisse du côté opposé au texte (sans tourner autour), pour ne jamais le recouvrir
 const VUES: { pos: [number, number, number]; cible: [number, number, number] }[] = [
-  { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },   // 0 · Fermez les yeux
-  { pos: [0, 0.6, 3.4], cible: [0, 0.45, 0] },  // 1 · manifeste
-  { pos: [0, 0.6, 3.4], cible: [0, 0.45, 0] },  // 2 · voir / entendre / sentir
-  { pos: [0, 1.1, 3.0], cible: [0, 0.55, 0] },  // 3 · la mèche
-  { pos: [0, 0.5, 3.0], cible: [0, 0.46, 0] },  // 4 · l'étiquette
-  { pos: [0, 0.7, 3.2], cible: [0, 0.42, 0] },  // 5 · le défi
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },   // 6 · règle d'or
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },   // 7+ : la scène s'efface
+  { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },          // 0 · Fermez les yeux (texte dessous)
+  { pos: [0.2, 0.7, 2.8], cible: [-0.55, 0.45, 0] },   // 1 · manifeste : texte à gauche → bougie à droite
+  { pos: [-0.2, 0.7, 2.8], cible: [0.55, 0.45, 0] },   // 2 · voir/entendre/sentir : texte à droite
+  { pos: [0.2, 1.2, 2.5], cible: [-0.5, 0.55, 0] },    // 3 · la mèche : texte à gauche
+  { pos: [-0.15, 0.5, 2.3], cible: [0.5, 0.46, 0] },   // 4 · l'étiquette : texte à droite
+  { pos: [0.2, 0.8, 2.6], cible: [-0.55, 0.42, 0] },   // 5 · le défi : texte à gauche
+  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },          // 6 · règle d'or (texte en haut)
+  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },

@@ -34,7 +34,9 @@
   </head>
   <body>
     <div id="root">
-      <main style="max-width:640px;margin:0 auto;padding:40px 20px;font-family:system-ui,sans-serif;color:#023341">
+      <!-- écran affiché le temps que l'appli démarre (même fond que le loader) ; le texte reste lisible pour les robots -->
+      <div style="position:fixed;inset:0;background:#023341;display:grid;place-items:center"><img src="/logo-orange.png" alt="" width="220" /></div>
+      <main style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
         <img src="/logo-bleu.png" alt="Scent Back" width="160" />
         <h1>Scent Back — la chasse aux lapins encapuchonnés</h1>
         <p>Scent Back est un jeu de chasse urbaine : trouve les statuettes cachées dans Paris, scanne leur puce NFC, prends-les en photo et complète ta collection pour gagner des points au pop-up store. Projet étudiant réalisé dans le cadre d'une SAE du BUT MMI.</p>
