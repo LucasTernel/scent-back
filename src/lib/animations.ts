@@ -77,6 +77,12 @@ export async function lancerAnimations(racine: HTMLElement) {
       ScrollTrigger.create({ ...st, onUpdate: (s) => mv?.setAttribute('camera-orbit', `${-30 + s.progress * 390}deg ${80 - s.progress * 12}deg 150%`) })
       sec.querySelectorAll('[data-glisse]').forEach((el, i) => gsap.fromTo(el, { xPercent: i % 2 ? 25 : -25 }, { xPercent: i % 2 ? -25 : 25, ease: 'none', scrollTrigger: st }))
     })
+    // Texte qui s'allume mot par mot au défilement (réf. Lando Norris)
+    racine.querySelectorAll<HTMLElement>('[data-mots]').forEach((el) => {
+      el.dataset.origine ??= el.textContent ?? ''
+      el.replaceChildren(...el.dataset.origine.split(/(\s+)/).map((m) => { const s = document.createElement('span'); s.textContent = m; if (m.trim()) s.className = 'mot'; return s }))
+      gsap.fromTo(el.querySelectorAll('.mot'), { opacity: .14 }, { opacity: 1, stagger: .08, ease: 'none', scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true } })
+    })
     // Mots géants qui glissent en sens opposés au défilement (hors section lapin)
     racine.querySelectorAll<HTMLElement>('[data-glisse]').forEach((el, i) => {
       if (el.closest('[data-lapin]')) return

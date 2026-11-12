@@ -182,3 +182,9 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .flamme-3d span { position: absolute; left: 50%; bottom: 0; width: 22px; height: 46px; translate: -50% 0; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
   background: radial-gradient(ellipse at 50% 78%, #FFF6CC 0%, #FFC24A 38%, #FF7722 72%, transparent 100%);
   transform-origin: 50% 100%; animation: vacille 2.4s ease-in-out infinite; filter: drop-shadow(0 0 10px #FFB347) drop-shadow(0 0 30px #FF772288); }
+
+/* Repères de l'anatomie, accrochés au modèle 3D */
+.repere { display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.repere-actif { opacity: 1; }
+.repere-point { width: 14px; height: 14px; border-radius: 50%; background: #FF7722; box-shadow: 0 0 0 6px #FF772240; }
+.repere-texte { white-space: nowrap; border-radius: 8px; background: var(--color-encre); color: var(--color-creme); padding: 6px 12px; font: 700 13px var(--font-sans); translate: 0 0; }

@@ -283,6 +283,51 @@ function Defi() {
   )
 }
 
+/** Anatomie de la bougie (réf. Opal Tadpole) : la bougie 3D reste à l'écran, la caméra va d'un détail à l'autre
+ *  au fil du défilement, et une étiquette accrochée au modèle pointe la partie décrite. */
+const ETAPES_ANATOMIE: { titre: string; texte: string; orbite: string; cible: string; point?: string }[] = [
+  { titre: 'Une bougie, un monde.', texte: 'Rhum Marin, la bougie d\'Assassin\'s Creed IV Black Flag : l\'odeur des Caraïbes, du bois des navires et des embruns.', orbite: '20deg 72deg 270%', cible: '0m 0.05m 0m' },
+  { titre: 'La mèche.', texte: 'En coton. Une fois allumée, elle compte le temps avec vous : la bougie est pensée pour brûler toute la durée du jeu.', orbite: '10deg 30deg 175%', cible: '0m 0.075m 0m', point: '0m 0.085m 0m' },
+  { titre: 'L\'étiquette.', texte: 'En arche, comme toutes les bougies Scent Back. Un nom de parfum par licence, le logo de la collab, et le grammage.', orbite: '0deg 84deg 180%', cible: '0m 0.047m 0m', point: '0m 0.06m 0.039m' },
+  { titre: 'La cire.', texte: '140 g de cire 100 % végétale, coulée en France par La Belle Mèche, dans un verre épais à garder une fois la partie terminée.', orbite: '70deg 64deg 215%', cible: '0m 0.05m 0m', point: '0.034m 0.07m 0m' },
+]
+function Anatomie() {
+  const [ref, p] = useProgression()
+  const n = Math.min(ETAPES_ANATOMIE.length - 1, Math.floor(p * ETAPES_ANATOMIE.length))
+  const e = ETAPES_ANATOMIE[n]
+  return (
+    <section ref={ref} className="relative h-[400vh] bg-creme" aria-label="Anatomie de la bougie Rhum Marin">
+      <div className="sticky top-0 grid h-dvh grid-cols-[1fr_1.1fr] items-center overflow-hidden">
+        <div className="relative h-full">
+          <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Rhum Marin en 3D, vue détail par détail" camera-orbit={e.orbite} camera-target={e.cible}
+            field-of-view="26deg" exposure="1.1" shadow-intensity="1" interaction-prompt="none" disable-zoom interpolation-decay="160"
+            style={{ width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
+            <div slot="progress-bar" />
+            <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
+            {ETAPES_ANATOMIE.map((x, i) => x.point && (
+              <div key={x.titre} slot={`hotspot-${i}`} data-position={x.point} aria-hidden className={`repere ${i === n ? 'repere-actif' : ''}`}>
+                <span className="repere-point" /><span className="repere-texte">{x.titre.replace('.', '')}</span>
+              </div>
+            ))}
+          </model-viewer>
+        </div>
+        <div className="pr-[max(2rem,calc((100vw-72rem)/2+2rem))]">
+          <Chapitre n="✦" titre="Anatomie" />
+          <ol className="mt-10 flex flex-col gap-1" aria-live="polite">
+            {ETAPES_ANATOMIE.map((x, i) => (
+              <li key={x.titre} className={`border-l-2 py-4 pl-6 transition-all duration-500 ${i === n ? 'border-flamme' : 'border-trait opacity-30'}`}>
+                <p className="font-serif text-xs font-bold text-flamme">0{i + 1}</p>
+                <h3 className={`titre leading-tight transition-all duration-500 ${i === n ? 'text-[clamp(2rem,3.6vw,3.2rem)]' : 'text-2xl'}`}>{x.titre}</h3>
+                <p className={`overflow-hidden text-lg leading-relaxed text-doux transition-all duration-500 ${i === n ? 'mt-3 max-h-40' : 'max-h-0'}`}>{x.texte}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 /** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
   useApparition()
@@ -346,10 +391,12 @@ export default function Landing() {
             </div>
           </div>
           <div className="mx-auto mt-16 grid max-w-6xl gap-10 px-8 md:grid-cols-2">
-            <p className="apparait text-xl leading-relaxed">La Belle Mèche coule des bougies parfumées naturelles en France. Ubisoft crée des mondes. Les deux font voyager : l'un par l'image et le son, l'autre par l'odeur et la lumière.</p>
+            <p data-mots className="text-[clamp(1.4rem,2.2vw,2rem)] leading-snug">La Belle Mèche coule des bougies parfumées naturelles en France. Ubisoft crée des mondes. Les deux font voyager : l'un par l'image et le son, l'autre par l'odeur et la lumière.</p>
             <p className="apparait leading-relaxed text-creme/70" style={{ ['--d' as string]: '.12s' }}>Notre collaboration remet au goût du jour les jeux cultes d'Ubisoft : chaque box réunit un jeu et une bougie au parfum de son univers, calculée pour brûler le temps de l'aventure. Premier pack : Assassin's Creed. Ensuite, chaque grande licence aura le sien dans la collection All Stars.</p>
           </div>
         </section>
+
+        <Anatomie />
 
         {/* Photo plein cadre */}
         <figure className="bg-encre">
