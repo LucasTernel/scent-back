@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { type Lot } from '../lib/api'
-import { Icon, LogoMarque } from '../ui'
+import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
 import Compteur from '../components/Compteur'
 import Scene3D from '../components/Scene3D'
@@ -98,20 +98,22 @@ function Accessibilite({ rond = false }: { rond?: boolean }) {
 }
 
 /** Habillage des pages vues sur ordinateur (landing, pages légales) : en-tête + pied, responsive. */
-export function SiteDesktop({ children }: { children: React.ReactNode }) {
+export function SiteDesktop({ children, sansEntete = false }: { children: React.ReactNode; sansEntete?: boolean }) {
   const [tuto, setTuto] = useState(false)
   useEffect(() => { const f = () => setTuto(true); addEventListener('tuto-installation', f); return () => removeEventListener('tuto-installation', f) }, [])
   return (
     <div className="flex min-h-dvh flex-col bg-creme text-encre">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b border-trait px-5 py-3 md:px-8">
-        <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><LogoMarque className="h-full w-full scale-[2] object-contain" /></a>
-        <div className="flex items-center gap-2">
-        <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-encre px-4 text-sm font-bold transition hover:bg-[#023341] hover:text-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>
-        <Accessibilite />
-        <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-[#023341] px-4 text-sm font-bold text-[#FCF5E3] transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
+      {/* En-tête : bandeau bleu de la charte (#023341), logo orange, deux actions */}
+      {!sansEntete && <header className="relative z-20 bg-[#023341] text-[#FCF5E3]">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3 md:px-8">
+          <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><img src="/logo-orange.png" alt="Scent Back" className="h-full w-full scale-[2] object-contain" /></a>
+          <nav aria-label="Actions" className="flex items-center gap-2">
+            <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-[#FCF5E3]/40 px-4 text-sm font-bold transition hover:border-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>
+            <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-flamme px-5 text-sm font-bold text-[#023341] transition hover:brightness-110"><Icon name="nfc" size={18} />Installer l'appli</button>
+          </nav>
         </div>
-      </header>
+      </header>}
       <div className="flex-1">{children}</div>
       <footer className="relative z-10 overflow-hidden bg-[#011A22] text-[#FCF5E3]">
         <div className="mx-auto grid max-w-6xl gap-12 px-8 pt-20 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
@@ -265,7 +267,7 @@ export default function Landing() {
   }, [])
 
   return (
-    <SiteDesktop>
+    <SiteDesktop sansEntete>
       <LoaderBougie />
       <main id="contenu" ref={racine} data-curseur>
         {/* L'expérience : la bougie 3D dans le noir (canvas fixe), le récit défile par-dessus */}
