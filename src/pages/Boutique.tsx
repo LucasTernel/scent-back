@@ -14,6 +14,8 @@ export default function Boutique() {
   const lots = useData(getLots, v) ?? []
   const bons = useData(getBons, v) ?? []
   const ouverte = useData(getBoutiqueOuverte) ?? false
+  const [choixOnglet, setOnglet] = useState<'boutique' | 'recompenses'>()
+  const onglet = ouverte ? choixOnglet ?? 'boutique' : 'recompenses'
   const [qr, setQr] = useState<{ code: string; lot: string }>()
   const [choix, setChoix] = useState<string>() // lot en attente de confirmation
   const [busy, setBusy] = useState(false)
@@ -32,14 +34,38 @@ export default function Boutique() {
     <div className="flex flex-col gap-5">
       <header className="monte flex items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-doux">Tes points contre des récompenses</p>
-          <h1 className="titre text-[30px]">{ouverte ? 'Boutique' : 'Récompenses'}</h1>
+          <p className="text-sm font-medium text-doux">{onglet === 'boutique' ? 'Box et bougies, retrait au pop-up' : 'Tes points contre des récompenses'}</p>
+          <h1 className="titre text-[30px]">{onglet === 'boutique' ? 'Boutique' : 'Récompenses'}</h1>
         </div>
         <p className="flex items-center gap-1.5 rounded-full bg-encre py-2 pr-3.5 pl-3 text-[15px] font-bold text-creme" aria-label={`Solde : ${solde} points`}><Flamme />{solde}</p>
       </header>
 
+      {ouverte && (
+        <div role="tablist" aria-label="Boutique ou récompenses" className="relative grid grid-cols-2 rounded-full bg-creme-2 p-1">
+          <span aria-hidden className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-encre transition-transform duration-300 ${onglet === 'recompenses' ? 'translate-x-full' : ''}`} />
+          {([['boutique', 'Boutique'], ['recompenses', 'Récompenses']] as const).map(([k, l]) => (
+            <button key={k} role="tab" aria-selected={onglet === k} onClick={() => setOnglet(k)} className={`relative min-h-11 rounded-full text-sm font-bold transition-colors ${onglet === k ? 'text-creme' : 'text-doux'}`}>{l}</button>
+          ))}
+        </div>
+      )}
+
       {msg && <p role="alert" className="rounded-2xl bg-sceau/10 px-4 py-3 text-sm font-medium text-sceau">{msg}</p>}
 
+      {onglet === 'boutique' ? (
+        <section aria-labelledby="produits" className="flex flex-col gap-2.5">
+          <h2 id="produits" className="sr-only">La boutique</h2>
+          <div className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+            {PRODUITS.map((p) => (
+              <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
+                <img src={p.image} alt={p.nom} className={`aspect-square w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-4'}`} />
+                <BoutonSentir id={p.id} nom={p.nom} className="absolute top-1.5 right-1.5 size-16" />
+                <div className="p-3"><p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
+              </a>
+            ))}
+          </div>
+          <p className="text-xs text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche.</p>
+        </section>
+      ) : (<>
       {bons.length > 0 && (
         <section className="monte flex flex-col gap-2.5" aria-labelledby="bons">
           <h2 id="bons" className="font-serif text-lg font-bold">Mes bons</h2>
@@ -57,24 +83,8 @@ export default function Boutique() {
         </section>
       )}
 
-      {ouverte && (
-        <section aria-labelledby="produits" className="flex flex-col gap-2.5">
-          <h2 id="produits" className="font-serif text-lg font-bold">La boutique</h2>
-          <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none]">
-            {PRODUITS.map((p) => (
-              <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative w-56 shrink-0 overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
-                <img src={p.image} alt={p.nom} className={`aspect-square w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-4'}`} />
-                <BoutonSentir id={p.id} nom={p.nom} className="absolute top-2 right-2 size-20" />
-                <div className="p-3"><p className="font-serif leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
-              </a>
-            ))}
-          </div>
-          <p className="text-xs text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche.</p>
-        </section>
-      )}
-
       <section aria-labelledby="lots" className="flex flex-col gap-2.5">
-        <h2 id="lots" className={`font-serif text-lg font-bold ${ouverte ? '' : 'sr-only'}`}>Récompenses <span className="text-sm font-normal text-doux">· contre tes points</span></h2>
+        <h2 id="lots" className="sr-only">Récompenses <span className="text-sm font-normal text-doux">· contre tes points</span></h2>
         <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
           {lots.map((l, i) => {
             const manque = l.cost - solde, ok = manque <= 0 && l.stock > 0
@@ -103,6 +113,7 @@ export default function Boutique() {
           })}
         </ul>
       </section>
+      </>)}
 
       {qr && (
         <div role="dialog" aria-modal="true" aria-labelledby="qr-titre" className="fixed inset-0 z-50 grid place-items-center bg-encre/80 p-6" onClick={() => setQr(undefined)}>

@@ -516,6 +516,37 @@ function AdminPopup() {
   )
 }
 
+/** Configuration de l'appli : boutique permanente (+ fiches senteurs) et pop-up store. */
+export function AdminReglages() {
+  const [v, setV] = useState(0)
+  const ouverte = useData(getBoutiqueOuverte, v) ?? false
+  const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
+  return (
+    <div className="flex flex-col gap-5">
+      <Tete sous="Espace admin" titre="Réglages" desc="Configuration de l'appli et du site." />
+      <section className="monte relative overflow-hidden rounded-[28px] bg-[#023341] p-5 text-[#FCF5E3]">
+        <span aria-hidden className="absolute -top-16 -right-16 size-48 rounded-full bg-flamme/25 blur-2xl" />
+        <div className="relative flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-bold tracking-[.2em] text-flamme uppercase">Boutique permanente</p>
+            <p className="titre mt-1 text-2xl">{ouverte ? 'Ouverte' : 'Fermée'}</p>
+            <p className="mt-1 max-w-[16rem] text-xs opacity-70">{ouverte ? 'Box et bougies visibles sur le site et dans l\'appli.' : 'Produits masqués partout. Les récompenses restent actives.'}</p>
+          </div>
+          <button role="switch" aria-checked={ouverte} aria-label="Boutique permanente ouverte" onClick={basculer}
+            className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${ouverte ? 'bg-flamme' : 'bg-[#FCF5E3]/25'}`}>
+            <span className={`absolute top-1 left-1 size-7 rounded-full bg-[#FCF5E3] shadow transition-transform ${ouverte ? 'translate-x-7' : ''}`} />
+          </button>
+        </div>
+      </section>
+      <AdminPopup />
+      <section className="flex flex-col gap-3">
+        <h2 className="titre text-xl">« Cliquez pour sentir »</h2>
+        <AdminSenteurs />
+      </section>
+    </div>
+  )
+}
+
 export function AdminBoutique() {
   const [v, setV] = useState(0)
   const lots = useData(getLots, v) ?? []
@@ -524,8 +555,6 @@ export function AdminBoutique() {
   const [bon, setBon] = useState<{ ok: boolean; texte: string }>()
   const [scan, setScan] = useState(false)
   const fini = () => { setEdition(undefined); setV(v + 1) }
-  const ouverte = useData(getBoutiqueOuverte, v) ?? false
-  const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
 
   async function valider(e: FormEvent) {
     e.preventDefault()
@@ -543,30 +572,13 @@ export function AdminBoutique() {
   const stock = lots.reduce((s, l) => s + l.stock, 0), ruptures = lots.filter((l) => l.stock === 0).length
   return (
     <div className="flex flex-col gap-5">
-      <Tete sous="Espace admin" titre="Boutique" />
+      <Tete sous="Espace admin" titre="Récompenses" desc="Les lots échangés contre des points, et la validation des bons au pop-up." />
 
-      {/* Bandeau : état de la boutique + chiffres clés */}
-      <section className="monte relative overflow-hidden rounded-[28px] bg-[#023341] p-5 text-[#FCF5E3]">
-        <span aria-hidden className="absolute -top-16 -right-16 size-48 rounded-full bg-flamme/25 blur-2xl" />
-        <div className="relative flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-bold tracking-[.2em] text-flamme uppercase">Boutique en ligne</p>
-            <p className="titre mt-1 text-2xl">{ouverte ? 'Ouverte' : 'Fermée'}</p>
-            <p className="mt-1 max-w-[16rem] text-xs opacity-70">{ouverte ? 'Produits visibles sur le site et dans l\'appli.' : 'Produits masqués partout. Les récompenses restent actives.'}</p>
-          </div>
-          <button role="switch" aria-checked={ouverte} aria-label="Boutique en ligne ouverte" onClick={basculer}
-            className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${ouverte ? 'bg-flamme' : 'bg-[#FCF5E3]/25'}`}>
-            <span className={`absolute top-1 left-1 size-7 rounded-full bg-[#FCF5E3] shadow transition-transform ${ouverte ? 'translate-x-7' : ''}`} />
-          </button>
-        </div>
-        <dl className="relative mt-5 grid grid-cols-3 gap-2">
-          {[['Récompenses', lots.length], ['En stock', stock], ['Ruptures', ruptures]].map(([k, n]) => (
-            <div key={k} className="rounded-[16px] bg-[#FCF5E3]/8 p-3"><dd className={`titre text-2xl ${k === 'Ruptures' && n ? 'text-flamme' : ''}`}>{n}</dd><dt className="text-[11px] font-bold opacity-70">{k}</dt></div>
-          ))}
-        </dl>
-      </section>
-
-      <AdminPopup />
+      <dl className="monte grid grid-cols-3 gap-2">
+        {[['Récompenses', lots.length], ['En stock', stock], ['Ruptures', ruptures]].map(([k, n]) => (
+          <div key={k} className="rounded-[18px] bg-[#023341] p-3 text-[#FCF5E3]"><dd className={`titre text-2xl ${k === 'Ruptures' && n ? 'text-flamme' : ''}`}>{n}</dd><dt className="text-[11px] font-bold opacity-70">{k}</dt></div>
+        ))}
+      </dl>
 
       {/* Valider un bon : format ticket */}
       <section className="monte relative rounded-[24px] bg-flamme p-5 text-[#023341]">
@@ -620,10 +632,6 @@ export function AdminBoutique() {
         </ul>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="titre text-xl">« Cliquez pour sentir »</h2>
-        <AdminSenteurs />
-      </section>
     </div>
   )
 }
