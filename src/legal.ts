@@ -32,10 +32,10 @@ export const pages: Record<string, { titre: string; court: string; intro: string
     titre: 'Conditions générales de vente', court: 'CGV', intro: 'Les conditions qui s\'appliquent aux réservations faites sur la boutique Scent Back.',
     sections: [
       ['Boutique de démonstration', 'Scent Back est un projet étudiant pédagogique. La boutique en ligne est une démonstration : aucune commande n\'est facturée, aucun paiement n\'est demandé et aucune coordonnée bancaire n\'est collectée.'],
-      ['Produits', '• Box Assassin\'s Creed IV Black Flag : le jeu, la bougie Rhum Marin 140 g et l\'écrin.\n• Bougie Rhum Marin, 140 g de cire végétale.\n• Bougie Figue Tabacée, 70 g (prochainement).\nLes visuels sont non contractuels.'],
+      ['Produits', '• Bundles : un jeu PS5, sa bougie 140 g et son écrin (Assassin\'s Creed IV Black Flag, Prince of Persia : The Lost Crown, The Division, All Stars).\n• Bougies seules 140 g, cire 100 % végétale.\n• Savons Bwaaah en forme de Lapin Crétin.\nLes visuels sont non contractuels.'],
       ['Prix', 'Les prix sont affichés en euros, toutes taxes comprises. Ils sont indicatifs dans le cadre de ce prototype.'],
       ['Réservation', 'Ajoutez vos produits au panier puis validez : un numéro de réservation vous est attribué. Il ne s\'agit pas d\'un contrat de vente.'],
-      ['Retrait', 'Les réservations se retirent au pop-up store Ubisoft × La Belle Mèche, à Paris, à partir du 13 novembre 2027. Le lieu sera communiqué prochainement.'],
+      ['Retrait', 'Les réservations se retirent au pop-up store Ubisoft × La Belle Mèche, à Paris, à partir du 13 novembre 2027, au pop-up store de Paris. Les précommandes (ex. All Stars Bundle) sont livrées à la date indiquée sur la fiche du produit.'],
       ['Lots de l\'application', 'Les lots obtenus avec les points de la chasse (autocollants, tote bag, bougies…) sont gratuits, dans la limite des stocks, et se retirent au pop-up sur présentation du bon.'],
       ['Droit de rétractation', 'Aucune vente n\'étant conclue, le droit de rétractation ne s\'applique pas. Dans une version commerciale, vous disposeriez de 14 jours pour vous rétracter (Code de la consommation, art. L221-18).'],
       ['Sécurité des bougies', 'Ne laissez jamais une bougie allumée plus de 3 à 4 heures d\'affilée, ni sans surveillance. Tenez-la hors de portée des enfants et des animaux, sur un support stable et loin de tout objet inflammable.'],

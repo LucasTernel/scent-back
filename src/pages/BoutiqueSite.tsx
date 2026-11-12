@@ -249,33 +249,33 @@ export function FicheProduit({ mobile = false }: { mobile?: boolean }) {
   return (
     <main id="contenu" className={mobile ? '-mx-5 -mt-4 flex flex-col' : ''}>
       {/* Bandeau : visuel sur fond flouté de lui-même */}
-      <section className="relative overflow-hidden bg-[#011A22] text-[#FCF5E3]">
-        <img src={p.image} alt="" aria-hidden className="absolute inset-0 size-full scale-125 object-cover opacity-50 blur-3xl" />
+      <section className="relative overflow-hidden bg-creme text-encre">
+        <img src={p.image} alt="" aria-hidden className="absolute inset-0 size-full scale-125 object-cover opacity-35 blur-3xl dark:opacity-50" />
         <div className={`relative mx-auto grid max-w-6xl items-center gap-8 ${mobile ? 'px-5 pt-4 pb-8' : 'px-8 py-14 lg:grid-cols-[1.25fr_1fr] lg:gap-14'}`}>
           <div className="relative">
-            <Link to="/boutique" viewTransition className="mb-4 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-[#FCF5E3]/80"><Icon name="retour" size={18} />Boutique</Link>
-            <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[28px] shadow-[0_30px_80px_rgba(0,0,0,.45)] ring-1 ring-white/10" />
+            <Link to="/boutique" viewTransition className="mb-4 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-encre/80"><Icon name="retour" size={18} />Boutique</Link>
+            <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[28px] shadow-[0_30px_80px_rgba(0,0,0,.45)] ring-1 ring-encre/10" />
             {p.epuise && <span className="absolute inset-0 top-14 grid place-items-center"><span className="titre -rotate-6 rounded-[14px] bg-flamme px-6 py-3 text-3xl text-[#023341] shadow-2xl">Sold out</span></span>}
           </div>
           <div className="flex flex-col gap-5">
             <div className="flex flex-wrap gap-2">
-              {p.licence && <span className="rounded-full bg-[#FCF5E3]/12 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{p.licence}</span>}
-              <span className="rounded-full bg-[#FCF5E3]/12 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{CATEGORIES.find(([k]) => k === p.categorie)?.[1]}</span>
+              {p.licence && <span className="rounded-full bg-encre/10 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{p.licence}</span>}
+              <span className="rounded-full bg-encre/10 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{CATEGORIES.find(([k]) => k === p.categorie)?.[1]}</span>
               {p.licence === 'All Stars' && <span className="rounded-full bg-flamme px-3 py-1 text-xs font-bold text-[#023341]">1 000 exemplaires</span>}
             </div>
             <h1 className="titre text-[clamp(2.2rem,4.2vw,3.8rem)] leading-[.95]">{p.nom}</h1>
-            <p className="max-w-md text-lg leading-relaxed text-[#FCF5E3]/75">{p.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
+            <p className="max-w-md text-lg leading-relaxed text-encre/75">{p.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
             <div className="flex items-end gap-4">
               <p className="titre text-5xl">{euros(p.prix)}</p>
-              <p className="pb-1.5 text-sm text-[#FCF5E3]/60">TTC</p>
+              <p className="pb-1.5 text-sm text-encre/60">TTC</p>
             </div>
-            <div className={`flex items-center gap-3 rounded-[18px] p-4 ${achetable ? 'bg-flamme/15 ring-1 ring-flamme/40' : 'bg-[#FCF5E3]/8'}`}>
-              <span className={`size-3 shrink-0 rounded-full ${achetable ? 'bg-flamme shadow-[0_0_0_4px_rgba(255,119,34,.25)]' : 'bg-[#FCF5E3]/40'}`} />
-              <p><b>{statut[0]}</b><span className="block text-sm text-[#FCF5E3]/70">{statut[1]}</span></p>
+            <div className={`flex items-center gap-3 rounded-[18px] p-4 ${achetable ? 'bg-flamme/15 ring-1 ring-flamme/40' : 'bg-encre/8'}`}>
+              <span className={`size-3 shrink-0 rounded-full ${achetable ? 'bg-flamme shadow-[0_0_0_4px_rgba(255,119,34,.25)]' : 'bg-encre/40'}`} />
+              <p><b>{statut[0]}</b><span className="block text-sm text-encre/70">{statut[1]}</span></p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {!mobile && achetable && (panier[p.id]
-                ? <><div className="rounded-[12px] bg-[#FCF5E3] px-2 py-1.5 text-[#023341]"><Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} /></div><Link to="/panier" className="min-h-12 content-center rounded-[12px] bg-flamme px-6 font-bold text-[#023341]">Voir le panier →</Link></>
+                ? <><div className="rounded-[12px] bg-papier px-2 py-1.5"><Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} /></div><Link to="/panier" className="min-h-12 content-center rounded-[12px] bg-flamme px-6 font-bold text-[#023341]">Voir le panier →</Link></>
                 : <button onClick={() => changer(p.id, 1)} className="min-h-14 flex-1 rounded-[14px] bg-flamme px-8 text-lg font-bold text-[#023341] transition hover:brightness-110 sm:flex-none">{p.precommande ? 'Précommander' : 'Ajouter au panier'}</button>)}
               <BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="!min-h-14 !px-6 !text-base" />
             </div>
