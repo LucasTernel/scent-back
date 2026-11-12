@@ -16,8 +16,10 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
   rarity: Rarity; nom: string; model?: string | null; image?: string | null; debloque?: boolean; mini?: boolean; className?: string; vt?: string; children?: ReactNode
 }) {
   const hex = HEX[rarity]
+  // vignettes : rendu fixe du modèle (public/avatars/corps) — 13 modèles 3D à la fois saturent Safari/iPhone
+  const vignette = mini ? model?.match(/(lapin-[a-z0-9-]+)\.glb/)?.[1] : undefined
   const [pret, setPret] = useState(false)
-  useEffect(() => { if (model) import('@google/model-viewer').then(() => setPret(true)) }, [model])
+  useEffect(() => { if (model && !vignette) import('@google/model-viewer').then(() => setPret(true)) }, [model, vignette])
 
   return (
     <div className={`cq relative overflow-hidden bg-[#011A22] ${className}`} style={vt ? { viewTransitionName: vt } : undefined}>
@@ -25,7 +27,13 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
       {!mini && <div aria-hidden className="rayons absolute top-[38%] left-1/2 size-[140%] -translate-x-1/2 -translate-y-1/2" style={{ ['--c' as string]: hex }} />}
       {!model && <div aria-hidden className="absolute bottom-[13%] left-1/2 h-[7%] w-[62%] -translate-x-1/2 rounded-[50%] border-2" style={{ borderColor: hex, boxShadow: `0 0 40px 8px ${hex}88, inset 0 0 24px ${hex}aa` }} />}
 
-      {model ? (
+      {vignette ? (
+        <>
+          <div aria-hidden className="socle absolute bottom-[8%] left-1/2 -translate-x-1/2" style={{ ['--c' as string]: hex, width: '58%', aspectRatio: '58 / 13', filter: debloque ? undefined : 'brightness(0) invert(1) opacity(.35)' }} />
+          <img src={`/avatars/corps/${vignette}.webp`} alt={debloque ? nom : 'Silhouette d\'une statuette mystère'} loading="lazy"
+            className="absolute inset-0 size-full object-contain" style={{ filter: debloque ? `drop-shadow(0 14px 22px ${hex}66)` : 'brightness(0) drop-shadow(0 0 14px #ffffff40)' }} />
+        </>
+      ) : model ? (
         pret && (
           <>
           {/* socle derrière le modèle (un hotspot HTML passait devant le canvas) */}
