@@ -86,7 +86,7 @@ export default function SceneBougie() {
     const braisesGeo = new THREE.BufferGeometry()
     const posB = new Float32Array(NB * 3), vieB = new Float32Array(NB).map(() => Math.random())
     braisesGeo.setAttribute('position', new THREE.BufferAttribute(posB, 3))
-    const braises = new THREE.Points(braisesGeo, new THREE.PointsMaterial({ color: 0xffb060, size: .006, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false }))
+    const braises = new THREE.Points(braisesGeo, new THREE.PointsMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d')!; const r = g.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, '#fff'); r.addColorStop(.4, 'rgba(255,200,120,.8)'); r.addColorStop(1, 'rgba(255,150,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c) })(), color: 0xffb060, size: .006, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false }))
     scene.add(braises)
 
     // la bougie
