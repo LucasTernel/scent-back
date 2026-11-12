@@ -113,7 +113,6 @@ export default function BoutiqueSite() {
               ))}
             </ul>
           </>}
-          <p className="mt-6 rounded-[12px] border-2 border-dashed border-trait p-3 text-xs leading-relaxed text-doux">Boutique de démonstration : aucun paiement. Retrait au pop-up store, Paris.</p>
         </nav>
 
         <section aria-label="Produits">
