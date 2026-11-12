@@ -115,7 +115,7 @@ export function SiteDesktop({ children, sansEntete = false }: { children: React.
         </div>
       </header>}
       <div className="flex-1">{children}</div>
-      <footer className={`relative z-10 overflow-hidden text-[#FCF5E3] ${sansEntete ? "bg-[#011A22]" : "bg-[#023341]"}`}>
+      <footer className={`relative z-10 overflow-hidden ${sansEntete ? "text-creme" : "text-[#FCF5E3]"} ${sansEntete ? "bg-encre" : "bg-[#023341]"}`}>
         <div className="mx-auto grid max-w-6xl gap-12 px-8 pt-20 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <img src="/logo-orange.png" alt="Scent Back" className="-ml-6 -mt-6 w-56" />
@@ -309,20 +309,20 @@ export default function Landing() {
         </div>
 
         {/* La suite : un chapitre = un écran, chacun avec sa propre animation */}
-        <div className="relative z-10 bg-[#011A22]">
-          <section className="relative h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
+        <div className="relative z-10 bg-creme">
+          <section className="relative h-dvh overflow-hidden bg-encre text-creme">
             <img data-parallax="-.1" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 h-[115%] w-full object-cover opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#011A22] via-[#011A22]/70 to-transparent" />
             <div className="relative flex h-full max-w-[min(60rem,55vw)] flex-col justify-center px-[8vw]">
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 01 · La première collection</p>
               <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">Assassin's<br />Creed IV<span className="text-flamme">.</span></h2>
-              <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-[#FCF5E3]/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
-              <div className="mt-8 flex gap-10 border-t border-[#FCF5E3]/20 pt-6">
-                {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
+              <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-creme/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
+              <div className="mt-8 flex gap-10 border-t border-creme/20 pt-6">
+                {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-creme/60">{b}</span></p>)}
               </div>
             </div>
           </section>
-          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-[#011A22] text-[#FCF5E3]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</p></div>
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-encre text-creme"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</p></div>
           <section data-cercle className="relative grid min-h-dvh place-items-center bg-flamme px-[8vw] py-24 text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div>
               <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
@@ -332,7 +332,7 @@ export default function Landing() {
               <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>
           </section>
-          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-flamme text-[#023341]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Et en attendant le jour J ? <span className="text-[#FCF5E3]">La chasse commence déjà</span>, dans les rues de Paris.</p></div>
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-flamme text-[#023341]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Et en attendant le jour J ? <span className="text-white">La chasse commence déjà</span>, dans les rues de Paris.</p></div>
           <section data-croise className="relative grid h-dvh grid-cols-[1fr_auto_auto] items-center gap-[3vw] overflow-hidden bg-creme px-[6vw] text-encre">
             <div>
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 03 · L'application</p>
