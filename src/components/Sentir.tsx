@@ -21,13 +21,19 @@ export async function getSenteurs(): Promise<Senteur[]> {
   const { data } = await supabase.from('senteurs').select('*')
   return data?.length ? data : DEMO // table pas encore créée → valeurs par défaut
 }
+/** Notes olfactives d'un produit (un bundle reprend celles de sa bougie ; All Stars : les trois). */
+export async function senteursDe(id: string): Promise<Senteur[]> {
+  const l = await getSenteurs(), t = (k: string) => l.find((x) => x.id === k) ?? DEMO.find((x) => x.id === k)
+  if (id === 'bundle-all-stars') return ALL_STARS.map(([k]) => t(k)).filter(Boolean) as Senteur[]
+  const s = t(id) ?? t(ALIAS[id] ?? ''); return s ? [s] : []
+}
 export async function saveSenteur(s: Senteur) {
   const { error } = await supabase.from('senteurs').upsert(s)
   if (error) throw error
 }
 // Mot de la note → photo de l'ingrédient (Wikimedia Commons, crédits dans les mentions légales) quand la tuile n'a pas d'image
 const PHOTOS: Record<string, string> = { 'VANILLÉ': 'vanille', VANILLE: 'vanille', FIGUE: 'figue', 'FRUITÉ': 'figue', ORANGE: 'orange', 'CÈDRE': 'bois', 'BOISÉ': 'bois', POIVRE: 'poivre', 'ÉPICÉ': 'poivre', TABAC: 'tabac', ROSE: 'rose', MIEL: 'miel', MENTHE: 'menthe', FRAIS: 'menthe', MARIN: 'marin', CUIR: 'cuir' }
-const photo = (x: Tuile) => x.image ?? (PHOTOS[x.mot] && `/senteurs/${PHOTOS[x.mot]}.webp`)
+export const photo = (x: Tuile) => x.image ?? (PHOTOS[x.mot] && `/senteurs/${PHOTOS[x.mot]}.webp`)
 const IMAGES: Record<string, string> = { 'rhum-marin': '/site/bougie.webp', 'box-ac4': '/site/box.webp', 'figue-tabacee': '/site/etiquette-pop.webp' }
 
 export function BoutonSentir({ id, nom, image, petit = false, className = '' }: { id: string; nom: string; image?: string; petit?: boolean; className?: string }) {

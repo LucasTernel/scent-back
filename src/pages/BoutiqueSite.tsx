@@ -1,8 +1,8 @@
 import ImageProduit from '../components/ImageProduit'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Icon } from '../ui'
-import { BoutonSentir } from '../components/Sentir'
+import { BoutonSentir, photo, senteursDe } from '../components/Sentir'
 import { dateLivraison, getProduitsVente, type Categorie, type Produit } from '../lib/api'
 import { useData } from '../lib/useData'
 
@@ -225,39 +225,127 @@ export function CommandeOk() {
 }
 
 /* ---------- Fiche produit (site et appli) ---------- */
+const CONTENU: Record<string, [string, string][]> = {
+  'box-ac4': [['Le jeu', 'Assassin\'s Creed IV Black Flag · PS5'], ['La bougie', 'Rhum Marin · 140 g'], ['L\'écrin', 'En forme de logo Assassin\'s Creed']],
+  'bundle-prince-of-persia': [['Le jeu', 'Prince of Persia : The Lost Crown · PS5'], ['La bougie', 'Figue Tabacée · 140 g'], ['L\'écrin', 'Coffre au trésor']],
+  'bundle-the-division': [['Le jeu', 'Tom Clancy\'s The Division · PS5'], ['La bougie', 'Cèdre Poivré · 140 g'], ['L\'écrin', 'Mallette d\'agent SHD']],
+  'bundle-all-stars': [['Les jeux', 'Assassin\'s Creed IV · The Division · Prince of Persia (PS5)'], ['Les bougies', 'Rhum Marin · Cèdre Poivré · Figue Tabacée'], ['Le coffret', 'Collector, limité aux 1 000 premières commandes']],
+}
 export function FicheProduit({ mobile = false }: { mobile?: boolean }) {
   const params = useParams(), { pathname } = useLocation()
   const id = params.id ?? pathname.split('/').pop() // site : rendu hors <Routes>
   const tous = useData(getProduitsVente)
+  const notes = useData(useCallback(() => senteursDe(id ?? ''), [id]))
   const { panier, changer } = usePanier()
   const p = tous?.find((x) => x.id === id)
-  const retour = mobile ? '/boutique' : '/boutique'
   if (!tous) return null
-  if (!p) return <main id="contenu" className="mx-auto max-w-6xl px-5 py-12"><p className="text-doux">Ce produit n'existe pas (ou plus).</p><Link to={retour} className="font-bold underline">Retour à la boutique</Link></main>
-  const statut = p.epuise ? 'Sold out · victime de son succès' : !p.dispo ? 'Prochainement' : p.precommande ? `Précommande · livraison prévue le ${dateLivraison(p.precommande)}` : 'En stock · retrait au pop-up store, Paris'
+  if (!p) return <main id="contenu" className="mx-auto max-w-6xl px-5 py-12"><p className="text-doux">Ce produit n'existe pas (ou plus).</p><Link to="/boutique" className="font-bold underline">Retour à la boutique</Link></main>
+  const lien = (x: Produit) => (mobile ? `/boutique/${x.id}` : `/produit/${x.id}`)
+  const achetable = p.dispo && !p.epuise
+  const statut = p.epuise ? ['Sold out', 'Victime de son succès'] : !p.dispo ? ['Prochainement', 'Disponible au lancement de la collection'] : p.precommande ? ['Précommande', `Livraison prévue le ${dateLivraison(p.precommande)}`] : ['En stock', 'Retrait au pop-up store, Paris']
+  const autres = tous.filter((x) => x.id !== p.id && (x.licence === p.licence || x.categorie === p.categorie)).slice(0, mobile ? 4 : 3)
+  const contenu = CONTENU[p.id]
+
   return (
-    <main id="contenu" className={mobile ? 'flex flex-col gap-5' : 'mx-auto max-w-6xl px-5 py-12 md:px-8'}>
-      <Link to={retour} viewTransition className="inline-flex min-h-10 w-fit items-center gap-1 text-sm font-bold text-doux"><Icon name="retour" size={18} />Boutique</Link>
-      <div className={mobile ? 'flex flex-col gap-5' : 'mt-4 grid items-start gap-12 lg:grid-cols-[1.2fr_1fr]'}>
-        <div className="relative">
-          <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[24px]" />
-          {p.epuise && <span className="absolute inset-0 grid place-items-center rounded-[24px] bg-[#011A22]/60"><span className="titre -rotate-6 rounded-[12px] bg-flamme px-5 py-3 text-2xl text-[#023341]">Sold out</span></span>}
-        </div>
-        <div className="flex flex-col gap-4">
-          {p.licence && <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">{p.licence} · {CATEGORIES.find(([k]) => k === p.categorie)?.[1]}</p>}
-          <h1 className="titre text-[clamp(2rem,4vw,3.4rem)] leading-[1]">{p.nom}</h1>
-          <p className="titre text-3xl">{euros(p.prix)}</p>
-          <p className={`w-fit rounded-full px-4 py-2 text-sm font-bold ${p.dispo && !p.epuise ? 'bg-flamme/15' : 'bg-creme-2 text-doux'}`}>{statut}</p>
-          {p.licence === 'All Stars' && <p className="w-fit rounded-full border-2 border-flamme px-3 py-1 text-sm font-bold text-flamme">Dans la limite des 1 000 premières commandes</p>}
-          <p className="text-lg leading-relaxed text-doux">{p.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
-          <div className="flex flex-wrap items-center gap-3">
-            {!mobile && p.dispo && !p.epuise && (panier[p.id]
-              ? <><Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} /><Link to="/panier" className="min-h-12 content-center rounded-[10px] bg-[#023341] px-6 font-bold text-[#FCF5E3]">Voir le panier</Link></>
-              : <button onClick={() => changer(p.id, 1)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">{p.precommande ? 'Précommander' : 'Ajouter au panier'}</button>)}
-            <BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="!min-h-12 !px-5 !text-sm" />
+    <main id="contenu" className={mobile ? '-mx-5 -mt-4 flex flex-col' : ''}>
+      {/* Bandeau : visuel sur fond flouté de lui-même */}
+      <section className="relative overflow-hidden bg-[#011A22] text-[#FCF5E3]">
+        <img src={p.image} alt="" aria-hidden className="absolute inset-0 size-full scale-125 object-cover opacity-50 blur-3xl" />
+        <div className={`relative mx-auto grid max-w-6xl items-center gap-8 ${mobile ? 'px-5 pt-4 pb-8' : 'px-8 py-14 lg:grid-cols-[1.25fr_1fr] lg:gap-14'}`}>
+          <div className="relative">
+            <Link to="/boutique" viewTransition className="mb-4 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-[#FCF5E3]/80"><Icon name="retour" size={18} />Boutique</Link>
+            <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full rounded-[28px] shadow-[0_30px_80px_rgba(0,0,0,.45)] ring-1 ring-white/10" />
+            {p.epuise && <span className="absolute inset-0 top-14 grid place-items-center"><span className="titre -rotate-6 rounded-[14px] bg-flamme px-6 py-3 text-3xl text-[#023341] shadow-2xl">Sold out</span></span>}
           </div>
-          {mobile && <p className="text-sm text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche, Paris.</p>}
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-wrap gap-2">
+              {p.licence && <span className="rounded-full bg-[#FCF5E3]/12 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{p.licence}</span>}
+              <span className="rounded-full bg-[#FCF5E3]/12 px-3 py-1 text-xs font-bold tracking-[.18em] uppercase">{CATEGORIES.find(([k]) => k === p.categorie)?.[1]}</span>
+              {p.licence === 'All Stars' && <span className="rounded-full bg-flamme px-3 py-1 text-xs font-bold text-[#023341]">1 000 exemplaires</span>}
+            </div>
+            <h1 className="titre text-[clamp(2.2rem,4.2vw,3.8rem)] leading-[.95]">{p.nom}</h1>
+            <p className="max-w-md text-lg leading-relaxed text-[#FCF5E3]/75">{p.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
+            <div className="flex items-end gap-4">
+              <p className="titre text-5xl">{euros(p.prix)}</p>
+              <p className="pb-1.5 text-sm text-[#FCF5E3]/60">TTC</p>
+            </div>
+            <div className={`flex items-center gap-3 rounded-[18px] p-4 ${achetable ? 'bg-flamme/15 ring-1 ring-flamme/40' : 'bg-[#FCF5E3]/8'}`}>
+              <span className={`size-3 shrink-0 rounded-full ${achetable ? 'bg-flamme shadow-[0_0_0_4px_rgba(255,119,34,.25)]' : 'bg-[#FCF5E3]/40'}`} />
+              <p><b>{statut[0]}</b><span className="block text-sm text-[#FCF5E3]/70">{statut[1]}</span></p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {!mobile && achetable && (panier[p.id]
+                ? <><div className="rounded-[12px] bg-[#FCF5E3] px-2 py-1.5 text-[#023341]"><Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} /></div><Link to="/panier" className="min-h-12 content-center rounded-[12px] bg-flamme px-6 font-bold text-[#023341]">Voir le panier →</Link></>
+                : <button onClick={() => changer(p.id, 1)} className="min-h-14 flex-1 rounded-[14px] bg-flamme px-8 text-lg font-bold text-[#023341] transition hover:brightness-110 sm:flex-none">{p.precommande ? 'Précommander' : 'Ajouter au panier'}</button>)}
+              <BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="!min-h-14 !px-6 !text-base" />
+            </div>
+          </div>
         </div>
+      </section>
+
+      <div className={`mx-auto flex w-full max-w-6xl flex-col gap-12 ${mobile ? 'px-5 pt-8' : 'px-8 py-16'}`}>
+        {/* Contenu du coffret */}
+        {contenu && (
+          <section aria-labelledby="contenu-titre">
+            <h2 id="contenu-titre" className="titre text-2xl">Dans le coffret</h2>
+            <ul className={`mt-5 grid gap-3 ${mobile ? '' : 'sm:grid-cols-3'}`}>
+              {contenu.map(([k, v], i) => (
+                <li key={k} className="flex gap-4 rounded-[20px] border-[1.5px] border-trait bg-papier p-5">
+                  <span className="titre text-3xl text-flamme">0{i + 1}</span>
+                  <p><b className="block">{k}</b><span className="text-sm text-doux">{v}</span></p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Notes olfactives avec photos */}
+        {!!notes?.length && (
+          <section aria-labelledby="notes-titre">
+            <h2 id="notes-titre" className="titre text-2xl">Notes olfactives</h2>
+            {notes.map((s) => (
+              <div key={s.id} className="mt-5">
+                {notes.length > 1 && <p className="mb-2 font-bold" style={{ color: s.couleur }}>{s.nom}</p>}
+                <ul className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                  {s.tuiles.map((x) => (
+                    <li key={x.mot} className="relative grid aspect-square place-items-center overflow-hidden rounded-[18px]"
+                      style={{ background: photo(x) ? `linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)), center/cover url(${photo(x)})` : `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${s.couleur} 35%, white), ${s.couleur})` }}>
+                      <span className="titre text-sm tracking-wider text-white drop-shadow sm:text-base">{x.mot}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* Retrait / garanties */}
+        <section className={`grid gap-3 ${mobile ? '' : 'sm:grid-cols-3'}`} aria-label="Infos pratiques">
+          {[['lieu', 'Retrait au pop-up', '23 rue de Bretagne, Paris'], ['boutique', 'Édition officielle', 'Ubisoft × La Belle Mèche'], ['photo', 'Cire 100 % végétale', 'Bougies coulées en France']].map(([ic, a, b]) => (
+            <div key={a} className="flex items-center gap-4 rounded-[20px] bg-creme-2 p-5">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#023341] text-[#FCF5E3]"><Icon name={ic as 'lieu'} size={20} /></span>
+              <p><b className="block">{a}</b><span className="text-sm text-doux">{b}</span></p>
+            </div>
+          ))}
+        </section>
+
+        {/* Vous aimerez aussi */}
+        {autres.length > 0 && (
+          <section aria-labelledby="aussi-titre">
+            <h2 id="aussi-titre" className="titre text-2xl">Vous aimerez aussi</h2>
+            <ul className={`mt-5 grid gap-4 ${mobile ? 'grid-cols-2' : 'sm:grid-cols-3'}`}>
+              {autres.map((x) => (
+                <li key={x.id}>
+                  <Link to={lien(x)} viewTransition className="group block overflow-hidden rounded-[20px] border-[1.5px] border-trait bg-papier">
+                    <ImageProduit src={x.image} alt={x.nom} className="aspect-[4/3] w-full" />
+                    <p className="p-3 pb-0 font-serif text-sm leading-tight font-bold">{x.nom}</p>
+                    <p className="px-3 pb-3 text-sm font-bold text-flamme">{euros(x.prix)}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   )
