@@ -38,7 +38,7 @@ html, body { background: var(--color-creme); }
 html, body { overflow-x: clip; overscroll-behavior: none; }
 html.sans-defilement, html.sans-defilement body { overflow: hidden; height: 100%; background: #F2EAD8; } /* = fond de carte : bandeaux Safari raccord */
 body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 2px solid var(--color-flamme); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--color-encre); outline-offset: 3px; border-radius: 6px; } /* contraste ≥ 3:1 en clair et en sombre */
 .titre { font-family: var(--font-serif); font-weight: 900; letter-spacing: -.01em; line-height: 1; }
 
 @utility btn { @apply inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-bold transition active:scale-[.97] disabled:opacity-50; }
@@ -124,3 +124,16 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .pin-lapin b { rotate: 45deg; }
 .pin-ok { width: 26px; height: 26px; border-radius: 50%; background: #023341; color: #FCF5E3; display: grid; place-items: center; font-weight: 900; font-size: 13px; border: 2px solid #FCF5E3; }
 @keyframes flotte { 50% { translate: 0 -6px; } }
+
+/* ---------- Accessibilité : contraste du texte orange (WCAG AA) ----------
+   #FF7722 sur crème = 2,4:1 (insuffisant) → texte orange foncé #B8470D (4,9:1) sur fond clair.
+   Sur fond bleu, l'orange vif reste (5,1:1). Les boutons / fonds orange ne changent pas. */
+[data-theme=clair] .text-flamme { color: #B8470D; }
+[data-theme=clair] :is(.bg-encre, [class*="bg-[#023341]"]) .text-flamme,
+[data-theme=sombre] .text-flamme { color: #FF7722; }
+[data-theme=sombre] .bg-encre .text-flamme { color: #B8470D; }
+
+/* Fiche statuette : rayons lumineux qui tournent derrière le modèle 3D */
+.rayons { background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 35%, transparent) 0deg 6deg, transparent 6deg 24deg);
+  mask: radial-gradient(circle, #000 0%, transparent 62%); animation: tourne 40s linear infinite; opacity: .55; }
+@keyframes tourne { to { rotate: 1turn; } }

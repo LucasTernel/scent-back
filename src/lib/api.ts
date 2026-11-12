@@ -69,6 +69,7 @@ const statues: Statue[] = [
   S('LUXEM-1SJ', 'Lapin Sénateur', 'Luxembourg', 'Dans un jardin royal plein de chaises vertes…', 'commune', 48.8462, 2.3372),
   S('PANTH-7EF', 'Lapin Grand Homme', 'Panthéon', 'Au sommet de la montagne Sainte-Geneviève…', 'rare', 48.8462, 2.3464),
   S('ARC-5YK', 'Lapin Point de Vue', 'Arc de Triomphe', 'Au centre de l\'étoile…', 'legendaire', 48.8738, 2.295),
+  { ...S('ULTIME-AC', 'Lapin Ultimate', 'Hôtel de Ville', 'Là où Paris garde ses archives…', 'legendaire', 48.8566, 2.3522), points: 250, model: '/models/lapin-ultimate.glb', description: 'Le maître de la Confrérie. Capuche bleu nuit, épée au poing et sourire de dément.' },
   S('DEMO-1', 'Lapin Démo Commun', 'Salle de l\'oral', 'Dans la salle !', 'commune', 48.8566, 2.3522),
   S('DEMO-2', 'Lapin Démo Rare', 'Salle de l\'oral', 'Dans la salle !', 'rare', 48.8566, 2.3522),
   S('DEMO-3', 'Lapin Démo Légendaire', 'Salle de l\'oral', 'Dans la salle !', 'legendaire', 48.8566, 2.3522),

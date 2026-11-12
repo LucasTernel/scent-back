@@ -11,6 +11,7 @@ import Detail from './pages/Detail'
 import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminNouvelleStatue, AdminStatue } from './pages/Admin'
 import Claim from './pages/Claim'
 import Login from './pages/Login'
+import Landing from './pages/Landing'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
 import Intro from './components/Intro'
@@ -44,6 +45,11 @@ export default function App() {
   const reveal = useCallback(() => setShown(true), [])
   const done = useCallback(() => setIntro(false), [])
 
+  // Ordinateur (grand écran + souris, hors appli installée) → landing uniquement, aucune connexion possible.
+  // Seule exception : l'aperçu de l'appli affiché DANS la landing (iframe ?mobile=1, non cliquable).
+  const apercu = window.self !== window.top && new URLSearchParams(location.search).has('mobile')
+  const bureau = !apercu && matchMedia('(min-width: 1024px) and (pointer: fine)').matches && !matchMedia('(display-mode: standalone)').matches
+
   // Connexion (ou déconnexion) : on repart toujours de l'accueil, pas de la dernière page visitée
   const navigate = useNavigate()
   const avant = useRef(session)
@@ -51,6 +57,8 @@ export default function App() {
     if (avant.current !== undefined && !!avant.current !== !!session) navigate('/', { replace: true })
     avant.current = session
   }, [session, navigate])
+
+  if (bureau && !location.pathname.startsWith('/legal')) return <Landing />
 
   return (
     <>
@@ -91,7 +99,7 @@ export default function App() {
         </Routes>
       ))}
       {intro && <Intro ready={!loading} onReveal={reveal} onDone={done} />}
-      {!intro && <Consentement />}
+      {!intro && !apercu && <Consentement />}
     </>
   )
 }
