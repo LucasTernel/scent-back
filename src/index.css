@@ -196,6 +196,6 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 @media (prefers-reduced-motion: reduce) { .volute { animation: none; } }
 
 /* Flip clock : le volet du haut tombe à chaque changement */
-.volet-flip { transform-origin: 50% 100%; animation: volet .6s cubic-bezier(.4,0,.6,1) forwards; backface-visibility: hidden; }
-@keyframes volet { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); opacity: .4; } }
+.volet-flip { transform-origin: 50% 100%; animation: volet 1.1s cubic-bezier(.22,.61,.36,1) forwards; backface-visibility: hidden; }
+@keyframes volet { from { transform: rotateX(0deg); opacity: 1; } 70% { opacity: .9; } to { transform: rotateX(-90deg); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .volet-flip { animation: none; display: none; } }
