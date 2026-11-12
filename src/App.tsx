@@ -11,7 +11,7 @@ import Detail from './pages/Detail'
 import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminFormStatue, AdminStatue } from './pages/Admin'
 import Claim from './pages/Claim'
 import Login from './pages/Login'
-import Landing from './pages/Landing'
+import Landing, { SiteDesktop } from './pages/Landing'
 import Boutique from './pages/Boutique'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
@@ -59,7 +59,9 @@ export default function App() {
     avant.current = session
   }, [session, navigate])
 
-  if (bureau && !location.pathname.startsWith('/legal')) return <Landing />
+  if (bureau) return location.pathname.startsWith('/legal')
+    ? <SiteDesktop><main id="contenu" className="mx-auto max-w-3xl px-5 py-10 md:px-8 md:py-14"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop>
+    : <Landing />
 
   return (
     <>

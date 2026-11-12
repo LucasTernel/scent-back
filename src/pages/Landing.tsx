@@ -1,6 +1,29 @@
 import { LogoMarque } from '../ui'
 
 const ADRESSE = 'scent-back.lucasternel.com'
+const LEGAL = [['mentions', 'Mentions légales'], ['conditions', 'Conditions d\'utilisation'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
+
+/** Habillage des pages vues sur ordinateur (landing, pages légales) : en-tête + pied, responsive. */
+export function SiteDesktop({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-dvh flex-col bg-creme text-encre">
+      <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 md:px-8">
+        <a href="/" aria-label="Accueil Scent Back"><LogoMarque className="-my-6 -ml-4 h-24 w-auto md:h-28" /></a>
+        <a href="/#installer" className="rounded-full border-[1.5px] border-trait px-4 py-2.5 text-sm font-bold transition hover:border-encre md:px-5">Installer l'appli</a>
+      </header>
+      <div className="flex-1">{children}</div>
+      <footer className="border-t border-trait">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-doux md:flex-row md:items-center md:justify-between md:px-8">
+          <p>Scent Back · projet étudiant BUT MMI</p>
+          <nav aria-label="Informations légales" className="flex flex-wrap gap-x-5 gap-y-2">
+            {LEGAL.map(([k, l]) => <a key={k} href={`/legal/${k}`} className="inline-flex min-h-10 items-center hover:text-encre hover:underline">{l}</a>)}
+          </nav>
+        </div>
+      </footer>
+    </div>
+  )
+}
 
 /** Accueil sur ordinateur : Scent Back se joue dans la rue, donc on invite à passer sur mobile. */
 export default function Landing() {
@@ -9,18 +32,12 @@ export default function Landing() {
     ['02', 'Scanne', 'Approche ton téléphone de la puce NFC cachée sous la statuette : elle apparaît dans un flash.'],
     ['03', 'Collectionne', 'Chaque capture devient une carte. Complète les collections et gagne des points pour le pop-up store.'],
   ]
-  const legal = [['mentions', 'Mentions légales'], ['conditions', 'Conditions d\'utilisation'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
 
   return (
-    <div className="min-h-dvh bg-creme text-encre">
-      <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-8 pt-6">
-        <LogoMarque className="-my-6 -ml-4 h-28 w-auto" />
-        <a href="#installer" className="rounded-full border-[1.5px] border-trait px-5 py-2.5 text-sm font-bold transition hover:border-encre">Installer l'appli</a>
-      </header>
+    <SiteDesktop>
 
       {/* Héros : texte + QR à gauche, aperçu réel de l'appli à droite */}
-      <main id="contenu" className="mx-auto grid max-w-6xl items-center gap-16 px-8 pt-10 pb-20 lg:grid-cols-[1.1fr_.9fr]">
+      <main id="contenu" className="mx-auto grid max-w-6xl items-center gap-12 px-5 pt-8 pb-16 md:gap-16 md:px-8 md:pt-10 md:pb-20 lg:grid-cols-[1.1fr_.9fr]">
         <section className="monte flex flex-col gap-6">
           <p className="w-fit rounded-full bg-encre px-4 py-1.5 text-xs font-bold tracking-[.16em] text-creme">UBISOFT × LA BELLE MÈCHE · POP-UP PARIS</p>
           <h1 className="titre text-[clamp(2.6rem,5vw,4.4rem)] leading-[1.02]">La chasse est ouverte.<br /><span className="text-flamme">Sur ton téléphone.</span></h1>
@@ -28,7 +45,7 @@ export default function Landing() {
             Des lapins encapuchonnés se cachent dans Paris. Scent Back se joue dans la rue : radar, vibrations, puces NFC et appareil photo. Tout ce qu'un ordinateur n'a pas.
           </p>
 
-          <div className="mt-2 flex items-center gap-6 rounded-[28px] border-[1.5px] border-trait bg-papier p-5 pr-8 shadow-[0_6px_0_var(--color-trait)]">
+          <div className="mt-2 flex flex-col items-start gap-5 rounded-[28px] border-[1.5px] border-trait bg-papier p-5 sm:flex-row sm:items-center sm:gap-6 sm:pr-8 shadow-[0_6px_0_var(--color-trait)]">
             <img src="/qr-app.svg" alt={`QR code qui ouvre ${ADRESSE} sur ton téléphone`} className="size-36 shrink-0 rounded-2xl bg-[#FCF5E3] p-2" />
             <div className="flex flex-col gap-2">
               <p className="font-serif text-xl font-bold">Scanne pour jouer</p>
@@ -52,7 +69,7 @@ export default function Landing() {
 
       {/* Comment ça marche */}
       <section className="bg-[#023341] py-20 text-[#FCF5E3] dark:bg-[#073D4F]">
-        <div className="mx-auto max-w-6xl px-8">
+        <div className="mx-auto max-w-6xl px-5 md:px-8">
           <h2 className="titre text-4xl">Comment on joue</h2>
           <ol className="mt-10 grid gap-5 md:grid-cols-3">
             {etapes.map(([n, t, d]) => (
@@ -67,7 +84,7 @@ export default function Landing() {
       </section>
 
       {/* Installation */}
-      <section id="installer" className="mx-auto max-w-6xl px-8 py-20">
+      <section id="installer" className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
         <h2 className="titre text-4xl">Installe-la comme une vraie appli</h2>
         <p className="mt-3 max-w-2xl text-lg text-doux">Pas besoin de store : ouvre {ADRESSE} sur ton téléphone, puis ajoute-la à ton écran d'accueil. Elle s'ouvrira en plein écran.</p>
         <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -87,14 +104,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-trait">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-8 py-8 text-sm text-doux">
-          <p>Scent Back · projet étudiant BUT MMI</p>
-          <nav aria-label="Informations légales" className="flex flex-wrap gap-x-5 gap-y-2">
-            {legal.map(([k, l]) => <a key={k} href={`/legal/${k}`} className="hover:text-encre hover:underline">{l}</a>)}
-          </nav>
-        </div>
-      </footer>
-    </div>
+    </SiteDesktop>
   )
 }
