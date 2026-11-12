@@ -125,9 +125,10 @@ export async function lancerAnimations(racine: HTMLElement) {
       const coulure = lettres.map(() => 40 + Math.random() * 140)
       // 1er écran : visible d'office, ne fond que quand on a vraiment commencé à descendre
       const tl = gsap.timeline({ scrollTrigger: i === 0 ? { trigger: sec, start: 'top+=15% top', end: 'bottom top', scrub: .5 } : { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: .5 } })
-      if (i > 0) tl.fromTo(lettres, { opacity: 0, y: -24, filter: 'blur(10px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', stagger: { each: .006, from: 'random' }, duration: .3, ease: 'power2.out' }, 0)
-      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { each: .004, from: 'random' }, duration: .3, ease: 'power2.in', immediateRender: false }, i === 0 ? .1 : .65)
-      tl.to(sec.querySelectorAll('a, button'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2, immediateRender: false }, i === 0 ? .1 : .65)
+      if (i > 0) tl.fromTo(lettres, { opacity: 0, y: -24, filter: 'blur(10px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', stagger: { amount: .15, from: 'random' }, duration: .15, ease: 'power2.out' }, 0)
+      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { amount: .15, from: 'random' }, duration: .15, ease: 'power2.in', immediateRender: false }, i === 0 ? .1 : .7)
+      tl.to(sec.querySelectorAll('a, button, img'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2, immediateRender: false }, i === 0 ? .1 : .7)
+      tl.set({}, {}, 1) // durée totale fixe = 1 → apparition 0–0,3, lecture 0,3–0,7, fonte 0,7–1
     })
     // 1er écran : allumage au chargement (après le loader)
     const premiers = document.querySelectorAll<HTMLElement>('[data-experience] > section:first-child .inline-block .inline-block')

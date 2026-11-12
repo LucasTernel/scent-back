@@ -21,7 +21,12 @@ const VUES: { pos: [number, number, number]; cible: [number, number, number] }[]
   { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
   { pos: [0.05, 0.46, 1.25], cible: [0.38, 0.46, 0] }, // 4 · l'étiquette
   { pos: [1.3, 0.75, 1.75], cible: [-0.5, 0.42, 0] },  // 5 · le défi : la cire fond
-  { pos: [0, 0.9, 4.2], cible: [0, 1.35, 0] },        // 6 · règle d'or : on recule
+  { pos: [0, 0.9, 4.2], cible: [0, 1.35, 0] },        // 6
+  { pos: [1.6, 0.8, 2.6], cible: [-0.6, 0.45, 0] },  // 7 · la box (texte à gauche → bougie à droite)
+  { pos: [-1.8, 1.2, 2.8], cible: [0.65, 0.5, 0] },    // 8 · pop-up
+  { pos: [1.2, 0.4, 2.4], cible: [-0.6, 0.5, 0] },   // 9 · appli
+  { pos: [-1.4, 0.6, 2.4], cible: [0.6, 0.45, 0] },  // 10 · boutique
+  { pos: [0, 2.2, 3.4], cible: [0, 1.2, 0] },         // 11 · fin : vue plongeante, la flamme seule · règle d'or : on recule
 ]
 
 /** Texture de flamme (dégradé en goutte) dessinée sur un canvas. */
