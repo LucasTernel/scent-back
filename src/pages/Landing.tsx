@@ -259,13 +259,13 @@ export default function Landing() {
         {/* L'expérience : la bougie 3D dans le noir (canvas fixe), le récit défile par-dessus */}
         <SceneBougie />
         <div data-experience className="relative text-encre">
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-[46vw]">
+          <section className="relative z-10 flex min-h-dvh items-end justify-center px-[8vw] pb-[9vh] text-center"><div>
             <p className="inline-block rounded-full bg-flamme px-4 py-1.5 text-sm font-bold tracking-[.22em] text-[#023341] uppercase">Ubisoft × La Belle Mèche</p>
-            <h1 className="titre mt-6 text-[clamp(4rem,9vw,9rem)] leading-[.85]">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
-            <p className="mt-8 max-w-md text-xl leading-relaxed">Une box, un jeu culte d'Ubisoft et une bougie La Belle Mèche qui a l'odeur de son monde.</p>
-            <div className="mt-8 flex gap-3">
+            <h1 className="titre mt-5 text-[clamp(3rem,6vw,6rem)] leading-[.85]">Fermez les yeux<span className="text-flamme">.</span></h1>
+            <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed">Une box, un jeu culte d'Ubisoft et une bougie La Belle Mèche qui a l'odeur de son monde.</p>
+            <div className="mt-6 flex justify-center gap-3">
               <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>
-              <span className="min-h-12 content-center px-2 text-sm font-bold opacity-70">Défilez pour allumer ↓</span>
+              <button onClick={() => dispatchEvent(new Event('visite-auto'))} className="min-h-12 rounded-[10px] border-2 border-current/40 px-5 text-sm font-bold">▶ Visite automatique</button>
             </div>
           </div></section>
           <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">

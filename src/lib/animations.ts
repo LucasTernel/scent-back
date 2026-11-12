@@ -28,6 +28,16 @@ export async function lancerAnimations(racine: HTMLElement) {
     if (cible) { e.preventDefault(); lenis.scrollTo(cible as HTMLElement, { offset: -20 }) }
   }
   racine.addEventListener('click', ancres)
+  // Visite automatique : la page défile seule à travers l'expérience 3D ; molette / touche = on reprend la main
+  const visite = () => {
+    const exp = document.querySelector<HTMLElement>('[data-experience]')
+    if (!exp) return
+    const fin = exp.offsetTop + exp.offsetHeight - innerHeight
+    lenis.scrollTo(fin, { duration: Math.max(8, (fin - scrollY) / 280), easing: (t: number) => t })
+    const stop = () => { lenis.scrollTo(scrollY, { immediate: true }); removeEventListener('wheel', stop); removeEventListener('keydown', stop) }
+    addEventListener('wheel', stop, { once: true }); addEventListener('keydown', stop, { once: true })
+  }
+  addEventListener('visite-auto', visite)
 
   const ctx = gsap.context(() => {
     // Titres lettre par lettre (découpe toujours depuis le HTML d'origine : sûr même si l'effet est relancé)
@@ -114,5 +124,5 @@ export async function lancerAnimations(racine: HTMLElement) {
   }
 
   requestAnimationFrame(() => ScrollTrigger.refresh())
-  return () => { ctx.revert(); gsap.ticker.remove(tic); lenis.destroy(); racine.removeEventListener('click', ancres); nettoyerCurseur() }
+  return () => { ctx.revert(); gsap.ticker.remove(tic); lenis.destroy(); racine.removeEventListener('click', ancres); removeEventListener('visite-auto', visite); nettoyerCurseur() }
 }

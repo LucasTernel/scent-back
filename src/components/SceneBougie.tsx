@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
 /**
  * La bougie dans le noir (Three.js) : la flamme est la seule vraie source de lumière, elle vacille,
@@ -14,7 +15,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 
 // Points de vue (unités de la scène : la bougie fait ~0,93 de haut). cible.x décale la bougie à l'écran.
 const VUES: { pos: [number, number, number]; cible: [number, number, number] }[] = [
-  { pos: [0.6, 0.75, 2.8], cible: [-0.75, 0.5, 0] },  // 0 · Fermez les yeux : la flamme dans le noir
+  { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },         // 0 · Fermez les yeux : la flamme dans le noir
   { pos: [1.5, 0.95, 2.2], cible: [-0.55, 0.5, 0] },   // 1 · manifeste (texte à gauche)
   { pos: [-1.3, 0.55, 1.6], cible: [0.5, 0.45, 0] },   // 2 · voir / entendre / sentir (texte à droite)
   { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
@@ -50,6 +51,9 @@ export default function SceneBougie() {
     el.appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
+    // environnement studio : donne des reflets au verre (sinon invisible)
+    scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture
+    scene.environmentIntensity = .35
     const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 50)
     camera.position.set(...VUES[0].pos)
     const cible = new THREE.Vector3(...VUES[0].cible)
@@ -97,7 +101,7 @@ export default function SceneBougie() {
       const b = g.scene; b.scale.setScalar(10); scene.add(b); b.updateMatrixWorld(true)
       // verre : l'extension « transmission » n'est pas lue → on le rend nous-mêmes transparent
       b.traverse((o) => { const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
-        if (m && m.name === 'Verre') { m.transparent = true; m.opacity = .18; m.depthWrite = false; m.roughness = .05; m.metalness = 0; m.color.set(0xffffff) } })
+        if (m && m.name === 'Verre') { m.transparent = true; m.opacity = .32; m.depthWrite = false; m.roughness = .02; m.metalness = .1; m.envMapIntensity = 2.2; m.color.set(0xe8f2ff) } })
       cire = b.getObjectByName('Cire'); const meche = b.getObjectByName('Meche')
       if (cire) {
         const box = new THREE.Box3().setFromObject(cire); hauteurCire = box.max.y - box.min.y
