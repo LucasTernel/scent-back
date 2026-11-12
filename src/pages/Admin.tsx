@@ -1,3 +1,5 @@
+import QrCode from '../components/QrCode'
+import { renderSVG } from 'uqr'
 import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
@@ -8,7 +10,8 @@ import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
 import { AdminSenteurs } from '../components/Sentir'
 
-const lienNfc = (code: string) => `${location.origin}/s/${code}`
+// lien de la puce / du QR : toujours le domaine public (pas localhost quand on génère en local)
+const lienNfc = (code: string) => `${location.hostname === 'localhost' ? 'https://scent-back.lucasternel.com' : location.origin}/s/${code}`
 
 /** Écrit le lien sur une puce NFC (Chrome Android uniquement : Web NFC). */
 async function ecrireNfc(code: string) {
@@ -379,6 +382,12 @@ export function AdminFormStatue() {
 }
 
 /* ---------- 4. Fiche statuette (vue joueur + stats d'obtention) ---------- */
+function telechargerQr(texte: string, nom: string) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([renderSVG(texte, { border: 2 })], { type: 'image/svg+xml' })); a.download = nom; a.click()
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
 export function AdminStatue() {
   const { id } = useParams()
   const s = useData(adminStatues)?.find((x) => x.id === id)
@@ -416,6 +425,16 @@ export function AdminStatue() {
         <Carton className="flex items-center gap-3 p-4">
           <div className="min-w-0 flex-1"><p className="text-xs font-bold text-doux">PUCE NFC · {s.points} pts</p><p className="truncate font-mono text-sm">{lienNfc(s.code)}</p></div>
           <button onClick={() => ecrireNfc(s.code).catch((e) => alert(e.message))} className="min-h-11 shrink-0 rounded-full bg-encre px-4 text-xs font-bold text-creme">Lier NFC</button>
+        </Carton>
+
+        {/* QR code fixe du lapin (même lien que la puce) : pour les téléphones sans NFC web (iPhone/Safari) */}
+        <Carton className="flex items-center gap-4 p-4">
+          <QrCode texte={lienNfc(s.code)} className="size-28 shrink-0 rounded-xl bg-white p-1" />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-doux">QR CODE · assigné à ce lapin</p>
+            <p className="mt-1 text-sm">À imprimer et coller sous la statuette, à côté de la puce.</p>
+            <button onClick={() => telechargerQr(lienNfc(s.code), `qr-${s.code}.svg`)} className="mt-2 min-h-11 rounded-full bg-encre px-4 text-xs font-bold text-creme">Télécharger (SVG)</button>
+          </div>
         </Carton>
       </div>
     </div>

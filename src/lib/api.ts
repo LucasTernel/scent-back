@@ -296,13 +296,14 @@ export async function setBoutiqueOuverte(v: boolean) {
 }
 
 /* ---------- Amis ---------- */
-export type Joueur = { username: string; avatar_url: string | null; friend_code?: string; ami?: boolean }
+export type Joueur = { username: string; avatar_url: string | null; friend_code?: string; etat?: 'ami' | 'envoyee' | 'recue' | null }
+export type Demande = { username: string; avatar_url: string | null; created_at: string }
 export type Ami = { username: string; avatar_url: string | null; total: number; lapins: number }
 export type ProfilAmi = { username: string; avatar_url: string | null; depuis: string; total: number; captures: { id: string; nom: string; rarete: Rarity; model?: string; date: string }[] }
 const AMIS_DEMO: Ami[] = [{ username: 'altair_bwaah', avatar_url: 'lapin:ultimate', total: 620, lapins: 9 }, { username: 'lapin_furtif', avatar_url: 'jeu:farcry', total: 180, lapins: 3 }]
 
 export async function chercherJoueurs(q: string): Promise<Joueur[]> {
-  if (MOCK) return [...AMIS_DEMO, { username: 'edward_kenway', avatar_url: 'jeu:ac', total: 0, lapins: 0 }].filter((a) => a.username.startsWith(q.toLowerCase())).map((a) => ({ ...a, ami: AMIS_DEMO.includes(a) }))
+  if (MOCK) return [...AMIS_DEMO, { username: 'edward_kenway', avatar_url: 'jeu:ac', total: 0, lapins: 0 }].filter((a) => a.username.startsWith(q.toLowerCase())).map((a) => ({ ...a, etat: AMIS_DEMO.includes(a) ? 'ami' as const : null }))
   const { data, error } = await supabase.rpc('chercher_joueurs', { q })
   if (error) throw new Error('Recherche impossible pour le moment.')
   return data ?? []
@@ -312,10 +313,22 @@ export async function getAmis(): Promise<Ami[]> {
   const { data } = await supabase.rpc('mes_amis')
   return data ?? []
 }
-export async function ajouterAmi(pseudoOuCode: string) {
-  if (MOCK) return
-  const { error } = await supabase.rpc('add_friend', { code: pseudoOuCode })
+/** Envoie une demande (ou accepte directement si l'autre avait déjà demandé). */
+export async function ajouterAmi(pseudoOuCode: string): Promise<'ami' | 'envoyee'> {
+  if (MOCK) return 'envoyee'
+  const { data, error } = await supabase.rpc('add_friend', { code: pseudoOuCode })
   if (error) throw new Error('Joueur introuvable. Vérifie le pseudo ou le code ami.')
+  return data
+}
+export async function getDemandes(): Promise<Demande[]> {
+  if (MOCK) return JSON.parse(localStorage.getItem('demandes') ?? '[{"username":"edward_kenway","avatar_url":"jeu:ac","created_at":"2026-11-12"}]')
+  const { data } = await supabase.rpc('demandes_recues')
+  return data ?? []
+}
+export async function repondreDemande(pseudo: string, accepter: boolean) {
+  if (MOCK) return localStorage.setItem('demandes', JSON.stringify((await getDemandes()).filter((d) => d.username !== pseudo)))
+  const { error } = await supabase.rpc('repondre_demande', { pseudo, accepter })
+  if (error) throw new Error('Cette demande n\'existe plus.')
 }
 export async function retirerAmi(pseudo: string) {
   if (MOCK) return

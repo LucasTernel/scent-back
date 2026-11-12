@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ajouterAmi, chercherJoueurs, getAmis, getProfile, getProfilAmi, HEX_RARETE, retirerAmi, type Joueur } from '../lib/api'
+import { ajouterAmi, chercherJoueurs, getAmis, getDemandes, repondreDemande, getProfile, getProfilAmi, HEX_RARETE, retirerAmi, type Joueur } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Avatar, avatarParDefaut } from '../components/Avatar'
 import Scene3D from '../components/Scene3D'
@@ -13,6 +13,7 @@ const Retour = ({ to = '/compte' }: { to?: string }) => <Link to={to} viewTransi
 export default function Amis() {
   const [v, setV] = useState(0)
   const amis = useData(getAmis, v) ?? []
+  const demandes = useData(getDemandes, v) ?? []
   const moi = useData(getProfile)
   const [q, setQ] = useState('')
   const [res, setRes] = useState<Joueur[]>()
@@ -22,7 +23,8 @@ export default function Amis() {
     const t = setTimeout(() => chercherJoueurs(q.trim()).then(setRes).catch((e) => setMsg(e.message)), 300)
     return () => clearTimeout(t)
   }, [q, v])
-  const ajouter = async (j: Joueur) => { try { await ajouterAmi(j.friend_code ?? j.username); setMsg(`${j.username} est maintenant ton ami ✓`); setV(v + 1) } catch (e) { setMsg((e as Error).message) } }
+  const ajouter = async (j: Joueur) => { try { const r = await ajouterAmi(j.friend_code ?? j.username); setMsg(r === 'ami' ? `${j.username} est maintenant ton ami ✓` : `Demande envoyée à ${j.username} ✓`); setV(v + 1) } catch (e) { setMsg((e as Error).message) } }
+  const repondre = async (pseudo: string, ok: boolean) => { try { await repondreDemande(pseudo, ok); setMsg(ok ? `${pseudo} est maintenant ton ami ✓` : 'Demande refusée.'); setV(v + 1); dispatchEvent(new Event('demandes-maj')) } catch (e) { setMsg((e as Error).message) } }
   const lien = moi && `${location.origin}/?parrain=${moi.friend_code}`
   const inviter = async () => {
     if (!lien) return
@@ -54,13 +56,30 @@ export default function Amis() {
               <li key={j.username} className="flex items-center gap-3 rounded-[18px] border-[1.5px] border-trait bg-papier p-2.5">
                 <Avatar id={av(j)} className="size-11" />
                 <p className="min-w-0 flex-1 truncate font-bold">{j.username}</p>
-                {j.ami ? <span className="text-xs font-bold text-doux">Déjà ami</span>
-                  : <button onClick={() => ajouter(j)} className="min-h-10 rounded-full bg-encre px-4 text-sm font-bold text-creme">Ajouter</button>}
+                {j.etat === 'ami' ? <span className="text-xs font-bold text-doux">Déjà ami</span>
+                  : j.etat === 'envoyee' ? <span className="text-xs font-bold text-doux">Demande envoyée</span>
+                  : <button onClick={() => ajouter(j)} className="min-h-10 rounded-full bg-encre px-4 text-sm font-bold text-creme">{j.etat === 'recue' ? 'Accepter' : 'Ajouter'}</button>}
               </li>
             ))}
           </ul>
         ) : <p className="px-2 text-sm text-doux">Aucun joueur trouvé.</p>)}
       </section>
+
+      {demandes.length > 0 && (
+        <section className="flex flex-col gap-2.5" aria-labelledby="demandes">
+          <h2 id="demandes" className="font-serif text-lg font-bold">Demandes d'amis <span className="ml-1 rounded-full bg-flamme px-2 py-0.5 text-sm text-encre">{demandes.length}</span></h2>
+          <ul className="flex flex-col gap-2">
+            {demandes.map((d) => (
+              <li key={d.username} className="flex items-center gap-3 rounded-[18px] border-[1.5px] border-flamme bg-papier p-2.5">
+                <Avatar id={av(d)} className="size-11" />
+                <p className="min-w-0 flex-1 truncate font-bold">{d.username}</p>
+                <button onClick={() => repondre(d.username, false)} className="min-h-10 rounded-full border-[1.5px] border-trait px-3 text-sm font-bold">Refuser</button>
+                <button onClick={() => repondre(d.username, true)} className="min-h-10 rounded-full bg-flamme px-3 text-sm font-bold text-encre">Accepter</button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="flex flex-col gap-2.5">
         <h2 className="font-serif text-lg font-bold">{amis.length} ami{amis.length > 1 ? 's' : ''}</h2>

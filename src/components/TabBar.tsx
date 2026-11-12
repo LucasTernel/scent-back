@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { getDemandes } from '../lib/api'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Icon, type IconName } from '../ui'
 
@@ -20,6 +22,7 @@ export default function TabBar({ tabs = tabsJoueur, fondu = true }: { tabs?: Ong
   const { pathname } = useLocation()
   const p = pathname === '/classement' || pathname.startsWith('/legal') ? '/compte' : pathname.startsWith('/galerie') ? '/galerie' : /^\/(collections|statuette)/.test(pathname) ? '/collections' : pathname
   const i = Math.max(0, tabs.findIndex((t) => t.to === p))
+  const nbDemandes = useDemandes()
   return (
     <>
     {/* fondu crème derrière la barre : elle reste lisible au-dessus des cartes foncées */}
@@ -35,8 +38,10 @@ export default function TabBar({ tabs = tabsJoueur, fondu = true }: { tabs?: Ong
         <ul className="relative flex h-16">
           {tabs.map((t, k) => (
             <li key={t.to} className="flex-1">
-              <NavLink viewTransition to={t.to} end aria-label={t.label} data-dir={k < i ? 'arriere' : 'avant'} className="flex h-full flex-col items-center justify-center text-[#F2E7CB]">
-                <span className={`transition-all duration-300 ${k === i ? 'translate-y-2 opacity-0' : 'opacity-75'}`}><Icon name={t.icon} /></span>
+              <NavLink viewTransition to={t.to} end aria-label={t.to === '/compte' && nbDemandes ? `${t.label}, ${nbDemandes} demande${nbDemandes > 1 ? 's' : ''} d'ami` : t.label} data-dir={k < i ? 'arriere' : 'avant'} className="flex h-full flex-col items-center justify-center text-[#F2E7CB]">
+                <span className={`relative transition-all duration-300 ${k === i ? 'translate-y-2 opacity-0' : 'opacity-75'}`}><Icon name={t.icon} />
+                  {t.to === '/compte' && nbDemandes > 0 && <span className="absolute -top-1 -right-2 grid size-[18px] place-items-center rounded-full bg-flamme text-[10px] font-bold text-[#023341]">{nbDemandes}</span>}
+                </span>
                 <span className={`absolute bottom-2.5 text-xs font-bold text-[#FCF5E3] transition-all duration-300 ${k === i ? 'opacity-100' : 'translate-y-1 opacity-0'}`}>{t.label}</span>
               </NavLink>
             </li>
@@ -46,4 +51,15 @@ export default function TabBar({ tabs = tabsJoueur, fondu = true }: { tabs?: Ong
     </nav>
     </>
   )
+}
+
+/** Nombre de demandes d'amis reçues (rafraîchi toutes les 60 s et après une réponse). */
+function useDemandes() {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    const maj = () => getDemandes().then((d) => setN(d.length), () => {})
+    maj(); const t = setInterval(maj, 60000); addEventListener('demandes-maj', maj)
+    return () => { clearInterval(t); removeEventListener('demandes-maj', maj) }
+  }, [])
+  return n
 }

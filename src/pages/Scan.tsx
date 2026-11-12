@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import ScanQr from '../components/ScanQr'
+import { useEffect, useRef, useState , useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -41,6 +42,8 @@ export default function Scan() {
     return () => clearInterval(t)
   }, [niveau])
 
+  const [qr, setQr] = useState(false)
+  const trouveQr = useCallback((code: string) => { vibrer([100, 50, 200]); navigate(`/s/${code}`, { viewTransition: true }) }, [navigate])
   // NFC dans l'appli (Chrome Android) ; ailleurs la puce ouvre directement /s/CODE
   const [nfc, setNfc] = useState(false)
   useEffect(() => {
@@ -125,6 +128,7 @@ export default function Scan() {
         <Icon name="lieu" size={20} />
       </button>
 
+      {qr && <ScanQr trouve={trouveQr} fermer={() => setQr(false)} />}
       <section className="fixed inset-x-0 bottom-[calc(max(.75rem,env(safe-area-inset-bottom)_-_10px)+118px)] z-[35] mx-auto max-w-md px-4">
         <div className="flex flex-col gap-3 rounded-[26px] bg-encre p-4 text-creme shadow-xl">
           <div className="flex items-center gap-3">
@@ -138,9 +142,11 @@ export default function Scan() {
               {d !== undefined && <p className="text-xs text-trait">Lapin le plus proche : ~{d < 1000 ? `${Math.round(d / 10) * 10} m` : `${(d / 1000).toFixed(1)} km`}</p>}
             </div>
           </div>
-          {nfcDispo
-            ? <button onClick={() => setNfc(!nfc)} aria-pressed={nfc} className={`btn min-h-12 text-sm ${nfc ? 'bg-flamme text-encre' : 'bg-creme text-encre'}`}><Icon name="nfc" size={18} />{nfc ? 'Approche la puce…' : 'Scanner la puce NFC'}</button>
-            : <p className="text-center text-xs text-trait">Approche ton téléphone de la puce sous la statuette.</p>}
+          <div className="flex gap-2">
+            {nfcDispo && <button onClick={() => setNfc(!nfc)} aria-pressed={nfc} className={`btn min-h-12 flex-1 text-sm ${nfc ? 'bg-flamme text-encre' : 'bg-creme text-encre'}`}><Icon name="nfc" size={18} />{nfc ? 'Approche la puce…' : 'Puce NFC'}</button>}
+            <button onClick={() => setQr(true)} className="btn min-h-12 flex-1 bg-creme text-sm text-encre"><Icon name="photo" size={18} />Scanner le QR code</button>
+          </div>
+          {!nfcDispo && <p className="text-center text-xs text-trait">Ou approche ton téléphone de la puce sous la statuette.</p>}
         </div>
       </section>
     </>
