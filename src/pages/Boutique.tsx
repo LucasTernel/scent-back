@@ -63,7 +63,7 @@ export default function Boutique() {
               <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
                 <img src={p.image} alt={p.nom} className="aspect-square w-full object-cover" />
                 {p.categorie !== 'savon' && <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-1.5 right-1.5 size-14" />}
-                <div className="p-3"><p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
+                <div className="p-3">{p.licence && <p className="mb-0.5 text-[10px] font-bold tracking-[.14em] text-flamme uppercase">{p.licence}</p>}<p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
               </a>
             ))}
           </div>

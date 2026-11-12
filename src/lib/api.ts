@@ -358,11 +358,18 @@ export async function setPopup(p: Popup) {
 
 /* ---------- Boutique permanente (produits) ---------- */
 export type Categorie = 'bundle' | 'bougie' | 'savon'
-export type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean; ordre: number; categorie: Categorie }
+export type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean; ordre: number; categorie: Categorie; licence?: string | null }
 export const PRODUITS_DEFAUT: Produit[] = [
-  { id: 'box-ac4', nom: 'Box Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 + la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo.', prix: 59.9, image: '/site/box.webp', dispo: true, ordre: 1, categorie: 'bundle' },
-  { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale · coulée en France. Brûle le temps du jeu.', prix: 24.9, image: '/site/bougie.webp', dispo: true, ordre: 2, categorie: 'bougie' },
-  { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '70 g · cire 100 % végétale. La prochaine licence de la collection All Stars.', prix: 16.9, image: '/site/etiquette-pop.webp', dispo: false, ordre: 3, categorie: 'bougie' },
+  { id: 'box-ac4', nom: 'Bundle Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 et la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo Assassin\'s Creed.', prix: 84.9, image: '/site/produits/bundle-black-flag.webp', dispo: true, ordre: 1, categorie: 'bundle', licence: 'Assassin\'s Creed' },
+  { id: 'bundle-prince-of-persia', nom: 'Bundle Prince of Persia : The Lost Crown', detail: 'Le jeu PS5 et la bougie Figue Tabacée, dans un coffre au trésor.', prix: 64.9, image: '/site/produits/bundle-prince-of-persia.webp', dispo: true, ordre: 2, categorie: 'bundle', licence: 'Prince of Persia' },
+  { id: 'bundle-the-division', nom: 'Bundle Tom Clancy\'s The Division', detail: 'Le jeu PS5 et la bougie Cèdre Poivré, dans une mallette d\'agent SHD.', prix: 54.9, image: '/site/produits/bundle-the-division.webp', dispo: true, ordre: 3, categorie: 'bundle', licence: 'The Division' },
+  { id: 'bundle-all-stars', nom: 'All Stars Bundle', detail: 'Les trois jeux PS5 et les trois bougies dans un coffret collector.', prix: 169.9, image: '/site/produits/bundle-all-stars.webp', dispo: true, ordre: 4, categorie: 'bundle', licence: 'All Stars' },
+  { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale. L\'odeur d\'Assassin\'s Creed IV Black Flag.', prix: 21.9, image: '/site/produits/bougie-rhum-marin.webp', dispo: false, ordre: 10, categorie: 'bougie', licence: 'Assassin\'s Creed' },
+  { id: 'cedre-poivre', nom: 'Bougie Cèdre Poivré', detail: '140 g · cire 100 % végétale. L\'odeur de The Division.', prix: 21.9, image: '/site/produits/bougie-cedre-poivre.webp', dispo: false, ordre: 11, categorie: 'bougie', licence: 'The Division' },
+  { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '140 g · cire 100 % végétale. L\'odeur de Prince of Persia.', prix: 21.9, image: '/site/produits/bougie-figue-tabacee.webp', dispo: false, ordre: 12, categorie: 'bougie', licence: 'Prince of Persia' },
+  { id: 'savon-assassins-creed', nom: 'Savon Bwaaah · Assassin\'s Creed', detail: 'Savon en forme de Lapin Crétin, orange Assassin\'s Creed.', prix: 8.9, image: '/site/savons/assassins-creed.webp', dispo: true, ordre: 20, categorie: 'savon', licence: 'Assassin\'s Creed' },
+  { id: 'savon-prince-of-persia', nom: 'Savon Bwaaah · Prince of Persia', detail: 'Savon en forme de Lapin Crétin, rouge Prince of Persia.', prix: 8.9, image: '/site/savons/prince-of-persia.webp', dispo: true, ordre: 21, categorie: 'savon', licence: 'Prince of Persia' },
+  { id: 'savon-the-division', nom: 'Savon Bwaaah · The Division', detail: 'Savon en forme de Lapin Crétin, anthracite The Division.', prix: 8.9, image: '/site/savons/the-division.webp', dispo: true, ordre: 22, categorie: 'savon', licence: 'The Division' },
 ]
 export async function getProduits(): Promise<Produit[]> {
   if (MOCK) return JSON.parse(localStorage.getItem('produits') ?? 'null') ?? PRODUITS_DEFAUT

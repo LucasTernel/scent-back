@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { getBoutiqueOuverte, getPopup, getProduits, type Lot } from '../lib/api'
-import { euros } from './BoutiqueSite'
+import { BoutonPanier, euros } from './BoutiqueSite'
 import { useData } from '../lib/useData'
 import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
@@ -115,7 +115,8 @@ export function SiteDesktop({ children, sansEntete = false }: { children: React.
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3 md:px-8">
           <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><img src="/logo-orange.png" alt="Scent Back" className="h-full w-full scale-[2] object-contain" /></a>
           <nav aria-label="Actions" className="flex items-center gap-2">
-            {boutique && <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-[#FCF5E3]/40 px-4 text-sm font-bold transition hover:border-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>}
+            {boutique && <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-[#FCF5E3]/40 px-4 text-sm font-bold transition hover:border-[#FCF5E3]">Boutique</a>}
+            {boutique && <BoutonPanier />}
             <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-flamme px-5 text-sm font-bold text-[#023341] transition hover:brightness-110"><Icon name="nfc" size={18} />Installer l'appli</button>
           </nav>
         </div>
@@ -343,6 +344,7 @@ export default function Landing() {
                 ? <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(popup.adresse)}`} target="_blank" rel="noopener" className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#023341] px-5 py-2.5 text-[clamp(1rem,1.4vw,1.6rem)] font-bold text-[#FCF5E3]"><Icon name="lieu" size={20} />{popup.adresse}</a>
                 : <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>}
               <div className="mt-10"><Compteur date={popup?.date ?? '2027-11-13T10:00:00+01:00'} /></div>
+              {popup?.annonce && <img src="/site/produits/popup-devanture.webp" alt="La devanture du pop-up store Scent Back, rue de Bretagne" className="mx-auto mt-10 max-h-[60vh] rounded-[18px] shadow-2xl" />}
               {popup?.affiche && <img src={popup.affiche} alt="Affiche du pop-up store Scent Back" className="mx-auto mt-10 max-h-[60vh] rounded-[18px] shadow-2xl" />}
               <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>

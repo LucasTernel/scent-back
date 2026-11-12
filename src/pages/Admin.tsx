@@ -537,7 +537,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
     try {
       const image = img?.size ? await uploadMedia(img) : p?.image ?? ''
       const id = p?.id ?? nom.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'] })
+      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'], licence: String(f.get('licence') ?? '').trim() || null })
       fini()
     } catch (err) { alert((err as Error).message) }
     setBusy(false)
@@ -555,6 +555,8 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
           {CATEGORIES.filter(([k]) => k !== 'tout').map(([k, l]) => <option key={k} value={k}>{l}</option>)}
         </select>
       </label>
+      <Champ label="Licence / collection (ex. Assassin's Creed)" name="licence" defaultValue={p?.licence ?? ''} list="licences" />
+      <datalist id="licences">{['Assassin\'s Creed', 'Prince of Persia', 'The Division', 'All Stars'].map((l) => <option key={l} value={l} />)}</datalist>
       <Champ label={p?.image ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" required={!p} />
       <label className="flex items-center justify-between gap-3 rounded-2xl bg-creme-2 px-4 py-3 text-sm font-bold">Disponible à la commande<input type="checkbox" name="dispo" defaultChecked={p?.dispo ?? true} className="size-6" /></label>
       <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
@@ -600,6 +602,7 @@ function AdminPermanente() {
                 {!p.dispo && <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-[11px] font-bold text-[#FCF5E3]">Prochainement</span>}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-3">
+                {p.licence && <p className="text-[10px] font-bold tracking-[.14em] text-flamme uppercase">{p.licence}</p>}
                 <p className="font-serif text-sm leading-tight font-bold">{p.nom}</p>
                 <p className="text-sm font-bold text-flamme">{euros(p.prix)}</p>
                 <div className="mt-auto flex gap-1.5">
