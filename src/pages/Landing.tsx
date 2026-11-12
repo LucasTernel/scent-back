@@ -336,19 +336,28 @@ export default function Landing() {
               <div className="relative h-[85vh]"><BoiteOuverture /></div>
             </div>
           </section>
-          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-encre text-creme"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</p></div>
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-encre text-creme"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">{popup?.annonce ? <>Le rendez-vous est donné : <span className="text-flamme">{popup.adresse}</span>.</> : <>Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</>}</p></div>
           <section data-cercle className="relative grid min-h-dvh place-items-center bg-flamme px-[8vw] py-24 text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+            {popup?.annonce ? (
+              <div className="grid w-full max-w-6xl items-center gap-12 text-left lg:grid-cols-[.9fr_1.1fr]">
+                <img src={popup.affiche ?? '/site/produits/popup-devanture.webp'} alt={popup.affiche ? 'Affiche du pop-up store Scent Back' : 'La devanture du pop-up store Scent Back'} className="mx-auto max-h-[78vh] -rotate-2 rounded-[18px] shadow-[0_40px_80px_rgba(0,0,0,.35)]" />
+                <div>
+                  <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store · c'est officiel</p>
+                  <h2 className="titre mt-4 text-[clamp(2.4rem,4.2vw,5rem)] leading-[.9]">{new Date(popup.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<span className="text-[#FCF5E3]">.</span></h2>
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(popup.adresse)}`} target="_blank" rel="noopener" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#023341] px-6 py-3 text-[clamp(1rem,1.4vw,1.5rem)] font-bold text-[#FCF5E3]"><Icon name="lieu" size={20} />{popup.adresse}</a>
+                  <div className="mt-10 [&_[role=timer]]:flex-nowrap [&_[role=timer]]:justify-start" style={{ zoom: .72 }}><Compteur date={popup.date} /></div>
+                  <p className="mt-8 max-w-lg text-[clamp(1rem,1.2vw,1.4rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
+                </div>
+              </div>
+            ) : (
             <div>
               <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
               <h2 className="titre mt-4 text-[clamp(3.4rem,8vw,11rem)] leading-[.85]">{new Date(popup?.date ?? '2027-11-13T10:00:00+01:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<span className="text-[#FCF5E3]">.</span></h2>
-              {popup?.annonce
-                ? <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(popup.adresse)}`} target="_blank" rel="noopener" className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#023341] px-5 py-2.5 text-[clamp(1rem,1.4vw,1.6rem)] font-bold text-[#FCF5E3]"><Icon name="lieu" size={20} />{popup.adresse}</a>
-                : <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>}
+              <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>
               <div className="mt-10"><Compteur date={popup?.date ?? '2027-11-13T10:00:00+01:00'} /></div>
-              {popup?.annonce && <img src="/site/produits/popup-devanture.webp" alt="La devanture du pop-up store Scent Back, rue de Bretagne" className="mx-auto mt-10 max-h-[60vh] rounded-[18px] shadow-2xl" />}
-              {popup?.affiche && <img src={popup.affiche} alt="Affiche du pop-up store Scent Back" className="mx-auto mt-10 max-h-[60vh] rounded-[18px] shadow-2xl" />}
               <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>
+            )}
           </section>
           <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-flamme text-[#023341]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Et en attendant le jour J ? <span className="text-white">La chasse commence déjà</span>, dans les rues de Paris.</p></div>
           <section data-croise className="relative grid h-dvh grid-cols-[1fr_auto_auto] items-center gap-[3vw] overflow-hidden bg-creme px-[6vw] text-encre">
