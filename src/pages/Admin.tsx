@@ -538,7 +538,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
     try {
       const image = img?.size ? await uploadMedia(img) : p?.image ?? ''
       const id = p?.id ?? nom.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'], licence: String(f.get('licence') ?? '').trim() || null, epuise: f.get('epuise') === 'on' })
+      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'], licence: String(f.get('licence') ?? '').trim() || null, epuise: f.get('epuise') === 'on', precommande: String(f.get('precommande') ?? '') || null })
       fini()
     } catch (err) { alert((err as Error).message) }
     setBusy(false)
@@ -560,6 +560,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
       <datalist id="licences">{['Assassin\'s Creed', 'Prince of Persia', 'The Division', 'All Stars'].map((l) => <option key={l} value={l} />)}</datalist>
       <Champ label={p?.image ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" required={!p} />
       <label className="flex items-center justify-between gap-3 rounded-2xl bg-creme-2 px-4 py-3 text-sm font-bold">Disponible à la commande<input type="checkbox" name="dispo" defaultChecked={p?.dispo ?? true} className="size-6" /></label>
+      <Champ label="Précommande : date de livraison prévue (vide = pas de précommande)" name="precommande" type="date" defaultValue={p?.precommande ?? ''} />
       <label className="flex items-center justify-between gap-3 rounded-2xl bg-flamme/15 px-4 py-3 text-sm font-bold">Sold out · « Victime de son succès »<input type="checkbox" name="epuise" defaultChecked={p?.epuise ?? false} className="size-6" /></label>
       <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
     </form>

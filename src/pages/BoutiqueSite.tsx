@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
-import { getProduitsVente, type Categorie, type Produit } from '../lib/api'
+import { dateLivraison, getProduitsVente, type Categorie, type Produit } from '../lib/api'
 import { useData } from '../lib/useData'
 
 /** Boutique du site (ordinateur) — démonstration : vitrine, panier, commande fictive. Aucun paiement, aucune donnée bancaire. */
@@ -77,12 +77,13 @@ export default function BoutiqueSite() {
           <div className="flex flex-col justify-center gap-4 p-8 md:p-12">
             <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">À la une · {vedette.licence === 'All Stars' ? 'Édition limitée' : 'Bundle'}</p>
             {vedette.licence === 'All Stars' && <p className="w-fit rounded-full border-2 border-flamme px-3 py-1 text-sm font-bold text-flamme">Dans la limite des 1 000 premières commandes</p>}
+            {vedette.precommande && <p className="text-sm font-bold">Précommande · livraison prévue le {dateLivraison(vedette.precommande)}</p>}
             <h1 className="titre text-[clamp(2rem,3.4vw,3.4rem)] leading-[1]">{vedette.nom}</h1>
             <p className="text-[#FCF5E3]/75">{vedette.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
             <div className="mt-2 flex flex-wrap items-center gap-4">
               <p className="titre text-4xl">{euros(vedette.prix)}</p>
               {vedette.dispo && !vedette.epuise
-                ? <button onClick={() => ajouter(vedette)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341] transition hover:brightness-110">Ajouter au panier</button>
+                ? <button onClick={() => ajouter(vedette)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341] transition hover:brightness-110">{vedette.precommande ? 'Précommander' : 'Ajouter au panier'}</button>
                 : <span className="min-h-12 content-center rounded-[10px] border-2 border-[#FCF5E3]/40 px-6 font-bold">{vedette.epuise ? 'Victime de son succès' : 'Prochainement'}</span>}
             </div>
           </div>
@@ -127,12 +128,14 @@ export default function BoutiqueSite() {
                   <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full" />
                   {<BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="absolute top-3 right-3" />}
                   {p.epuise && <span className="absolute inset-0 grid place-items-center bg-[#011A22]/70"><span className="-rotate-6 rounded-[10px] bg-flamme px-4 py-2 text-center font-bold text-[#023341] shadow-xl"><span className="titre block text-lg leading-none">Sold out</span><span className="text-xs">Victime de son succès</span></span></span>}
+                  {p.precommande && !p.epuise && <span className="absolute top-3 left-3 rounded-[8px] bg-flamme px-2.5 py-1 text-xs font-bold text-[#023341]">Précommande</span>}
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   {p.licence && <p className="mb-1 text-[11px] font-bold tracking-[.18em] text-flamme uppercase">{p.licence}</p>}
                   <h3 className="titre text-lg leading-tight">{p.nom}</h3>
                   <p className="mt-2 line-clamp-2 flex-1 text-sm text-doux">{p.detail}</p>
+                  {p.precommande && <p className="mt-2 text-xs font-bold text-flamme">Livraison prévue le {dateLivraison(p.precommande)}</p>}
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <p className="titre text-xl">{euros(p.prix)}</p>
                     {p.epuise ? <span className="text-sm font-bold text-flamme">Épuisé</span>
@@ -180,7 +183,7 @@ export function PanierSite() {
             {lignes.map((p) => (
               <li key={p.id} className="flex items-center gap-5 py-5">
                 <img src={p.image} alt="" className="size-24 shrink-0 rounded-[14px] object-cover" />
-                <div className="min-w-0 flex-1"><p className="titre text-lg leading-tight">{p.nom}</p><p className="text-sm text-doux">{euros(p.prix)} l'unité</p></div>
+                <div className="min-w-0 flex-1"><p className="titre text-lg leading-tight">{p.nom}</p><p className="text-sm text-doux">{euros(p.prix)} l'unité{p.precommande && ` · précommande, livraison prévue le ${dateLivraison(p.precommande)}`}</p></div>
                 <Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} />
                 <p className="titre w-28 text-right text-xl">{euros(p.prix * panier[p.id])}</p>
                 <button onClick={() => changer(p.id, -panier[p.id])} aria-label={`Retirer ${p.nom} du panier`} className="grid size-10 place-items-center rounded-full text-doux hover:text-sceau">×</button>

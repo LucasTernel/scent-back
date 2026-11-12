@@ -358,12 +358,12 @@ export async function setPopup(p: Popup) {
 
 /* ---------- Boutique permanente (produits) ---------- */
 export type Categorie = 'bundle' | 'bougie' | 'savon'
-export type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean; ordre: number; categorie: Categorie; licence?: string | null; epuise?: boolean }
+export type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean; ordre: number; categorie: Categorie; licence?: string | null; epuise?: boolean; precommande?: string | null }
 export const PRODUITS_DEFAUT: Produit[] = [
   { id: 'box-ac4', nom: 'Bundle Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 et la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo Assassin\'s Creed.', prix: 99.9, image: '/site/produits/bundle-black-flag.webp', dispo: true, ordre: 1, categorie: 'bundle', licence: 'Assassin\'s Creed' },
   { id: 'bundle-prince-of-persia', nom: 'Bundle Prince of Persia : The Lost Crown', detail: 'Le jeu PS5 et la bougie Figue Tabacée, dans un coffre au trésor.', prix: 99.9, image: '/site/produits/bundle-prince-of-persia.webp', dispo: true, ordre: 2, categorie: 'bundle', licence: 'Prince of Persia' },
   { id: 'bundle-the-division', nom: 'Bundle Tom Clancy\'s The Division', detail: 'Le jeu PS5 et la bougie Cèdre Poivré, dans une mallette d\'agent SHD.', prix: 99.9, image: '/site/produits/bundle-the-division.webp', dispo: true, ordre: 3, categorie: 'bundle', licence: 'The Division' },
-  { id: 'bundle-all-stars', nom: 'All Stars Bundle', detail: 'Les trois jeux PS5 et les trois bougies dans un coffret collector. Dans la limite des 1 000 premières commandes.', prix: 279.9, image: '/site/produits/bundle-all-stars.webp', dispo: true, ordre: 0, categorie: 'bundle', licence: 'All Stars' },
+  { id: 'bundle-all-stars', nom: 'All Stars Bundle', detail: 'Les trois jeux PS5 et les trois bougies dans un coffret collector. Dans la limite des 1 000 premières commandes.', prix: 279.9, image: '/site/produits/bundle-all-stars.webp', dispo: true, ordre: 0, categorie: 'bundle', licence: 'All Stars', precommande: '2027-11-13' },
   { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale. L\'odeur d\'Assassin\'s Creed IV Black Flag.', prix: 19.9, image: '/site/produits/bougie-rhum-marin.webp', dispo: false, ordre: 10, categorie: 'bougie', licence: 'Assassin\'s Creed' },
   { id: 'cedre-poivre', nom: 'Bougie Cèdre Poivré', detail: '140 g · cire 100 % végétale. L\'odeur de The Division.', prix: 19.9, image: '/site/produits/bougie-cedre-poivre.webp', dispo: false, ordre: 11, categorie: 'bougie', licence: 'The Division' },
   { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '140 g · cire 100 % végétale. L\'odeur de Prince of Persia.', prix: 19.9, image: '/site/produits/bougie-figue-tabacee.webp', dispo: false, ordre: 12, categorie: 'bougie', licence: 'Prince of Persia' },
@@ -390,7 +390,7 @@ export const setCachees = (l: string[]) => ecrireListe('licences_cachees', l)
 /** Produits tels que vus par le public : en vente seulement si dispo ET licence lancée. */
 export async function getProduitsVente(): Promise<Produit[]> {
   const [p, l, c] = await Promise.all([getProduits(), getLancees(), getCachees()])
-  return p.filter((x) => !x.licence || !c.includes(x.licence)).map((x) => ({ ...x, dispo: x.dispo && !!x.licence && l.includes(x.licence) }))
+  return p.filter((x) => !x.licence || !c.includes(x.licence)).map((x) => ({ ...x, dispo: x.dispo && (!!x.precommande || (!!x.licence && l.includes(x.licence))) })) // une précommande est commandable avant le lancement
 }
 export async function getProduits(): Promise<Produit[]> {
   if (MOCK) return ((JSON.parse(localStorage.getItem('produits') ?? 'null') ?? PRODUITS_DEFAUT) as Produit[]).sort((a, b) => a.ordre - b.ordre)
@@ -407,3 +407,6 @@ export async function supprimerProduit(id: string) {
   const { error } = await supabase.from('produits').delete().eq('id', id)
   if (error) throw new Error('Suppression impossible : ' + error.message)
 }
+
+/** « 13 novembre 2027 » */
+export const dateLivraison = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
