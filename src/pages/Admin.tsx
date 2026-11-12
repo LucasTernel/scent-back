@@ -7,6 +7,7 @@ import {
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
+import { AdminSenteurs } from '../components/Sentir'
 
 const lienNfc = (code: string) => `${location.origin}/s/${code}`
 
@@ -508,6 +509,9 @@ export function AdminBoutique() {
           </div>
         ))}
       </Carton>
+
+      <h2 className="titre mt-4 text-xl">« Cliquez pour sentir »</h2>
+      <AdminSenteurs />
     </div>
   )
 }
