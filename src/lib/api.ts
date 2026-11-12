@@ -275,3 +275,15 @@ export async function compress(file: File, max = 1280): Promise<Blob> {
   c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
   return new Promise((ok) => c.toBlob((b) => ok(b!), 'image/jpeg', 0.8))
 }
+
+/** Boutique en ligne (produits) ouverte ? Réglé par l'admin ; fermée par défaut. */
+export async function getBoutiqueOuverte(): Promise<boolean> {
+  if (MOCK) return localStorage.getItem('boutique_ouverte') === 'true'
+  const { data } = await supabase.from('reglages').select('valeur').eq('cle', 'boutique_ouverte').maybeSingle()
+  return data?.valeur === true
+}
+export async function setBoutiqueOuverte(v: boolean) {
+  if (MOCK) return localStorage.setItem('boutique_ouverte', String(v))
+  const { error } = await supabase.from('reglages').upsert({ cle: 'boutique_ouverte', valeur: v })
+  if (error) throw error
+}

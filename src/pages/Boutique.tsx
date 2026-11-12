@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { echangerLot, getBons, getLots, getWallet, type Lot } from '../lib/api'
+import { echangerLot, getBons, getBoutiqueOuverte, getLots, getWallet, type Lot } from '../lib/api'
 import { secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
+import QrCode from '../components/QrCode'
+import { PRODUITS, euros } from './BoutiqueSite'
 
 /** Boutique : on échange ses points contre des lots, récupérés au pop-up store avec un bon. */
 export default function Boutique() {
@@ -11,6 +13,8 @@ export default function Boutique() {
   const solde = useData(getWallet, v)?.total ?? 0
   const lots = useData(getLots, v) ?? []
   const bons = useData(getBons, v) ?? []
+  const ouverte = useData(getBoutiqueOuverte) ?? false
+  const [qr, setQr] = useState<{ code: string; lot: string }>()
   const [choix, setChoix] = useState<string>() // lot en attente de confirmation
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
@@ -28,8 +32,8 @@ export default function Boutique() {
     <div className="flex flex-col gap-5">
       <header className="monte flex items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-doux">À récupérer au pop-up store</p>
-          <h1 className="titre text-[30px]">Boutique</h1>
+          <p className="text-sm font-medium text-doux">Tes points contre des récompenses</p>
+          <h1 className="titre text-[30px]">{ouverte ? 'Boutique' : 'Récompenses'}</h1>
         </div>
         <p className="flex items-center gap-1.5 rounded-full bg-encre py-2 pr-3.5 pl-3 text-[15px] font-bold text-creme" aria-label={`Solde : ${solde} points`}><Flamme />{solde}</p>
       </header>
@@ -40,34 +44,37 @@ export default function Boutique() {
         <section className="monte flex flex-col gap-2.5" aria-labelledby="bons">
           <h2 id="bons" className="font-serif text-lg font-bold">Mes bons</h2>
           {bons.map((b) => (
-            <div key={b.code} className={`relative flex items-center gap-4 overflow-hidden rounded-[20px] p-4 ${b.retire ? 'bg-creme-2 text-doux' : 'bg-encre text-creme'}`}>
+            <button key={b.code} disabled={b.retire} onClick={() => setQr(b)} aria-label={b.retire ? `${b.lot}, déjà récupéré` : `Afficher le QR code de ${b.lot}`} className={`relative flex w-full items-center gap-4 overflow-hidden rounded-[20px] p-4 text-left ${b.retire ? 'bg-creme-2 text-doux' : 'bg-encre text-creme'}`}>
               <span aria-hidden className="absolute top-1/2 -left-3 size-6 -translate-y-1/2 rounded-full bg-creme" />
               <span aria-hidden className="absolute top-1/2 -right-3 size-6 -translate-y-1/2 rounded-full bg-creme" />
               <div className="min-w-0 flex-1 pl-2">
                 <p className="truncate font-bold">{b.lot}</p>
-                <p className="text-xs opacity-75">{b.retire ? 'Déjà récupéré' : 'Montre ce code au pop-up store'}</p>
+                <p className="text-xs opacity-75">{b.retire ? 'Déjà récupéré' : 'Touche pour afficher le QR code'}</p>
               </div>
               <p className="titre border-l border-dashed border-current/30 pl-4 text-2xl tracking-widest">{b.code}</p>
-            </div>
+            </button>
           ))}
         </section>
       )}
 
-      <section aria-labelledby="bougies" className="flex flex-col gap-2.5">
-        <h2 id="bougies" className="font-serif text-lg font-bold">Les bougies</h2>
-        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none]">
-          {[['rhum-marin', 'Rhum Marin', '/site/bougie.webp', 'Assassin\'s Creed IV'], ['figue-tabacee', 'Figue Tabacée', '/site/etiquette-pop.webp', 'Prochainement']].map(([id, nom, img, info]) => (
-            <div key={id} className="relative w-56 shrink-0 overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
-              <img src={img} alt={`Bougie ${nom}`} className="aspect-square w-full bg-white object-contain p-4" />
-              <BoutonSentir id={id} nom={`Bougie ${nom}`} className="absolute top-2 right-2 size-20" />
-              <div className="p-3"><p className="font-serif font-bold">{nom}</p><p className="text-xs text-doux">{info}</p></div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {ouverte && (
+        <section aria-labelledby="produits" className="flex flex-col gap-2.5">
+          <h2 id="produits" className="font-serif text-lg font-bold">La boutique</h2>
+          <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none]">
+            {PRODUITS.map((p) => (
+              <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative w-56 shrink-0 overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
+                <img src={p.image} alt={p.nom} className={`aspect-square w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-4'}`} />
+                <BoutonSentir id={p.id} nom={p.nom} className="absolute top-2 right-2 size-20" />
+                <div className="p-3"><p className="font-serif leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
+              </a>
+            ))}
+          </div>
+          <p className="text-xs text-doux">Commande et retrait au pop-up store Ubisoft × La Belle Mèche.</p>
+        </section>
+      )}
 
       <section aria-labelledby="lots" className="flex flex-col gap-2.5">
-        <h2 id="lots" className="font-serif text-lg font-bold">Les lots</h2>
+        <h2 id="lots" className="font-serif text-lg font-bold">Récompenses <span className="text-sm font-normal text-doux">· contre tes points</span></h2>
         <ul className="grid grid-cols-2 gap-3">
           {lots.map((l, i) => {
             const manque = l.cost - solde, ok = manque <= 0 && l.stock > 0
@@ -97,13 +104,26 @@ export default function Boutique() {
         </ul>
       </section>
 
+      {qr && (
+        <div role="dialog" aria-modal="true" aria-labelledby="qr-titre" className="fixed inset-0 z-50 grid place-items-center bg-encre/80 p-6" onClick={() => setQr(undefined)}>
+          <div className="pop flex w-full max-w-sm flex-col items-center gap-3 rounded-[28px] bg-papier p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <h2 id="qr-titre" className="titre text-xl">{qr.lot}</h2>
+            <QrCode texte={qr.code} className="size-60 rounded-2xl bg-white p-2" />
+            <p className="titre text-2xl tracking-[.2em]">{qr.code}</p>
+            <p className="text-xs text-doux">À scanner par l'équipe du pop-up store.</p>
+            <button onClick={() => setQr(undefined)} className="btn btn-encre mt-1" autoFocus>Fermer</button>
+          </div>
+        </div>
+      )}
+
       {nouveau && (
         <div role="dialog" aria-modal="true" aria-labelledby="bravo" className="fixed inset-0 z-50 grid place-items-center bg-encre/70 p-6" onClick={() => setNouveau(undefined)}>
           <div className="pop flex w-full max-w-sm flex-col items-center gap-3 rounded-[28px] bg-papier p-6 text-center" onClick={(e) => e.stopPropagation()}>
             <span className="grid size-14 place-items-center rounded-full bg-flamme text-encre"><Icon name="boutique" size={26} /></span>
             <h2 id="bravo" className="titre text-2xl">C'est à toi !</h2>
-            <p className="text-sm text-doux">{nouveau.lot}<br />Montre ce code au pop-up store :</p>
-            <p className="titre rounded-2xl bg-creme-2 px-5 py-3 text-4xl tracking-[.2em]">{nouveau.code}</p>
+            <p className="text-sm text-doux">{nouveau.lot}<br />Montre ce QR code au pop-up store :</p>
+            <QrCode texte={nouveau.code} className="size-52 rounded-2xl bg-white p-2" />
+            <p className="titre text-2xl tracking-[.2em]">{nouveau.code}</p>
             <p className="text-xs text-doux">Tu le retrouves aussi dans « Mes bons ».</p>
             <button onClick={() => setNouveau(undefined)} className="btn btn-encre mt-1" autoFocus>Super</button>
           </div>

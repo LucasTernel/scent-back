@@ -2,8 +2,7 @@ import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue, enregistrerLot, getLots, supprimerLot, validerBon, type Lot,
-  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity,
-} from '../lib/api'
+  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
@@ -460,6 +459,8 @@ export function AdminBoutique() {
   const [code, setCode] = useState('')
   const [bon, setBon] = useState<{ ok: boolean; texte: string }>()
   const fini = () => { setEdition(undefined); setV(v + 1) }
+  const ouverte = useData(getBoutiqueOuverte, v) ?? false
+  const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
 
   async function valider(e: FormEvent) {
     e.preventDefault()
@@ -477,6 +478,17 @@ export function AdminBoutique() {
   return (
     <div className="flex flex-col gap-5">
       <Tete sous="Espace admin" titre="Boutique" action={<button onClick={() => setEdition('nouveau')} className="flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-flamme px-4 text-sm font-bold text-encre shadow-md"><Icon name="plus" size={18} />Lot</button>} />
+
+      <Carton className="flex items-center justify-between gap-4 p-4">
+        <div>
+          <h2 className="font-serif text-lg font-bold">Boutique en ligne</h2>
+          <p className="text-xs text-doux">{ouverte ? 'Visible sur le site et dans l\'appli.' : 'Masquée : ni le site ni l\'appli ne montrent les produits.'} Les récompenses en points restent toujours actives.</p>
+        </div>
+        <button role="switch" aria-checked={ouverte} aria-label="Boutique en ligne ouverte" onClick={basculer}
+          className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${ouverte ? 'bg-flamme' : 'bg-trait'}`}>
+          <span className={`absolute top-1 left-1 size-6 rounded-full bg-papier transition-transform ${ouverte ? 'translate-x-6' : ''}`} />
+        </button>
+      </Carton>
 
       <Carton className="p-4">
         <h2 className="font-serif text-lg font-bold">Valider un bon</h2>

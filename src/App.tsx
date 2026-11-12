@@ -1,3 +1,5 @@
+import { getBoutiqueOuverte } from './lib/api'
+import { useData } from './lib/useData'
 import { LogoMarque } from './ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
@@ -59,6 +61,7 @@ export default function App() {
   try { entreeAdmin = sessionStorage.getItem('ordi-admin') === '1' } catch { /* rien */ }
   if (entreeAdmin && session && role && role !== 'admin') { try { sessionStorage.removeItem('ordi-admin') } catch { /* rien */ } entreeAdmin = false }
   const bureau = !apercu && !entreeAdmin && matchMedia('(min-width: 1024px) and (pointer: fine)').matches && !matchMedia('(display-mode: standalone)').matches
+  const boutique = useData(getBoutiqueOuverte) // undefined tant que ça charge
 
   // Connexion (ou déconnexion) : on repart toujours de l'accueil, pas de la dernière page visitée
   const navigate = useNavigate()
@@ -68,7 +71,7 @@ export default function App() {
     avant.current = session
   }, [session, navigate])
 
-  if (bureau && location.pathname === '/boutique') return <SiteDesktop><BoutiqueSite /></SiteDesktop>
+  if (bureau && location.pathname === '/boutique') return boutique === false ? <Navigate to="/" replace /> : <SiteDesktop>{boutique && <BoutiqueSite />}</SiteDesktop>
   if (bureau) return location.pathname.startsWith('/legal')
     ? <div className="bg-creme"><SiteDesktop><main id="contenu" className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop></div>
     : <Landing />

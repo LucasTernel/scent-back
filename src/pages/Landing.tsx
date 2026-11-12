@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { type Lot } from '../lib/api'
+import { getBoutiqueOuverte, type Lot } from '../lib/api'
+import { useData } from '../lib/useData'
 import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
 import Compteur from '../components/Compteur'
@@ -8,6 +9,8 @@ import Scene3D from '../components/Scene3D'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
+/** Boutique en ligne visible seulement si l'admin l'a ouverte. */
+export const useBoutique = () => useData(getBoutiqueOuverte) ?? false
 const LEGAL = [['mentions', 'Mentions légales'], ['conditions', 'CGU'], ['cgv', 'CGV'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
 
 const ETAPES_OS: [string, string, string[]][] = [
@@ -100,6 +103,7 @@ function Accessibilite({ rond = false }: { rond?: boolean }) {
 
 /** Habillage des pages vues sur ordinateur (landing, pages légales) : en-tête + pied, responsive. */
 export function SiteDesktop({ children, sansEntete = false }: { children: React.ReactNode; sansEntete?: boolean }) {
+  const boutique = useBoutique()
   const [tuto, setTuto] = useState(false)
   useEffect(() => { const f = () => setTuto(true); addEventListener('tuto-installation', f); return () => removeEventListener('tuto-installation', f) }, [])
   return (
@@ -110,7 +114,7 @@ export function SiteDesktop({ children, sansEntete = false }: { children: React.
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3 md:px-8">
           <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><img src="/logo-orange.png" alt="Scent Back" className="h-full w-full scale-[2] object-contain" /></a>
           <nav aria-label="Actions" className="flex items-center gap-2">
-            <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-[#FCF5E3]/40 px-4 text-sm font-bold transition hover:border-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>
+            {boutique && <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-[#FCF5E3]/40 px-4 text-sm font-bold transition hover:border-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>}
             <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-flamme px-5 text-sm font-bold text-[#023341] transition hover:brightness-110"><Icon name="nfc" size={18} />Installer l'appli</button>
           </nav>
         </div>
@@ -125,7 +129,7 @@ export function SiteDesktop({ children, sansEntete = false }: { children: React.
           </div>
           <nav aria-label="Découvrir" className="flex flex-col gap-3">
             <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">Découvrir</p>
-            <a href="/boutique" className="hover:text-flamme">La boutique</a>
+            {boutique && <a href="/boutique" className="hover:text-flamme">La boutique</a>}
             <button onClick={() => setTuto(true)} className="w-fit hover:text-flamme">Installer l'appli</button>
             <a href="/#contenu" className="hover:text-flamme">L'expérience</a>
           </nav>
@@ -256,6 +260,7 @@ function LoaderBougie() {
 
 /** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
+  const boutique = useBoutique()
   useApparition()
   useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
   const [demo, setDemo] = useState<Lot>()
@@ -279,7 +284,7 @@ export default function Landing() {
             <h1 className="titre mt-5 text-[clamp(3rem,6vw,9rem)] leading-[.85]">Fermez les yeux<span className="text-flamme">.</span></h1>
             <p className="mx-auto mt-5 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed">Une box, un jeu culte d'Ubisoft et une bougie La Belle Mèche qui a l'odeur de son monde.</p>
             <div className="mt-6 flex justify-center gap-3">
-              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>
+              {boutique && <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>}
               <button onClick={() => dispatchEvent(new Event('visite-auto'))} className="min-h-12 rounded-[10px] border-2 border-current/40 px-5 text-sm font-bold">▶ Visite automatique</button>
             </div>
           </div></section>
@@ -360,6 +365,7 @@ export default function Landing() {
               </div>
             </div>
           </section>
+          {boutique && <>
           <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-creme text-encre"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Chaque lapin trouvé rapporte des points. <span className="text-flamme">Et la box, elle, se commande ici.</span></p></div>
           <section data-cascade className="relative grid min-h-dvh content-center bg-[#011A22] px-[8vw] py-24 text-[#FCF5E3] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div className="flex flex-wrap items-end justify-between gap-6">
@@ -375,6 +381,7 @@ export default function Landing() {
               ))}
             </div>
           </section>
+          </>}
         </div>
       </main>
       {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}
