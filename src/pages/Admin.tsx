@@ -7,7 +7,7 @@ import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue, enregistrerLot, getLots, supprimerLot, validerBon, type Lot,
-  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte, getPopup, setPopup, getProduits, enregistrerProduit, supprimerProduit, type Produit, AFFICHE_POPUP, getLancees, setLancees } from '../lib/api'
+  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte, getPopup, setPopup, getProduits, enregistrerProduit, supprimerProduit, type Produit, AFFICHE_POPUP, getLancees, setLancees, getCachees, setCachees } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
@@ -572,6 +572,8 @@ function AdminPermanente() {
   const [edition, setEdition] = useState<string>()
   const fini = () => { setEdition(undefined); setV(v + 1) }
   const lancees = useData(getLancees, v) ?? []
+  const cachees = useData(getCachees, v) ?? []
+  const cacher = async (l: string) => { try { await setCachees(cachees.includes(l) ? cachees.filter((x) => x !== l) : [...cachees, l]); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   const lancer = async (l: string) => { try { await setLancees(lancees.includes(l) ? lancees.filter((x) => x !== l) : [...lancees, l]); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   const basculerEpuise = async (p: Produit) => { try { await enregistrerProduit({ ...p, epuise: !p.epuise }); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   const supprimer = async (p: Produit) => { if (!confirm(`Supprimer « ${p.nom} » ?`)) return; try { await supprimerProduit(p.id); setV(v + 1) } catch (err) { alert((err as Error).message) } }
@@ -594,16 +596,18 @@ function AdminPermanente() {
         </div>
       </section>
       <section className="flex flex-col gap-3" aria-labelledby="lancements">
-        <h2 id="lancements" className="titre text-xl">Lancer une collection</h2>
-        <p className="-mt-2 text-xs text-doux">Tant qu'une collection n'est pas lancée, tous ses produits s'affichent « Prochainement ».</p>
+        <h2 id="lancements" className="titre text-xl">Collections</h2>
+        <p className="-mt-2 text-xs text-doux">Non lancée : produits « Prochainement ». Masquée : la collection entière disparaît de la boutique.</p>
         <ul className="grid grid-cols-2 gap-2 landscape:grid-cols-4">
           {[...new Set(produits.map((p) => p.licence).filter(Boolean))].map((l) => {
-            const on = lancees.includes(l!)
+            const on = lancees.includes(l!), cachee = cachees.includes(l!)
             return (
-              <li key={l}><button aria-pressed={on} onClick={() => lancer(l!)}
-                className={`flex min-h-14 w-full items-center justify-between gap-2 rounded-[16px] px-4 text-left text-sm font-bold transition ${on ? 'bg-flamme text-[#023341]' : 'border-[1.5px] border-trait'}`}>
-                <span>{l}</span><span className="text-xs">{on ? 'En vente ✓' : 'Prochainement'}</span>
-              </button></li>
+              <li key={l} className={`flex flex-col gap-1.5 rounded-[16px] border-[1.5px] p-2 ${cachee ? 'border-dashed border-trait opacity-60' : 'border-trait'}`}>
+                <p className="px-2 pt-1 text-sm font-bold">{l}</p>
+                <button aria-pressed={on} disabled={cachee} onClick={() => lancer(l!)}
+                  className={`min-h-10 rounded-full text-xs font-bold transition disabled:opacity-40 ${on ? 'bg-flamme text-[#023341]' : 'bg-creme-2'}`}>{on ? 'En vente ✓' : 'Prochainement · lancer'}</button>
+                <button aria-pressed={cachee} onClick={() => cacher(l!)} className="min-h-10 rounded-full border-[1.5px] border-trait text-xs font-bold">{cachee ? 'Masquée · afficher' : 'Masquer de la boutique'}</button>
+              </li>
             )
           })}
         </ul>

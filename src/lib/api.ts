@@ -372,20 +372,25 @@ export const PRODUITS_DEFAUT: Produit[] = [
   { id: 'savon-the-division', nom: 'Savon Bwaaah · The Division', detail: 'Savon en forme de Lapin Crétin, anthracite The Division.', prix: 8.9, image: '/site/savons/the-division.webp', dispo: true, ordre: 22, categorie: 'savon', licence: 'The Division' },
 ]
 /** Licences lancées à la vente (ex. ["Assassin's Creed"]). Les autres produits restent « Prochainement ». */
-export async function getLancees(): Promise<string[]> {
-  if (MOCK) return JSON.parse(localStorage.getItem('licences_lancees') ?? '[]')
-  const { data } = await supabase.from('reglages').select('valeur').eq('cle', 'licences_lancees').maybeSingle()
+async function lireListe(cle: string): Promise<string[]> {
+  if (MOCK) return JSON.parse(localStorage.getItem(cle) ?? '[]')
+  const { data } = await supabase.from('reglages').select('valeur').eq('cle', cle).maybeSingle()
   return Array.isArray(data?.valeur) ? data.valeur : []
 }
-export async function setLancees(l: string[]) {
-  if (MOCK) return localStorage.setItem('licences_lancees', JSON.stringify(l))
-  const { error } = await supabase.from('reglages').upsert({ cle: 'licences_lancees', valeur: l })
+async function ecrireListe(cle: string, l: string[]) {
+  if (MOCK) return localStorage.setItem(cle, JSON.stringify(l))
+  const { error } = await supabase.from('reglages').upsert({ cle, valeur: l })
   if (error) throw error
 }
+export const getLancees = () => lireListe('licences_lancees')
+export const setLancees = (l: string[]) => ecrireListe('licences_lancees', l)
+/** Licences masquées : leurs produits disparaissent de la boutique (site et appli). */
+export const getCachees = () => lireListe('licences_cachees')
+export const setCachees = (l: string[]) => ecrireListe('licences_cachees', l)
 /** Produits tels que vus par le public : en vente seulement si dispo ET licence lancée. */
 export async function getProduitsVente(): Promise<Produit[]> {
-  const [p, l] = await Promise.all([getProduits(), getLancees()])
-  return p.map((x) => ({ ...x, dispo: x.dispo && !!x.licence && l.includes(x.licence) }))
+  const [p, l, c] = await Promise.all([getProduits(), getLancees(), getCachees()])
+  return p.filter((x) => !x.licence || !c.includes(x.licence)).map((x) => ({ ...x, dispo: x.dispo && !!x.licence && l.includes(x.licence) }))
 }
 export async function getProduits(): Promise<Produit[]> {
   if (MOCK) return ((JSON.parse(localStorage.getItem('produits') ?? 'null') ?? PRODUITS_DEFAUT) as Produit[]).sort((a, b) => a.ordre - b.ordre)
