@@ -259,9 +259,14 @@ export default function Landing() {
         {/* L'expérience : la bougie 3D dans le noir (canvas fixe), le récit défile par-dessus */}
         <SceneBougie />
         <div data-experience className="relative text-encre">
-          <section className="relative z-10 flex min-h-dvh items-center justify-center px-[8vw] text-center"><div>
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-[46vw]">
             <p className="inline-block rounded-full bg-flamme px-4 py-1.5 text-sm font-bold tracking-[.22em] text-[#023341] uppercase">Ubisoft × La Belle Mèche</p>
-            <h1 className="titre mt-4 text-[clamp(4rem,10vw,10rem)] leading-[.85]">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+            <h1 className="titre mt-6 text-[clamp(4rem,9vw,9rem)] leading-[.85]">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+            <p className="mt-8 max-w-md text-xl leading-relaxed">Une box, un jeu culte d'Ubisoft et une bougie La Belle Mèche qui a l'odeur de son monde.</p>
+            <div className="mt-8 flex gap-3">
+              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>
+              <span className="min-h-12 content-center px-2 text-sm font-bold opacity-70">Défilez pour allumer ↓</span>
+            </div>
           </div></section>
           <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
             <p data-mots className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-snug font-medium">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… et pourtant, vous ne les avez jamais sentis.</p>

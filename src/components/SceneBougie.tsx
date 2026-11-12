@@ -14,7 +14,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 
 // Points de vue (unités de la scène : la bougie fait ~0,93 de haut). cible.x décale la bougie à l'écran.
 const VUES: { pos: [number, number, number]; cible: [number, number, number] }[] = [
-  { pos: [0, 0.62, 3.3], cible: [0, 0.48, 0] },        // 0 · Fermez les yeux : la flamme dans le noir
+  { pos: [0.6, 0.75, 2.8], cible: [-0.75, 0.5, 0] },  // 0 · Fermez les yeux : la flamme dans le noir
   { pos: [1.5, 0.95, 2.2], cible: [-0.55, 0.5, 0] },   // 1 · manifeste (texte à gauche)
   { pos: [-1.3, 0.55, 1.6], cible: [0.5, 0.45, 0] },   // 2 · voir / entendre / sentir (texte à droite)
   { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
