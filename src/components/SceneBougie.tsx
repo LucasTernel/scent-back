@@ -99,6 +99,13 @@ export default function SceneBougie() {
     const braises = new THREE.Points(braisesGeo, new THREE.PointsMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d')!; const r = g.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, '#fff'); r.addColorStop(.4, 'rgba(255,200,120,.8)'); r.addColorStop(1, 'rgba(255,150,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c) })(), color: 0xffb060, size: .006, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false }))
 
     void braises
+    // à partir de « la première collection », la bougie laisse place au Lapin Ultimate
+    let bougieObjets: THREE.Object3D[] = [groupeFlamme]
+    let lapin: THREE.Object3D | undefined
+    new GLTFLoader().load('/models/lapin-ultimate.glb', (g) => {
+      lapin = g.scene; const box = new THREE.Box3().setFromObject(lapin)
+      lapin.scale.multiplyScalar(1.05 / (box.max.y - box.min.y)); lapin.visible = false; scene.add(lapin)
+    })
     // la bougie
     let cire: THREE.Object3D | undefined, haut: THREE.Group | undefined, hauteurCire = .56
     const sommetMeche = new THREE.Vector3(0, .82, 0)
@@ -114,6 +121,7 @@ export default function SceneBougie() {
       }
       haut = new THREE.Group(); scene.add(haut)
       if (meche) { haut.attach(meche); const bm = new THREE.Box3().setFromObject(meche); sommetMeche.set(0, bm.max.y, 0) }
+      bougieObjets = [b, cire!, haut, groupeFlamme].filter(Boolean) as THREE.Object3D[]
       dispatchEvent(new Event('scene-bougie-prete'))
     })
 
@@ -155,6 +163,11 @@ export default function SceneBougie() {
       if (haut) haut.position.y = -baisse
       if (compteur) compteur.textContent = String(Math.round(140 * (1 - fonte / .85 * .99)))
 
+      // bascule bougie → lapin entre les chapitres 6,4 et 6,9
+      const bascule = Math.min(1, Math.max(0, (f - 6.4) / .5))
+      bougieObjets.forEach((o) => { o.visible = bascule < .5; o.scale.setScalar(o === bougieObjets[0] && o !== groupeFlamme ? 10 * Math.max(.001, 1 - bascule * 2) : o.scale.x) })
+      flamme.visible = bascule < .5
+      if (lapin) { lapin.visible = bascule > .5; lapin.rotation.y = Math.atan2(camera.position.x, camera.position.z) + Math.sin(t * .8) * .35; const s = Math.max(.001, (bascule - .5) * 2); lapin.userData.s ??= lapin.scale.x; lapin.scale.setScalar(lapin.userData.s * s) }
       // flamme vivante
       const vac = 1 + Math.sin(t * 13) * .05 + Math.sin(t * 29) * .04 + (Math.random() - .5) * .06
       groupeFlamme.position.set(sommetMeche.x, sommetMeche.y - baisse - .005, sommetMeche.z)

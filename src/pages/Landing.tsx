@@ -113,7 +113,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
       <div className="flex-1">{children}</div>
       <footer className="relative z-10 border-t border-trait bg-creme">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-doux md:flex-row md:items-center md:justify-between md:px-8">
-          <p>Scent Back · projet étudiant BUT MMI</p>
+          <div className="flex items-center gap-4"><LogoMarque className="-my-4 h-24 w-auto" /><p>Scent Back · projet étudiant BUT MMI</p></div>
           <nav aria-label="Informations légales" className="flex flex-wrap gap-x-5 gap-y-2">
             {LEGAL.map(([k, l]) => <a key={k} href={`/legal/${k}`} className="inline-flex min-h-10 items-center hover:text-encre hover:underline">{l}</a>)}
           </nav>
