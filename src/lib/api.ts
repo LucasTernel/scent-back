@@ -35,7 +35,7 @@ const sb = {
     // captures sans photo (ex. données de démo) : pas d'URL signée à demander
     const chemins = data.map((c) => c.photo_path).filter(Boolean) as string[]
     // les photos sont un bonus : si leur lien échoue, on affiche quand même les captures
-    let urls: { path: string | null; signedUrl: string }[] | null = []
+    let urls: { path: string | null; signedUrl: string | null }[] | null = []
     if (chemins.length) try { urls = (await supabase.storage.from('captures').createSignedUrls(chemins, 3600)).data } catch { urls = [] }
     const url = (p: string | null) => urls?.find((u) => u.path === p)?.signedUrl ?? undefined
     return data.map((c) => ({ statueId: c.statue_id, photo: url(c.photo_path), createdAt: c.created_at }))
