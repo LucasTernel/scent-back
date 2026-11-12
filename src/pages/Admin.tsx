@@ -1,3 +1,4 @@
+import ScanQr from '../components/ScanQr'
 import QrCode from '../components/QrCode'
 import { renderSVG } from 'uqr'
 import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
@@ -29,6 +30,10 @@ const Carton = ({ children, className = '' }: { children: ReactNode; className?:
 )
 
 /** En-tête admin : ligne retour + action à droite, puis titre complet (jamais coupé) et description. */
+/** Tête du lapin (même rendu que les avatars) d'après le nom de son modèle 3D. */
+const TETES = ['arc', 'canal', 'eiffel', 'louvre', 'luxem', 'marais', 'montm', 'ndame', 'opera', 'panth', 'pneuf', 'revolutionnaire', 'ultimate']
+const tete = (model?: string | null) => { const m = model?.match(/lapin-([a-z]+)\.glb/)?.[1]; return m && TETES.includes(m) ? `/avatars/lapin-${m}.png` : undefined }
+
 function Tete({ sous, titre, retour, action, desc }: { sous?: string; titre: string; retour?: string; action?: ReactNode; desc?: string }) {
   return (
     <header className="monte flex flex-col gap-1.5">
@@ -124,8 +129,8 @@ export function AdminAccueil() {
                 <li key={x.statue_id}>
                   <Link viewTransition to={`/statuette/${x.statue_id}`} className="flex items-center gap-3">
                     <span className={`titre w-6 text-xl ${i === 0 ? 'text-flamme' : 'text-doux'}`}>{i + 1}</span>
-                    <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-creme-2">
-                      {s?.image_url ? <img src={s.image_url} alt="" className="size-full object-cover" /> : <Lapin className="w-8" />}
+                    <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-[radial-gradient(circle_at_50%_35%,#0E5A70,#023341)]">
+                      {tete(s?.model_url) ? <img src={tete(s?.model_url)} alt="" className="size-full object-cover" /> : s?.image_url ? <img src={s.image_url} alt="" className="size-full object-cover" /> : <Lapin className="w-8" />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-bold">{s?.name ?? '…'}</span>
@@ -477,6 +482,7 @@ export function AdminBoutique() {
   const [edition, setEdition] = useState<string>() // id du lot édité, ou 'nouveau'
   const [code, setCode] = useState('')
   const [bon, setBon] = useState<{ ok: boolean; texte: string }>()
+  const [scan, setScan] = useState(false)
   const fini = () => { setEdition(undefined); setV(v + 1) }
   const ouverte = useData(getBoutiqueOuverte, v) ?? false
   const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
@@ -494,55 +500,88 @@ export function AdminBoutique() {
     try { await supprimerLot(l.id); setV(v + 1) } catch (err) { alert((err as Error).message) }
   }
 
+  const stock = lots.reduce((s, l) => s + l.stock, 0), ruptures = lots.filter((l) => l.stock === 0).length
   return (
     <div className="flex flex-col gap-5">
-      <Tete sous="Espace admin" titre="Boutique" action={<button onClick={() => setEdition('nouveau')} className="flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-flamme px-4 text-sm font-bold text-encre shadow-md"><Icon name="plus" size={18} />Lot</button>} />
+      <Tete sous="Espace admin" titre="Boutique" />
 
-      <Carton className="flex items-center justify-between gap-4 p-4">
-        <div>
-          <h2 className="font-serif text-lg font-bold">Boutique en ligne</h2>
-          <p className="text-xs text-doux">{ouverte ? 'Visible sur le site et dans l\'appli.' : 'Masquée : ni le site ni l\'appli ne montrent les produits.'} Les récompenses en points restent toujours actives.</p>
-        </div>
-        <button role="switch" aria-checked={ouverte} aria-label="Boutique en ligne ouverte" onClick={basculer}
-          className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${ouverte ? 'bg-flamme' : 'bg-trait'}`}>
-          <span className={`absolute top-1 left-1 size-6 rounded-full bg-papier transition-transform ${ouverte ? 'translate-x-6' : ''}`} />
-        </button>
-      </Carton>
-
-      <Carton className="p-4">
-        <h2 className="font-serif text-lg font-bold">Valider un bon</h2>
-        <p className="mb-3 text-xs text-doux">Le joueur te montre son code au pop-up store.</p>
-        <form onSubmit={valider} className="flex gap-2">
-          <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setBon(undefined) }} aria-label="Code du bon" placeholder="AB12CD" maxLength={6}
-            className="champ flex-1 text-center font-mono text-lg tracking-[.3em] uppercase" autoComplete="off" autoCapitalize="characters" />
-          <button disabled={code.length < 6} className="btn btn-encre !w-auto px-5">Valider</button>
-        </form>
-        {bon && <p role="status" className={`mt-3 rounded-2xl px-4 py-3 text-sm font-bold ${bon.ok ? 'bg-flamme/15' : 'bg-sceau/10 text-sceau'}`}>{bon.ok ? '✓ ' : ''}{bon.texte}</p>}
-      </Carton>
-
-      <Carton className="overflow-hidden">
-        <h2 className="px-4 pt-3.5 pb-2 font-serif text-lg font-bold">Lots ({lots.length})</h2>
-        {edition === 'nouveau' && <FormLot fini={fini} />}
-        {lots.map((l) => (
-          <div key={l.id} className="border-t border-creme-2">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-creme-2">
-                {l.image_url ? <img src={l.image_url} alt="" className="size-full object-cover" /> : <Icon name="boutique" size={22} className="text-doux" />}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold">{l.name}</p>
-                <p className="text-xs text-doux">{l.cost} pts · {l.stock === 0 ? <b className="text-sceau">rupture</b> : `${l.stock} en stock`}</p>
-              </div>
-              <button onClick={() => setEdition(edition === l.id ? undefined : l.id)} className="min-h-10 rounded-full border-[1.5px] border-trait px-3 text-xs font-bold">Modifier</button>
-              <button onClick={() => supprimer(l)} aria-label={`Supprimer ${l.name}`} className="grid size-10 place-items-center rounded-full text-sceau"><span aria-hidden className="text-lg">×</span></button>
-            </div>
-            {edition === l.id && <FormLot lot={l} fini={fini} />}
+      {/* Bandeau : état de la boutique + chiffres clés */}
+      <section className="monte relative overflow-hidden rounded-[28px] bg-[#023341] p-5 text-[#FCF5E3]">
+        <span aria-hidden className="absolute -top-16 -right-16 size-48 rounded-full bg-flamme/25 blur-2xl" />
+        <div className="relative flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-bold tracking-[.2em] text-flamme uppercase">Boutique en ligne</p>
+            <p className="titre mt-1 text-2xl">{ouverte ? 'Ouverte' : 'Fermée'}</p>
+            <p className="mt-1 max-w-[16rem] text-xs opacity-70">{ouverte ? 'Produits visibles sur le site et dans l\'appli.' : 'Produits masqués partout. Les récompenses restent actives.'}</p>
           </div>
-        ))}
-      </Carton>
+          <button role="switch" aria-checked={ouverte} aria-label="Boutique en ligne ouverte" onClick={basculer}
+            className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${ouverte ? 'bg-flamme' : 'bg-[#FCF5E3]/25'}`}>
+            <span className={`absolute top-1 left-1 size-7 rounded-full bg-[#FCF5E3] shadow transition-transform ${ouverte ? 'translate-x-7' : ''}`} />
+          </button>
+        </div>
+        <dl className="relative mt-5 grid grid-cols-3 gap-2">
+          {[['Récompenses', lots.length], ['En stock', stock], ['Ruptures', ruptures]].map(([k, n]) => (
+            <div key={k} className="rounded-[16px] bg-[#FCF5E3]/8 p-3"><dd className={`titre text-2xl ${k === 'Ruptures' && n ? 'text-flamme' : ''}`}>{n}</dd><dt className="text-[11px] font-bold opacity-70">{k}</dt></div>
+          ))}
+        </dl>
+      </section>
 
-      <h2 className="titre mt-4 text-xl">« Cliquez pour sentir »</h2>
-      <AdminSenteurs />
+      {/* Valider un bon : format ticket */}
+      <section className="monte relative rounded-[24px] bg-flamme p-5 text-[#023341]">
+        <span aria-hidden className="absolute top-1/2 -left-3 size-6 -translate-y-1/2 rounded-full bg-creme" />
+        <span aria-hidden className="absolute top-1/2 -right-3 size-6 -translate-y-1/2 rounded-full bg-creme" />
+        <div className="flex items-center justify-between gap-3">
+          <div><h2 className="titre text-xl">Valider un bon</h2><p className="text-xs font-medium opacity-80">Scanne le QR du joueur ou tape son code.</p></div>
+          <button onClick={() => setScan(true)} aria-label="Scanner le QR code du bon" className="grid size-12 shrink-0 place-items-center rounded-full bg-[#023341] text-[#FCF5E3]"><Icon name="photo" size={22} /></button>
+        </div>
+        <form onSubmit={valider} className="mt-4 flex gap-2 border-t-2 border-dashed border-[#023341]/30 pt-4">
+          <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setBon(undefined) }} aria-label="Code du bon" placeholder="AB12CD" maxLength={6}
+            className="min-h-12 min-w-0 flex-1 rounded-full bg-[#FCF5E3] px-4 text-center font-mono text-lg tracking-[.3em] text-[#023341] uppercase outline-none placeholder:text-[#023341]/30" autoComplete="off" autoCapitalize="characters" />
+          <button disabled={code.length < 6} className="min-h-12 rounded-full bg-[#023341] px-5 font-bold text-[#FCF5E3] disabled:opacity-40">Valider</button>
+        </form>
+        {bon && <p role="status" className={`mt-3 rounded-2xl px-4 py-3 text-sm font-bold ${bon.ok ? 'bg-[#023341] text-[#FCF5E3]' : 'bg-[#FCF5E3] text-sceau'}`}>{bon.ok ? '✓ ' : ''}{bon.texte}</p>}
+      </section>
+      {scan && <ScanQr extraire={(t) => t.match(/^[A-Z0-9]{6}$/i)?.[0]} trouve={(c) => { setScan(false); setCode(c.toUpperCase()); setBon(undefined) }} fermer={() => setScan(false)} />}
+
+      {/* Récompenses en grille de cartes */}
+      <section className="flex flex-col gap-3">
+        <div className="flex items-end justify-between">
+          <h2 className="titre text-xl">Récompenses</h2>
+          <button onClick={() => setEdition(edition === 'nouveau' ? undefined : 'nouveau')} className="flex min-h-11 items-center gap-1 rounded-full bg-encre px-4 text-sm font-bold text-creme"><Icon name="plus" size={18} />Ajouter</button>
+        </div>
+        {edition === 'nouveau' && <Carton><FormLot fini={fini} /></Carton>}
+        <ul className="grid grid-cols-2 gap-3">
+          {lots.map((l) => {
+            const max = Math.max(...lots.map((x) => x.stock), 1)
+            return (
+              <li key={l.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === l.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
+                <div className="relative aspect-[4/3] bg-creme-2">
+                  {l.image_url ? <img src={l.image_url} alt="" className="size-full object-cover" /> : <span className="grid size-full place-items-center text-doux"><Icon name="boutique" size={36} /></span>}
+                  <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">{l.cost} pts</span>
+                  {l.stock === 0 && <span className="absolute inset-0 grid place-items-center bg-[#023341]/70 font-bold tracking-widest text-[#FCF5E3] uppercase">Rupture</span>}
+                </div>
+                <div className="flex flex-1 flex-col gap-2 p-3">
+                  <p className="line-clamp-2 font-serif text-sm leading-tight font-bold">{l.name}</p>
+                  <div className="mt-auto">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-creme-2"><div className={`h-full rounded-full ${l.stock ? 'bg-flamme' : 'bg-sceau'}`} style={{ width: `${(l.stock / max) * 100}%` }} /></div>
+                    <p className="mt-1 text-[11px] text-doux">{l.stock} en stock</p>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button onClick={() => setEdition(edition === l.id ? undefined : l.id)} className="min-h-10 flex-1 rounded-full bg-encre text-xs font-bold text-creme">{edition === l.id ? 'Fermer' : 'Modifier'}</button>
+                    <button onClick={() => supprimer(l)} aria-label={`Supprimer ${l.name}`} className="grid size-10 place-items-center rounded-full border-[1.5px] border-trait text-sceau">×</button>
+                  </div>
+                </div>
+                {edition === l.id && <div className="border-t border-creme-2"><FormLot lot={l} fini={fini} /></div>}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="titre text-xl">« Cliquez pour sentir »</h2>
+        <AdminSenteurs />
+      </section>
     </div>
   )
 }
