@@ -39,7 +39,7 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
           {/* socle derrière le modèle (un hotspot HTML passait devant le canvas) */}
           <div aria-hidden className="socle absolute bottom-[8%] left-1/2 -translate-x-1/2"
             style={{ ['--c' as string]: hex, zIndex: 0, width: '58%', height: 'auto', aspectRatio: '58 / 13', filter: debloque ? undefined : 'brightness(0) invert(1) opacity(.35)' }} />
-          <model-viewer src={model} alt={debloque ? `Modèle 3D de ${nom}` : 'Silhouette d\'une statuette mystère'}
+          <model-viewer key={String(debloque)} src={model} alt={debloque ? `Modèle 3D de ${nom}` : 'Silhouette d\'une statuette mystère'}
             {...(mini ? {} : { 'camera-controls': true, 'touch-action': 'none', 'min-camera-orbit': 'auto 45deg auto', 'max-camera-orbit': 'auto 100deg auto' })}
             auto-rotate auto-rotate-delay="0" rotation-per-second={mini ? '18deg' : '24deg'} interaction-prompt="none"
             disable-zoom disable-pan shadow-intensity="1.2" shadow-softness=".8" exposure="1.15"
