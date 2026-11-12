@@ -8,7 +8,7 @@ import Classement from './pages/Classement'
 import Legal from './pages/Legal'
 import Consentement from './components/Consentement'
 import Detail from './pages/Detail'
-import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminNouvelleStatue, AdminStatue } from './pages/Admin'
+import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminFormStatue, AdminStatue } from './pages/Admin'
 import Claim from './pages/Claim'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
@@ -62,7 +62,10 @@ export default function App() {
 
   return (
     <>
-      {shown && (!MOCK && !session ? (
+      {shown && (apercu ? (
+        // aperçu dans la landing : la carte de chasse, sans compte
+        <Routes><Route element={<Layout />}><Route path="*" element={<Scan />} /></Route></Routes>
+      ) : !MOCK && !session ? (
         <Routes>
           <Route path="legal/:page" element={<div className="mx-auto min-h-dvh max-w-md px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-10"><Legal /></div>} />
           <Route path="*" element={<Login />} />
@@ -76,7 +79,8 @@ export default function App() {
             <Route path="collections/nouvelle" element={<AdminFormCollection />} />
             <Route path="collections/:id/modifier" element={<AdminFormCollection />} />
             <Route path="collections/:id" element={<AdminCollection />} />
-            <Route path="collections/:id/ajouter" element={<AdminNouvelleStatue />} />
+            <Route path="collections/:id/ajouter" element={<AdminFormStatue />} />
+            <Route path="statuette/:sid/modifier" element={<AdminFormStatue />} />
             <Route path="statuette/:id" element={<AdminStatue />} />
             <Route path="compte" element={<Account />} />
             <Route path="legal/:page" element={<Legal />} />

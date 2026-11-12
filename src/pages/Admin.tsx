@@ -1,7 +1,7 @@
 import { useCallback, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection,
+  adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue,
   getCollections, getProfile, uploadMedia, type Rarity,
 } from '../lib/api'
 import { useData } from '../lib/useData'
@@ -270,7 +270,7 @@ export function AdminCollection() {
           <div className="overflow-hidden rounded-b-[32px] border-b-[1.5px] border-trait bg-papier px-4 pt-16 pb-5">
             {col.image_url && <img src={col.image_url} alt="" className="mx-auto max-h-64 w-full object-contain" />}
           </div>
-          <Link viewTransition data-dir="arriere" to="/collections" aria-label="Retour" className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
+          <Link viewTransition data-dir="arriere" to="/collections" aria-label="Retour" className="absolute top-4 left-4 z-10 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
           <div className="absolute top-4 right-4"><BoutonAjout to={`/collections/${id}/ajouter`} label="Statuette" /></div>
         </div>
       )}
@@ -302,50 +302,69 @@ export function AdminCollection() {
   )
 }
 
-export function AdminNouvelleStatue() {
-  const { id } = useParams()
+/** Création (/collections/:id/ajouter) ou modification (/statuette/:sid/modifier) d'une statuette. */
+export function AdminFormStatue() {
+  const { id, sid } = useParams()
   const navigate = useNavigate()
+  const s = useData(adminStatues)?.find((x) => x.id === sid)
+  const cols = useData(getCollections) ?? []
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
-  const [pos, setPos] = useState({ lat: '', lng: '' })
+  const [pos, setPos] = useState<{ lat: string; lng: string }>()
+  if (sid && !s) return null
+  const lat = pos?.lat ?? (s ? String(s.lat) : ''), lng = pos?.lng ?? (s ? String(s.lng) : '')
+  const retour = sid ? `/statuette/${sid}` : `/collections/${id}`
+
   async function envoyer(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); setBusy(true); setMsg('')
     const f = new FormData(e.currentTarget)
     try {
-      const fichier = (k: string) => { const x = f.get(k) as File; return x?.size ? uploadMedia(x) : null }
+      const fichier = async (k: string) => { const x = f.get(k) as File; return x?.size ? await uploadMedia(x) : undefined }
       const [image_url, model_url] = await Promise.all([fichier('image'), fichier('model')])
-      await createStatue({
+      const col = sid ? String(f.get('collection') || '') : id
+      const v = {
         code: String(f.get('code')).trim().toUpperCase(), name: f.get('name'), description: f.get('description'), hint: f.get('hint'),
         district: f.get('district'), rarity: f.get('rarity') as Rarity, points: Number(f.get('points')),
-        lat: Number(f.get('lat')), lng: Number(f.get('lng')), collection_id: id === 'aucune' ? null : id, image_url, model_url,
-      })
-      navigate(`/collections/${id}`, { viewTransition: true })
+        lat: Number(f.get('lat')), lng: Number(f.get('lng')), collection_id: !col || col === 'aucune' ? null : col,
+        ...(image_url && { image_url }), ...(model_url && { model_url }),
+      }
+      if (sid) await updateStatue(sid, v); else await createStatue(v)
+      navigate(retour, { viewTransition: true })
     } catch (err) { setMsg((err as Error).message) }
     setBusy(false)
   }
   const maPosition = () => navigator.geolocation.getCurrentPosition((g) => setPos({ lat: g.coords.latitude.toFixed(6), lng: g.coords.longitude.toFixed(6) }))
+
   return (
     <div className="flex flex-col gap-5">
-      <Tete retour={`/collections/${id}`} titre="Nouvelle statuette" />
+      <Tete retour={retour} titre={sid ? 'Modifier la statuette' : 'Nouvelle statuette'} />
       {msg && <p role="alert" className="rounded-2xl bg-sceau/10 px-4 py-3 text-sm text-sceau">{msg}</p>}
       <form onSubmit={envoyer} className="flex flex-col gap-2.5">
-        <Champ label="Nom" name="name" required />
-        <Champ label="Code NFC (dans le lien /s/CODE)" name="code" required pattern="[A-Za-z0-9-]{3,20}" placeholder="LOUVRE-7Q2" />
-        <Champ label="Description (révélée après capture)" name="description" />
-        <Champ label="Indice" name="hint" />
-        <Champ label="Quartier" name="district" />
+        <Champ label="Nom" name="name" required defaultValue={s?.name} />
+        <Champ label="Code NFC (dans le lien /s/CODE)" name="code" required pattern="[A-Za-z0-9-]{3,20}" placeholder="LOUVRE-7Q2" defaultValue={s?.code} />
+        {sid && <p className="-mt-1 px-1 text-xs text-doux">Changer le code oblige à réécrire la puce NFC.</p>}
+        <Champ label="Description (révélée après capture)" name="description" defaultValue={s?.description ?? ''} />
+        <Champ label="Indice" name="hint" defaultValue={s?.hint ?? ''} />
+        <Champ label="Quartier" name="district" defaultValue={s?.district ?? ''} />
+        {sid && (
+          <label className="flex flex-col gap-1 text-xs font-bold text-doux">Collection
+            <select name="collection" className="champ" defaultValue={s?.collection_id ?? 'aucune'}>
+              <option value="aucune">— Sans collection —</option>{cols.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </label>
+        )}
         <div className="grid grid-cols-2 gap-2.5">
           <label className="flex flex-col gap-1 text-xs font-bold text-doux">Rareté
-            <select name="rarity" className="champ"><option value="commune">Commune</option><option value="rare">Rare</option><option value="legendaire">Légendaire</option></select>
+            <select name="rarity" className="champ" defaultValue={s?.rarity ?? 'commune'}><option value="commune">Commune</option><option value="rare">Rare</option><option value="legendaire">Légendaire</option></select>
           </label>
-          <Champ label="Points" name="points" type="number" min={1} defaultValue={30} required />
-          <Champ label="Latitude" name="lat" required inputMode="decimal" value={pos.lat} onChange={(e) => setPos({ ...pos, lat: e.target.value })} />
-          <Champ label="Longitude" name="lng" required inputMode="decimal" value={pos.lng} onChange={(e) => setPos({ ...pos, lng: e.target.value })} />
+          <Champ label="Points" name="points" type="number" min={1} defaultValue={s?.points ?? 30} required />
+          <Champ label="Latitude" name="lat" required inputMode="decimal" value={lat} onChange={(e) => setPos({ lat: e.target.value, lng })} />
+          <Champ label="Longitude" name="lng" required inputMode="decimal" value={lng} onChange={(e) => setPos({ lat, lng: e.target.value })} />
         </div>
         <button type="button" onClick={maPosition} className="btn-ligne"><Icon name="lieu" size={18} />Utiliser ma position</button>
-        <Champ label="Image" name="image" type="file" accept="image/*" />
-        <Champ label="Modèle 3D (.glb)" name="model" type="file" accept=".glb,model/gltf-binary" />
-        <button disabled={busy} className="btn btn-encre mt-2">{busy ? 'Envoi…' : 'Créer la statuette'}</button>
+        <Champ label={s?.image_url ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" />
+        <Champ label={s?.model_url ? 'Modèle 3D .glb (laisser vide pour garder l\'actuel)' : 'Modèle 3D (.glb)'} name="model" type="file" accept=".glb,model/gltf-binary" />
+        <button disabled={busy} className="btn btn-encre mt-2">{busy ? 'Envoi…' : sid ? 'Enregistrer' : 'Créer la statuette'}</button>
       </form>
     </div>
   )
@@ -364,8 +383,8 @@ export function AdminStatue() {
     <div className="-mx-5 -mt-4 flex flex-col">
       <Scene3D rarity={s.rarity} nom={s.name} model={s.model_url} image={s.image_url} vt={`c-${s.id}`} className="h-[min(56dvh,460px)] rounded-b-[36px]">
         <Link viewTransition data-vt="zoom" data-dir="arriere" to={s.collection_id ? `/collections/${s.collection_id}` : '/collections'} aria-label="Retour"
-          className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md"><Icon name="retour" size={20} /></Link>
-        {s.model_url && <p className="absolute top-6 right-4 rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-bold text-white/85 ring-1 ring-white/20">↻ Fais-le tourner</p>}
+          className="absolute top-4 left-4 z-10 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md"><Icon name="retour" size={20} /></Link>
+        <Link viewTransition to={`/statuette/${s.id}/modifier`} className="absolute top-4 right-4 z-10 flex min-h-11 items-center rounded-full bg-flamme px-4 text-sm font-bold text-encre shadow-md">Modifier</Link>
       </Scene3D>
       <div className="flex flex-col gap-5 px-5 pt-5">
         <div className="monte">

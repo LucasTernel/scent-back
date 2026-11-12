@@ -23,7 +23,7 @@ export default function Scan() {
 
   // Position en continu (radar toujours actif, sauf si refusé dans la bannière). Reste sur le téléphone.
   const [moi, setMoi] = useState<{ lat: number; lng: number }>()
-  const [refus, setRefus] = useState(lireConsent() === 'non')
+  const [refus, setRefus] = useState(lireConsent() === 'non' || window.self !== window.top) // aperçu landing : jamais de demande de position
   useEffect(() => {
     if (refus) return
     const id = navigator.geolocation.watchPosition((p) => setMoi({ lat: p.coords.latitude, lng: p.coords.longitude }), () => setRefus(true), { enableHighAccuracy: true })

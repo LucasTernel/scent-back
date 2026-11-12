@@ -150,9 +150,9 @@ export async function setIdentite(v: { prenom: string; nom: string }) {
 
 /* ---------- Admin (Supabase uniquement, protégé par RLS is_admin()) ---------- */
 
-export type StatueAdmin = { id: string; code: string; name: string; rarity: Rarity; points: number; collection_id: string | null; image_url: string | null; model_url: string | null; description: string | null; hint: string | null; district: string | null }
+export type StatueAdmin = { id: string; code: string; name: string; rarity: Rarity; points: number; collection_id: string | null; image_url: string | null; model_url: string | null; description: string | null; hint: string | null; district: string | null; lat: number; lng: number }
 export async function adminStatues(): Promise<StatueAdmin[]> {
-  const { data, error } = await supabase.from('statues').select('id, code, name, rarity, points, collection_id, image_url, model_url, description, hint, district').order('name')
+  const { data, error } = await supabase.from('statues').select('id, code, name, rarity, points, collection_id, image_url, model_url, description, hint, district, lat, lng').order('name')
   if (error) throw error
   return data
 }
@@ -178,6 +178,10 @@ export async function updateCollection(id: string, v: { name: string; descriptio
 }
 export async function createCollection(v: { name: string; description: string; image_url?: string; logo_url?: string }) {
   const { error } = await supabase.from('collections').insert(v)
+  if (error) throw error
+}
+export async function updateStatue(id: string, v: Record<string, unknown>) {
+  const { error } = await supabase.from('statues').update(v).eq('id', id)
   if (error) throw error
 }
 export async function createStatue(v: Record<string, unknown>) {

@@ -27,11 +27,11 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
       {model ? (
         pret && (
           <model-viewer src={model} alt={debloque ? `Modèle 3D de ${nom}` : 'Silhouette d\'une statuette mystère'}
-            {...(mini ? {} : { 'camera-controls': true, 'touch-action': 'pan-y' })}
+            {...(mini ? {} : { 'camera-controls': true, 'touch-action': 'none', 'min-camera-orbit': 'auto 45deg auto', 'max-camera-orbit': 'auto 100deg auto' })}
             auto-rotate auto-rotate-delay="0" rotation-per-second={mini ? '18deg' : '24deg'} interaction-prompt="none"
             disable-zoom disable-pan shadow-intensity="1.2" shadow-softness=".8" exposure="1.15"
-            camera-orbit="0deg 80deg 145%" field-of-view="30deg" loading={mini ? 'lazy' : 'eager'}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: mini ? 'none' : undefined, ['--poster-color' as string]: 'transparent',
+            camera-orbit="0deg 80deg 145%" camera-target="0m auto 0m" field-of-view="30deg" loading={mini ? 'lazy' : 'eager'}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: mini ? 'none' : undefined, cursor: mini ? undefined : 'grab', zIndex: 1, ['--poster-color' as string]: 'transparent',
               filter: debloque ? `drop-shadow(0 18px 30px ${hex}66)` : 'brightness(0) drop-shadow(0 0 18px #ffffff40)' }} />
         )
       ) : image ? (
