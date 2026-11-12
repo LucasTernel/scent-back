@@ -1,15 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCaptures, getCollections, getStatues } from '../lib/api'
 import { useData } from '../lib/useData'
-import { Icon, Lapin, rarityLabel } from '../ui'
+import { Icon, rarityLabel } from '../ui'
+import Scene3D, { HEX } from '../components/Scene3D'
 
-declare module 'react' {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX { interface IntrinsicElements { 'model-viewer': React.HTMLAttributes<HTMLElement> & Record<string, unknown> } }
-}
-
-const HEX = { commune: '#8A7660', rare: '#2F7FB5', legendaire: '#B3121B' } as const
 const NIVEAU = { commune: 1, rare: 2, legendaire: 3 } as const
 const POINTS_MAX = 250
 
@@ -20,8 +14,6 @@ export default function Detail() {
   const c = useData(getCaptures)?.find((x) => x.statueId === id)
   const col = useData(getCollections)?.find((x) => x.id === s?.collectionId)
   const ok = !!c
-  const [pret3d, setPret3d] = useState(false)
-  useEffect(() => { if (s?.model) import('@google/model-viewer').then(() => setPret3d(true)) }, [s?.model])
   if (!s) return null
   const hex = HEX[s.rarity]
   const visuel = ok ? (s.image ?? c.photo) : undefined
@@ -40,30 +32,12 @@ export default function Detail() {
   return (
     <div className="-mx-5 -mt-4 flex flex-col">
       {/* Scène : fond sombre + halo de la couleur de rareté + socle lumineux */}
-      <section className="relative h-[min(62dvh,520px)] overflow-hidden bg-[#011A22]" style={{ viewTransitionName: `c-${s.id}` }} aria-label={ok ? `Modèle de ${s.name}` : 'Statuette pas encore trouvée'}>
-        <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(60% 55% at 50% 42%, ${hex}cc 0%, ${hex}33 45%, transparent 75%)` }} />
-        <div aria-hidden className="rayons absolute top-[38%] left-1/2 size-[140%] -translate-x-1/2 -translate-y-1/2" style={{ ['--c' as string]: hex }} />
-        <div aria-hidden className="absolute bottom-[13%] left-1/2 h-10 w-[62%] -translate-x-1/2 rounded-[50%] border-2 blur-[1px]" style={{ borderColor: `${hex}`, boxShadow: `0 0 40px 8px ${hex}88, inset 0 0 24px ${hex}aa` }} />
-
-        {s.model ? (
-          pret3d && (
-            <model-viewer src={s.model} alt={ok ? `Modèle 3D de ${s.name}` : 'Silhouette d\'une statuette mystère'}
-              camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="24deg" interaction-prompt="none"
-              disable-zoom disable-pan touch-action="pan-y" shadow-intensity="1.2" shadow-softness=".8" exposure="1.15"
-              camera-orbit="0deg 80deg 145%" field-of-view="30deg"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', ['--poster-color' as string]: 'transparent', filter: ok ? `drop-shadow(0 18px 30px ${hex}66)` : 'brightness(0) drop-shadow(0 0 18px #ffffff40)' }} />
-          )
-        ) : visuel ? (
-          <img src={visuel} alt={s.name} className="absolute inset-0 size-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 grid place-items-center">{ok ? <Lapin className="w-1/2" /> : <span className="titre text-7xl text-white/15">?</span>}</div>
-        )}
-
+      <Scene3D rarity={s.rarity} nom={s.name} model={s.model} image={visuel} debloque={ok} vt={`c-${s.id}`} className="h-[min(62dvh,520px)]">
         <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-creme to-transparent" />
         <Link viewTransition data-vt="zoom" data-dir="arriere" to={`/galerie/c/${s.collectionId ?? 'aucune'}`} aria-label="Retour à la collection"
           className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md"><Icon name="retour" size={20} /></Link>
         {s.model && <p className="absolute top-6 right-4 rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-bold text-white/85 ring-1 ring-white/20">↻ Fais-le tourner</p>}
-      </section>
+      </Scene3D>
 
       <div className="relative -mt-6 flex flex-col gap-6 px-5">
         <header className="monte">

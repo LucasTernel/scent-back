@@ -6,6 +6,7 @@ import {
 } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
+import Scene3D from '../components/Scene3D'
 
 const lienNfc = (code: string) => `${location.origin}/s/${code}`
 
@@ -284,10 +285,9 @@ export function AdminCollection() {
         {statues.map((s, i) => (
           <li key={s.id} className="monte" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
             <Link viewTransition data-vt="zoom" to={`/statuette/${s.id}`} className="flex flex-col gap-2 rounded-[22px] border-[1.5px] border-trait bg-papier p-2 pb-3 active:scale-[.98] transition">
-              <span style={{ viewTransitionName: `c-${s.id}` }} className="relative grid aspect-square place-items-center overflow-hidden rounded-[16px] bg-creme-2">
-                {s.image_url ? <img src={s.image_url} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" /> : <Lapin className="w-[64%]" />}
-                <span className="absolute top-2 left-2 size-3 rounded-full ring-2 ring-papier" style={{ background: `var(--color-${s.rarity})` }} title={rarityLabel[s.rarity]} />
-              </span>
+              <Scene3D mini rarity={s.rarity} nom={s.name} model={s.model_url} image={s.image_url} vt={`c-${s.id}`} className="aspect-square rounded-[16px]">
+                {s.model_url && <span className="absolute top-2 right-2 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/25">3D</span>}
+              </Scene3D>
               <span className="line-clamp-2 px-1 font-serif text-[13px] leading-snug font-bold">{s.name}</span>
               <span className="flex items-center justify-between px-1 text-[11px] text-doux">
                 <span>{s.points} pts</span>
@@ -362,11 +362,11 @@ export function AdminStatue() {
   const taux = joueurs ? Math.round((n / joueurs) * 100) : 0
   return (
     <div className="-mx-5 -mt-4 flex flex-col">
-      <div className="relative grid aspect-square place-items-center overflow-hidden rounded-b-[36px] bg-encre" style={{ viewTransitionName: `c-${s.id}` }}>
-        {s.image_url ? <img src={s.image_url} alt={s.name} className="absolute inset-0 size-full object-cover" /> : <Lapin className="w-1/2" />}
+      <Scene3D rarity={s.rarity} nom={s.name} model={s.model_url} image={s.image_url} vt={`c-${s.id}`} className="h-[min(56dvh,460px)] rounded-b-[36px]">
         <Link viewTransition data-vt="zoom" data-dir="arriere" to={s.collection_id ? `/collections/${s.collection_id}` : '/collections'} aria-label="Retour"
-          className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-creme/90 text-encre"><Icon name="retour" size={20} /></Link>
-      </div>
+          className="absolute top-4 left-4 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md"><Icon name="retour" size={20} /></Link>
+        {s.model_url && <p className="absolute top-6 right-4 rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-bold text-white/85 ring-1 ring-white/20">↻ Fais-le tourner</p>}
+      </Scene3D>
       <div className="flex flex-col gap-5 px-5 pt-5">
         <div className="monte">
           <span className="inline-block rounded-full px-3 py-1 text-[11px] font-bold text-creme" style={{ background: `var(--color-${s.rarity})` }}>{rarityLabel[s.rarity]} · {s.district}</span>
