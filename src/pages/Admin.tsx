@@ -1,3 +1,4 @@
+import ImageProduit from '../components/ImageProduit'
 import ScanQr from '../components/ScanQr'
 import { CATEGORIES, euros } from './BoutiqueSite'
 import QrCode from '../components/QrCode'
@@ -537,7 +538,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
     try {
       const image = img?.size ? await uploadMedia(img) : p?.image ?? ''
       const id = p?.id ?? nom.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'], licence: String(f.get('licence') ?? '').trim() || null })
+      await enregistrerProduit({ id, nom, detail: String(f.get('detail')).trim(), prix: Number(f.get('prix')), image, dispo: f.get('dispo') === 'on', ordre: Number(f.get('ordre')) || ordre, categorie: String(f.get('categorie')) as Produit['categorie'], licence: String(f.get('licence') ?? '').trim() || null, epuise: f.get('epuise') === 'on' })
       fini()
     } catch (err) { alert((err as Error).message) }
     setBusy(false)
@@ -559,6 +560,7 @@ function FormProduit({ p, ordre, fini }: { p?: Produit; ordre: number; fini: () 
       <datalist id="licences">{['Assassin\'s Creed', 'Prince of Persia', 'The Division', 'All Stars'].map((l) => <option key={l} value={l} />)}</datalist>
       <Champ label={p?.image ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" required={!p} />
       <label className="flex items-center justify-between gap-3 rounded-2xl bg-creme-2 px-4 py-3 text-sm font-bold">Disponible à la commande<input type="checkbox" name="dispo" defaultChecked={p?.dispo ?? true} className="size-6" /></label>
+      <label className="flex items-center justify-between gap-3 rounded-2xl bg-flamme/15 px-4 py-3 text-sm font-bold">Sold out · « Victime de son succès »<input type="checkbox" name="epuise" defaultChecked={p?.epuise ?? false} className="size-6" /></label>
       <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
     </form>
   )
@@ -569,6 +571,7 @@ function AdminPermanente() {
   const produits = useData(getProduits, v) ?? []
   const [edition, setEdition] = useState<string>()
   const fini = () => { setEdition(undefined); setV(v + 1) }
+  const basculerEpuise = async (p: Produit) => { try { await enregistrerProduit({ ...p, epuise: !p.epuise }); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   const supprimer = async (p: Produit) => { if (!confirm(`Supprimer « ${p.nom} » ?`)) return; try { await supprimerProduit(p.id); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   const ouverte = useData(getBoutiqueOuverte, v) ?? false
   const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
@@ -598,13 +601,14 @@ function AdminPermanente() {
           {produits.map((p) => (
             <li key={p.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === p.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
               <div className="relative">
-                <img src={p.image} alt="" className="aspect-[4/3] w-full object-cover" />
+                <ImageProduit src={p.image} alt="" className="aspect-[4/3] w-full" />
                 {!p.dispo && <span className="absolute top-2 left-2 rounded-full bg-[#023341] px-2.5 py-1 text-[11px] font-bold text-[#FCF5E3]">Prochainement</span>}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-3">
                 {p.licence && <p className="text-[10px] font-bold tracking-[.14em] text-flamme uppercase">{p.licence}</p>}
                 <p className="font-serif text-sm leading-tight font-bold">{p.nom}</p>
                 <p className="text-sm font-bold text-flamme">{euros(p.prix)}</p>
+                <button onClick={() => basculerEpuise(p)} aria-pressed={!!p.epuise} className={`min-h-9 rounded-full text-xs font-bold ${p.epuise ? 'bg-flamme text-[#023341]' : 'border-[1.5px] border-trait text-doux'}`}>{p.epuise ? 'Sold out ✓' : 'Passer en sold out'}</button>
                 <div className="mt-auto flex gap-1.5">
                   <button onClick={() => setEdition(edition === p.id ? undefined : p.id)} className="min-h-10 flex-1 rounded-full bg-encre text-xs font-bold text-creme">{edition === p.id ? 'Fermer' : 'Modifier'}</button>
                   <button onClick={() => supprimer(p)} aria-label={`Supprimer ${p.nom}`} className="grid size-10 place-items-center rounded-full border-[1.5px] border-trait text-sceau">×</button>

@@ -1,3 +1,4 @@
+import ImageProduit from '../components/ImageProduit'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Icon } from '../ui'
@@ -64,7 +65,7 @@ export default function BoutiqueSite() {
   const [lic, setLic] = useState<string>()
   const licences = [...new Set(tous.map((p) => p.licence).filter(Boolean))] as string[]
   const liste = tous.filter((p) => (cat === 'tout' || p.categorie === cat) && (!lic || p.licence === lic))
-  const vedette = tous.find((p) => p.categorie === 'bundle' && p.dispo)
+  const vedette = tous.find((p) => p.categorie === 'bundle' && p.dispo && !p.epuise)
   const ajouter = (p: Produit) => { changer(p.id, 1); setAjoute(p.nom); setTimeout(() => setAjoute(undefined), 2200) }
 
   return (
@@ -72,11 +73,12 @@ export default function BoutiqueSite() {
       {/* Mise en avant : le bundle */}
       {vedette && (
         <section aria-label="À la une" className="relative grid overflow-hidden rounded-[28px] bg-[#023341] text-[#FCF5E3] md:grid-cols-[1.1fr_1fr]">
-          <img src={vedette.image} alt={vedette.nom} className="h-full max-h-[460px] w-full object-cover" />
+          <ImageProduit src={vedette.image} alt={vedette.nom} className="aspect-[16/10] h-full max-h-[460px] w-full" />
           <div className="flex flex-col justify-center gap-4 p-8 md:p-12">
-            <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">À la une · Bundle</p>
+            <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">À la une · {vedette.licence === 'All Stars' ? 'Édition limitée' : 'Bundle'}</p>
+            {vedette.licence === 'All Stars' && <p className="w-fit rounded-full border-2 border-flamme px-3 py-1 text-sm font-bold text-flamme">Dans la limite des 1 000 premières commandes</p>}
             <h1 className="titre text-[clamp(2rem,3.4vw,3.4rem)] leading-[1]">{vedette.nom}</h1>
-            <p className="text-[#FCF5E3]/75">{vedette.detail}</p>
+            <p className="text-[#FCF5E3]/75">{vedette.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
             <div className="mt-2 flex flex-wrap items-center gap-4">
               <p className="titre text-4xl">{euros(vedette.prix)}</p>
               <button onClick={() => ajouter(vedette)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341] transition hover:brightness-110">Ajouter au panier</button>
@@ -121,8 +123,9 @@ export default function BoutiqueSite() {
             {liste.map((p) => (
               <li key={p.id} className="group flex flex-col overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="relative overflow-hidden">
-                  <img src={p.image} alt={p.nom} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" />
-                  {p.categorie !== 'savon' && <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-3 right-3 size-16" />}
+                  <ImageProduit src={p.image} alt={p.nom} className="aspect-[4/3] w-full" />
+                  {<BoutonSentir id={p.id} nom={p.nom} image={p.image} petit className="absolute top-3 right-3" />}
+                  {p.epuise && <span className="absolute inset-0 grid place-items-center bg-[#011A22]/70"><span className="-rotate-6 rounded-[10px] bg-flamme px-4 py-2 text-center font-bold text-[#023341] shadow-xl"><span className="titre block text-lg leading-none">Sold out</span><span className="text-xs">Victime de son succès</span></span></span>}
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
                 </div>
                 <div className="flex flex-1 flex-col p-4">
@@ -131,7 +134,8 @@ export default function BoutiqueSite() {
                   <p className="mt-2 line-clamp-2 flex-1 text-sm text-doux">{p.detail}</p>
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <p className="titre text-xl">{euros(p.prix)}</p>
-                    {!p.dispo ? <span className="text-sm font-bold text-doux">Bientôt</span>
+                    {p.epuise ? <span className="text-sm font-bold text-flamme">Épuisé</span>
+                      : !p.dispo ? <span className="text-sm font-bold text-doux">Bientôt</span>
                       : panier[p.id] ? <Quantite q={panier[p.id]} nom={p.nom} moins={() => changer(p.id, -1)} plus={() => changer(p.id, 1)} />
                       : <button onClick={() => ajouter(p)} aria-label={`Ajouter ${p.nom} au panier`} className="grid size-11 place-items-center rounded-full bg-[#023341] text-[#FCF5E3] transition hover:bg-flamme hover:text-[#023341]"><Icon name="plus" size={20} /></button>}
                   </div>
