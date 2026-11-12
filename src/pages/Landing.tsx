@@ -50,7 +50,7 @@ function TutoInstallation({ fermer }: { fermer: () => void }) {
 }
 
 /** Bouton Accessibilité : thème (auto / clair / sombre) + taille du texte (A à A+++), mémorisés. */
-function Accessibilite() {
+function Accessibilite({ rond = false }: { rond?: boolean }) {
   const [ouvert, setOuvert] = useState(false)
   const [theme, setTheme] = useState(lireTheme)
   const [taille, setTaille] = useState(lireTaille)
@@ -66,13 +66,13 @@ function Accessibilite() {
 
   return (
     <div ref={zone} className="relative">
-      <button onClick={() => setOuvert(!ouvert)} aria-expanded={ouvert} aria-controls="panneau-a11y"
-        className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-trait px-4 text-sm font-bold transition hover:border-encre">
+      <button onClick={() => setOuvert(!ouvert)} aria-expanded={ouvert} aria-controls="panneau-a11y" aria-label="Accessibilité"
+        className={rond ? 'grid size-14 place-items-center rounded-full bg-flamme text-[#023341] shadow-xl transition hover:scale-105' : 'flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-trait px-4 text-sm font-bold transition hover:border-encre'}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="4.5" r="1.8" /><path d="M5 8.5l7 1.5 7-1.5M12 10v5m0 0l-3.5 6M12 15l3.5 6" /></svg>
-        Accessibilité
+        {!rond && 'Accessibilité'}
       </button>
       {ouvert && (
-        <div id="panneau-a11y" role="group" aria-label="Réglages d'accessibilité" className="pop absolute top-full right-0 z-40 mt-2 flex w-80 flex-col gap-5 rounded-[24px] border-[1.5px] border-trait bg-papier p-5 shadow-2xl">
+        <div id="panneau-a11y" role="group" aria-label="Réglages d'accessibilité" className={`pop absolute right-0 z-40 flex w-80 ${rond ? 'bottom-full mb-3' : 'top-full mt-2'} flex-col gap-5 rounded-[24px] border-[1.5px] border-trait bg-papier p-5 shadow-2xl`}>
           <fieldset>
             <legend className="mb-2 font-serif text-sm font-bold">Thème</legend>
             <div className="grid grid-cols-3 gap-1 rounded-full bg-creme-2 p-1">
@@ -122,6 +122,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
       {tuto && <TutoInstallation fermer={() => setTuto(false)} />}
+      <div className="fixed right-6 bottom-6 z-50"><Accessibilite rond /></div>
     </div>
   )
 }
@@ -259,7 +260,7 @@ export default function Landing() {
         <SceneBougie />
         <div data-experience className="relative text-encre">
           <section className="relative z-10 flex min-h-dvh items-center justify-center px-[8vw] text-center"><div>
-            <p className="text-xs font-bold tracking-[.22em] text-doux uppercase">Ubisoft × La Belle Mèche</p>
+            <p className="inline-block rounded-full bg-flamme px-4 py-1.5 text-sm font-bold tracking-[.22em] text-[#023341] uppercase">Ubisoft × La Belle Mèche</p>
             <h1 className="titre mt-4 text-[clamp(4rem,10vw,10rem)] leading-[.85]">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
           </div></section>
           <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">

@@ -80,7 +80,8 @@ export default function SceneBougie() {
       s.scale.set(l, h, 1); s.center.set(.5, .05); return s
     }
     const flammeExt = spriteFlamme(false, .085, .2), flammeInt = spriteFlamme(true, .045, .12)
-    const halo = spriteFlamme(false, .5, .5); halo.center.set(.5, .35); (halo.material as THREE.SpriteMaterial).opacity = .35
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d')!; const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(255,190,110,.55)'); r.addColorStop(.4, 'rgba(255,140,60,.18)'); r.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx })(), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }))
+    halo.scale.set(.6, .6, 1); halo.center.set(.5, .4)
     const groupeFlamme = new THREE.Group(); groupeFlamme.add(halo, flammeExt, flammeInt); scene.add(groupeFlamme)
     const NB = 40
     const braisesGeo = new THREE.BufferGeometry()
