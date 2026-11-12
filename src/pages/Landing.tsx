@@ -283,9 +283,9 @@ export default function Landing() {
             <h2 className="titre mt-3 text-[clamp(2.4rem,4.6vw,4.6rem)] leading-[.95]">Finirez-vous le jeu avant la dernière goutte ?</h2>
             <p className="titre mt-6 text-7xl tabular-nums"><span data-cire-g>140</span><span className="text-3xl text-flamme"> g</span></p>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center justify-center px-[8vw] text-center"><div>
-            <p className="chiffre-contour titre text-[clamp(5rem,12vw,11rem)] leading-none whitespace-nowrap">3–4h</p>
-            <p className="mx-auto mt-6 max-w-xl text-xl text-doux">Jamais plus de 3 à 4 heures d'affilée. Éteignez-la, elle vous attend comme une sauvegarde.</p>
+          <section className="relative z-10 flex min-h-dvh items-start justify-center px-[8vw] pt-[12vh] text-center"><div>
+            <p className="titre text-[clamp(5rem,12vw,11rem)] leading-none whitespace-nowrap">3–4h</p>
+            <p className="mx-auto mt-6 max-w-xl text-xl font-medium">Jamais plus de 3 à 4 heures d'affilée. Éteignez-la, elle vous attend comme une sauvegarde.</p>
           </div></section>
         </div>
 

@@ -20,7 +20,7 @@ const VUES: { pos: [number, number, number]; cible: [number, number, number] }[]
   { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
   { pos: [0.05, 0.46, 1.25], cible: [0.38, 0.46, 0] }, // 4 · l'étiquette
   { pos: [1.3, 0.75, 1.75], cible: [-0.5, 0.42, 0] },  // 5 · le défi : la cire fond
-  { pos: [0, 0.62, 3.1], cible: [0, 0.45, 0] },        // 6 · règle d'or : on recule
+  { pos: [0, 0.9, 4.2], cible: [0, 1.35, 0] },        // 6 · règle d'or : on recule
 ]
 
 /** Texture de flamme (dégradé en goutte) dessinée sur un canvas. */
@@ -81,20 +81,23 @@ export default function SceneBougie() {
     }
     const flammeExt = spriteFlamme(false, .085, .2), flammeInt = spriteFlamme(true, .045, .12)
     const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d')!; const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(255,190,110,.55)'); r.addColorStop(.4, 'rgba(255,140,60,.18)'); r.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx })(), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }))
-    halo.scale.set(.6, .6, 1); halo.center.set(.5, .4)
+    halo.scale.set(.32, .32, 1); halo.center.set(.5, .4)
     const groupeFlamme = new THREE.Group(); groupeFlamme.add(halo, flammeExt, flammeInt); scene.add(groupeFlamme)
     const NB = 40
     const braisesGeo = new THREE.BufferGeometry()
     const posB = new Float32Array(NB * 3), vieB = new Float32Array(NB).map(() => Math.random())
     braisesGeo.setAttribute('position', new THREE.BufferAttribute(posB, 3))
     const braises = new THREE.Points(braisesGeo, new THREE.PointsMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d')!; const r = g.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, '#fff'); r.addColorStop(.4, 'rgba(255,200,120,.8)'); r.addColorStop(1, 'rgba(255,150,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c) })(), color: 0xffb060, size: .006, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false }))
-    scene.add(braises)
 
+    void braises
     // la bougie
     let cire: THREE.Object3D | undefined, haut: THREE.Group | undefined, hauteurCire = .56
     const sommetMeche = new THREE.Vector3(0, .82, 0)
     new GLTFLoader().load('/models/bougie-rhum-marin.glb', (g) => {
       const b = g.scene; b.scale.setScalar(10); scene.add(b); b.updateMatrixWorld(true)
+      // verre : l'extension « transmission » n'est pas lue → on le rend nous-mêmes transparent
+      b.traverse((o) => { const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
+        if (m && m.name === 'Verre') { m.transparent = true; m.opacity = .18; m.depthWrite = false; m.roughness = .05; m.metalness = 0; m.color.set(0xffffff) } })
       cire = b.getObjectByName('Cire'); const meche = b.getObjectByName('Meche')
       if (cire) {
         const box = new THREE.Box3().setFromObject(cire); hauteurCire = box.max.y - box.min.y
