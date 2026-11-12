@@ -3,7 +3,6 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 
 /**
@@ -81,7 +80,8 @@ export default function SceneBougie() {
       s.scale.set(l, h, 1); s.center.set(.5, .05); return s
     }
     const flammeExt = spriteFlamme(false, .085, .2), flammeInt = spriteFlamme(true, .045, .12)
-    const groupeFlamme = new THREE.Group(); groupeFlamme.add(flammeExt, flammeInt); scene.add(groupeFlamme)
+    const halo = spriteFlamme(false, .5, .5); halo.center.set(.5, .35); (halo.material as THREE.SpriteMaterial).opacity = .35
+    const groupeFlamme = new THREE.Group(); groupeFlamme.add(halo, flammeExt, flammeInt); scene.add(groupeFlamme)
     const NB = 40
     const braisesGeo = new THREE.BufferGeometry()
     const posB = new Float32Array(NB * 3), vieB = new Float32Array(NB).map(() => Math.random())
@@ -107,7 +107,7 @@ export default function SceneBougie() {
     // bloom
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
-    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .7, .5, .8); composer.addPass(bloom)
+    // pas de bloom : il transformait les reflets du verre en carrés flous
     composer.addPass(new OutputPass())
 
     const taille = () => { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix() }
@@ -157,7 +157,6 @@ export default function SceneBougie() {
         posB[n * 3 + 2] = Math.cos(n * 7.3 + t) * .05 * v
       }
       braisesGeo.attributes.position.needsUpdate = true
-      bloom.strength = sombre() ? .7 : .35
       composer.render()
     }
     boucle()
