@@ -7,7 +7,7 @@ type Onglet = { to: string; label: string; icon: IconName }
 export const tabsAdmin: Onglet[] = [
   { to: '/', label: 'Accueil', icon: 'lieu' },
   { to: '/collections', label: 'Collections', icon: 'collection' },
-  { to: '/boutique', label: 'Récompenses', icon: 'boutique' },
+  { to: '/boutique', label: 'Boutique', icon: 'boutique' },
   { to: '/reglages', label: 'Réglages', icon: 'reglages' },
   { to: '/compte', label: 'Profil', icon: 'profil' },
 ]

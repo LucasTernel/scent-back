@@ -1,4 +1,5 @@
 import ScanQr from '../components/ScanQr'
+import { PRODUITS, euros } from './BoutiqueSite'
 import QrCode from '../components/QrCode'
 import { renderSVG } from 'uqr'
 import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
@@ -518,12 +519,21 @@ function AdminPopup() {
 
 /** Configuration de l'appli : boutique permanente (+ fiches senteurs) et pop-up store. */
 export function AdminReglages() {
+  return (
+    <div className="flex flex-col gap-5">
+      <Tete sous="Espace admin" titre="Réglages" desc="Configuration de l'appli et du site." />
+      <AdminPopup />
+    </div>
+  )
+}
+
+/** Boutique permanente : ouverture + produits (fiches senteurs). */
+function AdminPermanente() {
   const [v, setV] = useState(0)
   const ouverte = useData(getBoutiqueOuverte, v) ?? false
   const basculer = async () => { try { await setBoutiqueOuverte(!ouverte); setV(v + 1) } catch (err) { alert((err as Error).message) } }
   return (
-    <div className="flex flex-col gap-5">
-      <Tete sous="Espace admin" titre="Réglages" desc="Configuration de l'appli et du site." />
+    <>
       <section className="monte relative overflow-hidden rounded-[28px] bg-[#023341] p-5 text-[#FCF5E3]">
         <span aria-hidden className="absolute -top-16 -right-16 size-48 rounded-full bg-flamme/25 blur-2xl" />
         <div className="relative flex items-start justify-between gap-4">
@@ -538,12 +548,22 @@ export function AdminReglages() {
           </button>
         </div>
       </section>
-      <AdminPopup />
+      <section className="flex flex-col gap-3">
+        <h2 className="titre text-xl">Produits</h2>
+        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+          {PRODUITS.map((p) => (
+            <li key={p.id} className="overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
+              <img src={p.image} alt="" className={`aspect-[4/3] w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
+              <div className="p-3"><p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
+            </li>
+          ))}
+        </ul>
+      </section>
       <section className="flex flex-col gap-3">
         <h2 className="titre text-xl">« Cliquez pour sentir »</h2>
         <AdminSenteurs />
       </section>
-    </div>
+    </>
   )
 }
 
@@ -554,6 +574,7 @@ export function AdminBoutique() {
   const [code, setCode] = useState('')
   const [bon, setBon] = useState<{ ok: boolean; texte: string }>()
   const [scan, setScan] = useState(false)
+  const [onglet, setOnglet] = useState<'permanente' | 'recompenses'>('recompenses')
   const fini = () => { setEdition(undefined); setV(v + 1) }
 
   async function valider(e: FormEvent) {
@@ -572,11 +593,18 @@ export function AdminBoutique() {
   const stock = lots.reduce((s, l) => s + l.stock, 0), ruptures = lots.filter((l) => l.stock === 0).length
   return (
     <div className="flex flex-col gap-5">
-      <Tete sous="Espace admin" titre="Récompenses" desc="Les lots échangés contre des points, et la validation des bons au pop-up." />
+      <Tete sous="Espace admin" titre="Boutique" />
+      <div role="tablist" aria-label="Type de boutique" className="relative grid grid-cols-2 rounded-full bg-creme-2 p-1">
+        <span aria-hidden className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-encre transition-transform duration-300 ${onglet === 'recompenses' ? 'translate-x-full' : ''}`} />
+        {([['permanente', 'Boutique permanente'], ['recompenses', 'Récompenses']] as const).map(([k, l]) => (
+          <button key={k} role="tab" aria-selected={onglet === k} onClick={() => setOnglet(k)} className={`relative min-h-11 rounded-full text-sm font-bold transition-colors ${onglet === k ? 'text-creme' : 'text-doux'}`}>{l}</button>
+        ))}
+      </div>
+      {onglet === 'permanente' ? <AdminPermanente /> : <>
 
       <dl className="monte grid grid-cols-3 gap-2">
         {[['Récompenses', lots.length], ['En stock', stock], ['Ruptures', ruptures]].map(([k, n]) => (
-          <div key={k} className="rounded-[18px] bg-[#023341] p-3 text-[#FCF5E3]"><dd className={`titre text-2xl ${k === 'Ruptures' && n ? 'text-flamme' : ''}`}>{n}</dd><dt className="text-[11px] font-bold opacity-70">{k}</dt></div>
+          <div key={k} className="rounded-[18px] border-[1.5px] border-trait bg-papier p-3"><dd className={`titre text-2xl ${k === 'Ruptures' && n ? 'text-flamme' : ''}`}>{n}</dd><dt className="text-[11px] font-bold opacity-70">{k}</dt></div>
         ))}
       </dl>
 
@@ -632,6 +660,7 @@ export function AdminBoutique() {
         </ul>
       </section>
 
+      </>}
     </div>
   )
 }
