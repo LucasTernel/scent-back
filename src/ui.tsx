@@ -5,6 +5,7 @@ import { LOGO_PATH } from './logo'
 
 const paths = {
   plus: 'M12 5v14M5 12h14',
+  boutique: 'M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8zM9 8V6.5a3 3 0 0 1 6 0V8',
   nfc: 'M6 8.3a6 6 0 0 1 0 7.4M9.5 6a10 10 0 0 1 0 12M13 4a14 14 0 0 1 0 16M17 2.5a18 18 0 0 1 0 19',
   collection: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 8h6M9 12h6',
   profil: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',

@@ -12,6 +12,7 @@ import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, A
 import Claim from './pages/Claim'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
+import Boutique from './pages/Boutique'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
 import Intro from './components/Intro'
@@ -93,6 +94,7 @@ export default function App() {
             <Route index element={<Scan />} />
             <Route path="galerie" element={<Gallery />} />
             <Route path="compte" element={<Account />} />
+            <Route path="boutique" element={<Boutique />} />
             <Route path="classement" element={<Classement />} />
             <Route path="legal/:page" element={<Legal />} />
             <Route path="galerie/c/:id" element={<GalleryCollection />} />

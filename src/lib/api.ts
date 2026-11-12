@@ -197,7 +197,42 @@ export async function createStatue(v: Record<string, unknown>) {
   for (const s of statues) if (!s.model) s.model = `/models/lapin-${m[s.rarity][n[s.rarity]++ % 2]}.glb`
 }
 
-export const resetMock = () => { localStorage.removeItem('captures'); localStorage.removeItem('txs') }
+/* ---------- Boutique ---------- */
+export type Lot = { id: string; name: string; cost: number; stock: number; image_url: string | null }
+export type Bon = { code: string; lot: string; retire: boolean; created_at: string }
+const LOTS_DEMO: Lot[] = [
+  { id: 'l1', name: 'Autocollants BWAAAH', cost: 50, stock: 500, image_url: null },
+  { id: 'l2', name: 'Tote bag La Belle Mèche x Ubisoft', cost: 150, stock: 100, image_url: null },
+  { id: 'l3', name: 'Bougie Lapin Assassin (cire de soja)', cost: 300, stock: 50, image_url: null },
+  { id: 'l4', name: 'Figurine Lapin Crétin édition Confrérie', cost: 500, stock: 20, image_url: null },
+]
+export async function getLots(): Promise<Lot[]> {
+  if (MOCK) return LOTS_DEMO
+  const { data } = await supabase.from('rewards').select('id, name, cost, stock, image_url').order('cost')
+  return data ?? []
+}
+export async function getBons(): Promise<Bon[]> {
+  if (MOCK) return load<Bon[]>('bons', [])
+  const { data } = await supabase.from('commandes').select('code, retire, created_at, rewards(name)').order('created_at', { ascending: false })
+  return (data ?? []).map((c) => ({ code: c.code, retire: c.retire, created_at: c.created_at, lot: (c.rewards as unknown as { name: string } | null)?.name ?? 'Lot' }))
+}
+export async function echangerLot(lot: Lot): Promise<{ code: string; lot: string }> {
+  if (MOCK) {
+    if ((await mock.getWallet()).total < lot.cost) throw new Error('Pas assez de points pour ce lot.')
+    const code = Math.random().toString(36).slice(2, 8).toUpperCase(), now = new Date().toISOString()
+    save('txs', [...(await mock.getTransactions()), { amount: -lot.cost, source: 'reward', note: lot.name, createdAt: now }])
+    save('bons', [{ code, lot: lot.name, retire: false, created_at: now }, ...(await getBons())])
+    return { code, lot: lot.name }
+  }
+  const { data, error } = await supabase.rpc('echanger_lot', { lot: lot.id })
+  if (error) throw new Error(
+    error.message.includes('insuffisants') ? 'Pas assez de points pour ce lot.'
+    : error.message.includes('rupture') ? 'Ce lot est en rupture de stock.'
+    : 'Échange impossible pour le moment, réessaie.')
+  return data
+}
+
+export const resetMock = () => { for (const k of ['captures', 'txs', 'bons']) localStorage.removeItem(k) }
 
 /* ---------- Utilitaires capture ---------- */
 

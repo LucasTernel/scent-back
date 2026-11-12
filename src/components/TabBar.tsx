@@ -10,6 +10,7 @@ export const tabsAdmin: Onglet[] = [
 const tabsJoueur: Onglet[] = [
   { to: '/', label: 'Chasse', icon: 'nfc' },
   { to: '/galerie', label: 'Collection', icon: 'collection' },
+  { to: '/boutique', label: 'Boutique', icon: 'boutique' },
   { to: '/compte', label: 'Profil', icon: 'profil' },
 ]
 
@@ -23,7 +24,7 @@ export default function TabBar({ tabs = tabsJoueur, fondu = true }: { tabs?: Ong
     {/* fondu crème derrière la barre : elle reste lisible au-dessus des cartes foncées */}
     {fondu && <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-t from-creme via-creme/85 to-transparent" />}
     <nav aria-label="Navigation principale" style={{ viewTransitionName: 'tabbar' }} className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(.75rem,calc(env(safe-area-inset-bottom)_-_10px))]">
-      <div className="barre relative mx-auto mt-8 max-w-[358px]" style={{ ['--x' as string]: `${(i * 2 + 1) * 100 / 6}%` }}>
+      <div className="barre relative mx-auto mt-8 max-w-[380px]" style={{ ['--x' as string]: `${(i * 2 + 1) * 100 / (2 * tabs.length)}%` }}>
         <div className="barre-fond absolute inset-0 rounded-full bg-encre" />
         <span aria-hidden className="bulle absolute -top-[38px] grid size-[60px] -translate-x-1/2 place-items-center rounded-full bg-flamme text-encre shadow-[0_6px_14px_rgba(238,123,42,.45)]">
           {tabs.map((t, k) => (
