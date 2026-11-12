@@ -369,13 +369,6 @@ export default function Landing() {
               ))}
             </div>
           </section>
-          <section data-zoom className="relative grid min-h-dvh place-items-center bg-creme px-[8vw] text-center text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
-            <div>
-              <LogoMarque className="mx-auto -my-6 w-72" />
-              <p className="mx-auto mt-4 max-w-[min(40rem,40vw)] text-3xl leading-snug">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
-              <div className="mt-10 flex justify-center gap-3"><a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-7 font-bold text-[#023341]">Boutique</a><button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-encre px-7 font-bold">Installer l'appli</button></div>
-            </div>
-          </section>
         </div>
       </main>
       {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}
