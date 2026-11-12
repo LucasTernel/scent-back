@@ -105,6 +105,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b-2 border-encre px-5 py-3 md:px-8">
         <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><LogoMarque className="h-full w-full scale-[2] object-contain" /></a>
         <div className="flex items-center gap-2">
+        <a href="/boutique" className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-encre px-4 text-sm font-bold transition hover:bg-[#023341] hover:text-[#FCF5E3]"><Icon name="boutique" size={18} />Boutique</a>
         <Accessibilite />
         <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-[#023341] px-4 text-sm font-bold text-[#FCF5E3] transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
         </div>
@@ -175,7 +176,7 @@ function Bougie({ cire = 1, className = '' }: { cire?: number; className?: strin
 }
 
 /** Cadre en forme d'étiquette Scent Back (arche en haut, contour épais). */
-function Etiquette({ children, couleur = '#023341', fond = '#FCF5E3', larg = '38%', arche = '2.6rem', className = '', corps = '' }: {
+export function Etiquette({ children, couleur = '#023341', fond = '#FCF5E3', larg = '38%', arche = '2.6rem', className = '', corps = '' }: {
   children: React.ReactNode; couleur?: string; fond?: string; larg?: string; arche?: string; className?: string; corps?: string
 }) {
   return (
@@ -205,18 +206,27 @@ function LoaderBougie() {
       const t = Math.min(1, (now - debut) / duree)
       setCire(1 - (1 - (1 - t) ** 2)) // fonte qui ralentit vers la fin
       if (t < 1) raf = requestAnimationFrame(pas)
-      else setTimeout(() => { setFini(true); try { sessionStorage.setItem('loader-vu', '1') } catch { /* rien */ } setTimeout(() => setParti(true), 700) }, 450)
+      else setTimeout(passer, 450)
     }
     raf = requestAnimationFrame(pas)
-    return () => cancelAnimationFrame(raf)
-  }, [fini])
+    // filet de sécurité : jamais plus de 3 s (onglet en arrière-plan = animations en pause)
+    const secours = setTimeout(passer, 3000)
+    const touche = (e: KeyboardEvent) => e.key === 'Escape' && passer()
+    addEventListener('keydown', touche)
+    return () => { cancelAnimationFrame(raf); clearTimeout(secours); removeEventListener('keydown', touche) }
+  }, [fini]) // eslint-disable-line react-hooks/exhaustive-deps
+  function passer() {
+    setFini(true); try { sessionStorage.setItem('loader-vu', '1') } catch { /* rien */ }
+    setTimeout(() => setParti(true), 700)
+  }
   if (parti) return null
   return (
-    <div role="status" aria-label="Chargement de Scent Back" className="fixed inset-0 z-[60] grid place-items-center bg-[#011A22] transition-opacity duration-700" style={{ opacity: fini ? 0 : 1 }}>
+    <div role="status" aria-label="Chargement de Scent Back" onClick={passer} className="fixed inset-0 z-[60] grid cursor-pointer place-items-center bg-[#011A22] transition-opacity duration-700" style={{ opacity: fini ? 0 : 1, pointerEvents: fini ? 'none' : undefined }}>
       <div className="flex flex-col items-center gap-6">
         <Bougie cire={Math.max(cire, .015)} className="w-36" />
         <img src="/logo-orange.png" alt="" className="-my-8 w-44" />
         <p className="font-mono text-sm text-[#FCF5E3]/50" aria-hidden>{Math.round(cire * 140)} g</p>
+        <p className="text-xs text-[#FCF5E3]/35">Cliquer pour passer</p>
       </div>
     </div>
   )
@@ -394,7 +404,10 @@ export default function Landing() {
             <Chapitre n="05" titre="La boutique" />
             <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <h2 id="titre-boutique" className="apparait titre max-w-2xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Vos points valent de vrais lots.</h2>
-              <p className="apparait max-w-sm leading-relaxed text-doux">Échangez vos points dans l'appli, puis récupérez le lot au pop-up store avec votre bon.</p>
+              <div className="apparait max-w-sm">
+                <p className="leading-relaxed text-doux">Échangez vos points dans l'appli, puis récupérez le lot au pop-up store avec votre bon.</p>
+                <a href="/boutique" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#023341] px-5 font-bold text-[#FCF5E3] dark:bg-flamme dark:text-[#023341]">Voir la boutique et commander →</a>
+              </div>
             </div>
             <ul className="mt-14 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
               {lots.map((l, i) => (

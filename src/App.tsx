@@ -12,6 +12,7 @@ import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, A
 import Claim from './pages/Claim'
 import Login from './pages/Login'
 import Landing, { SiteDesktop } from './pages/Landing'
+import BoutiqueSite from './pages/BoutiqueSite'
 import Boutique from './pages/Boutique'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
@@ -59,6 +60,7 @@ export default function App() {
     avant.current = session
   }, [session, navigate])
 
+  if (bureau && location.pathname === '/boutique') return <SiteDesktop><BoutiqueSite /></SiteDesktop>
   if (bureau) return location.pathname.startsWith('/legal')
     ? <SiteDesktop><main id="contenu" className="mx-auto max-w-3xl px-5 py-10 md:px-8 md:py-14"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop>
     : <Landing />
