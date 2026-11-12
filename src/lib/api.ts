@@ -189,6 +189,13 @@ export async function createStatue(v: Record<string, unknown>) {
   if (error) throw error
 }
 
+// mode démo : un modèle 3D par statuette, comme la migration 0011
+{
+  const n = { commune: 0, rare: 0, legendaire: 0 }
+  const m = { commune: ['novice', 'eclaireur'], rare: ['templier', 'ombre'], legendaire: ['maitre', 'maitre'] }
+  for (const s of statues) if (!s.model) s.model = `/models/lapin-${m[s.rarity][n[s.rarity]++ % 2]}.glb`
+}
+
 export const resetMock = () => { localStorage.removeItem('captures'); localStorage.removeItem('txs') }
 
 /* ---------- Utilitaires capture ---------- */
