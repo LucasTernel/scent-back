@@ -141,12 +141,11 @@ export default function Scan() {
               <p className="font-serif text-[15px] leading-tight font-bold">{etat}</p>
               {d !== undefined && <p className="text-xs text-trait">Lapin le plus proche : ~{d < 1000 ? `${Math.round(d / 10) * 10} m` : `${(d / 1000).toFixed(1)} km`}</p>}
             </div>
+            <button onClick={() => setQr(true)} aria-label="Scanner le QR code du lapin" className="grid size-12 shrink-0 place-items-center rounded-full bg-creme text-encre"><Icon name="photo" size={22} /></button>
           </div>
-          <div className="flex gap-2">
-            {nfcDispo && <button onClick={() => setNfc(!nfc)} aria-pressed={nfc} className={`btn min-h-12 flex-1 text-sm ${nfc ? 'bg-flamme text-encre' : 'bg-creme text-encre'}`}><Icon name="nfc" size={18} />{nfc ? 'Approche la puce…' : 'Puce NFC'}</button>}
-            <button onClick={() => setQr(true)} className="btn min-h-12 flex-1 bg-creme text-sm text-encre"><Icon name="photo" size={18} />Scanner le QR code</button>
-          </div>
-          {!nfcDispo && <p className="text-center text-xs text-trait">Ou approche ton téléphone de la puce sous la statuette.</p>}
+          {nfcDispo
+            ? <button onClick={() => setNfc(!nfc)} aria-pressed={nfc} className={`btn min-h-12 text-sm ${nfc ? 'bg-flamme text-encre' : 'bg-creme text-encre'}`}><Icon name="nfc" size={18} />{nfc ? 'Approche la puce…' : 'Scanner la puce NFC'}</button>
+            : <p className="text-center text-xs text-trait">Approche ton téléphone de la puce, ou scanne son QR code.</p>}
         </div>
       </section>
     </>
