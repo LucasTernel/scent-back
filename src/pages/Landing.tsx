@@ -278,22 +278,22 @@ export default function Landing() {
               <button onClick={() => dispatchEvent(new Event('visite-auto'))} className="min-h-12 rounded-[10px] border-2 border-current/40 px-5 text-sm font-bold">▶ Visite automatique</button>
             </div>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-[34vw]">
             <p data-mots className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-snug font-medium">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… et pourtant, vous ne les avez jamais sentis.</p>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl">
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-[34vw]">
             <p className="titre text-[clamp(3rem,6vw,6rem)] leading-[.95]">Voir.<br />Entendre.<br /><span className="text-flamme">Sentir.</span></p>
             <p className="mt-6 text-xl text-doux">Ubisoft fait voyager par l'image et le son. La Belle Mèche ajoute le sens qui manquait : l'odorat.</p>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-[34vw]">
             <p className="font-serif text-sm font-bold text-flamme">La mèche</p>
             <h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">Elle compte le temps avec vous.</h2>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl">
+          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-[34vw]">
             <p className="font-serif text-sm font-bold text-flamme">Rhum Marin</p>
             <h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">140 g de cire végétale, coulée en France.</h2>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl">
+          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-[34vw]">
             <p className="font-serif text-sm font-bold text-flamme">Le défi</p>
             <h2 className="titre mt-3 text-[clamp(2.4rem,4.6vw,4.6rem)] leading-[.95]">Finirez-vous le jeu avant la dernière goutte ?</h2>
             <p className="titre mt-6 text-7xl tabular-nums"><span data-cire-g>140</span><span className="text-3xl text-flamme"> g</span></p>

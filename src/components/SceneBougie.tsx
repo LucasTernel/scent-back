@@ -18,10 +18,10 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 // Cadrage doux : la bougie glisse du côté opposé au texte (sans tourner autour), pour ne jamais le recouvrir
 const VUES: { pos: [number, number, number]; cible: [number, number, number] }[] = [
   { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },          // 0 · Fermez les yeux (texte dessous)
-  { pos: [0.2, 0.7, 2.8], cible: [-0.55, 0.45, 0] },   // 1 · manifeste : texte à gauche → bougie à droite
-  { pos: [-0.2, 0.7, 2.8], cible: [0.55, 0.45, 0] },   // 2 · voir/entendre/sentir : texte à droite
-  { pos: [0.2, 1.2, 2.5], cible: [-0.5, 0.55, 0] },    // 3 · la mèche : texte à gauche
-  { pos: [-0.15, 0.5, 2.3], cible: [0.5, 0.46, 0] },   // 4 · l'étiquette : texte à droite
+  { pos: [0.2, 0.7, 2.8], cible: [-0.55, 0.45, 0] },   // 1 · manifeste ┐ texte à gauche
+  { pos: [0.2, 0.7, 2.8], cible: [-0.55, 0.45, 0] },   // 2 · voir      ┘ bougie immobile à droite
+  { pos: [-0.2, 1.0, 2.6], cible: [0.55, 0.5, 0] },    // 3 · la mèche  ┐ texte à droite
+  { pos: [-0.2, 1.0, 2.6], cible: [0.55, 0.5, 0] },    // 4 · étiquette ┘ bougie immobile à gauche
   { pos: [0.2, 0.8, 2.6], cible: [-0.55, 0.42, 0] },   // 5 · le défi : texte à gauche
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },          // 6 · règle d'or (texte en haut)
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
