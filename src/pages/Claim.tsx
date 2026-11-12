@@ -5,7 +5,6 @@ import { claimStatue, compress, getPosition, MOCK } from '../lib/api'
 import { Carte, Icon, rarityLabel, Sceau } from '../ui'
 
 type Result = Awaited<ReturnType<typeof claimStatue>>
-const DEMO = import.meta.env.VITE_DEMO_MODE === 'true'
 
 function Ecran({ children, sombre }: { children: React.ReactNode; sombre?: boolean }) {
   return (
@@ -31,7 +30,7 @@ export default function Claim() {
     if (!file) return
     setBusy(true)
     try {
-      const pos = MOCK ? undefined : await getPosition().catch((e) => { if (DEMO && code.startsWith('DEMO')) return undefined; throw e })
+      const pos = MOCK ? undefined : await getPosition().catch(() => undefined) // position facultative côté appli : c'est le serveur qui décide
       const blob = await compress(file)
       setPhoto(URL.createObjectURL(blob))
       setResult(await claimStatue(code, blob, pos))

@@ -41,7 +41,8 @@ Deno.serve(async (req) => {
   const { data: already } = await db.from('captures').select('id').eq('user_id', user.id).eq('statue_id', statue.id).maybeSingle()
   if (already) return fail('Tu as déjà synchronisé ce lapin !', 409)
 
-  if (!(DEMO && statue.is_demo)) {
+  // SANS_POSITION=true (secret Supabase) : pas de contrôle de distance, ex. démo à l'oral loin de Paris
+  if (!(DEMO && statue.is_demo) && Deno.env.get('SANS_POSITION') !== 'true') {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return fail('Position GPS requise.')
     const d = meters(lat, lng, statue.lat, statue.lng)
     if (d > statue.radius_m) return fail(`Trop loin de la cible (${Math.round(d)} m).`, 403)
