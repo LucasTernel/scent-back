@@ -125,7 +125,7 @@ export function ProfilAmi() {
       <section className="flex flex-col gap-2.5">
         <h2 className="font-serif text-lg font-bold">Sa collection</h2>
         {p.captures.length === 0 ? <p className="text-sm text-doux">Pas encore de lapin capturé.</p> : (
-          <ul className="grid grid-cols-2 gap-3">
+          <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
             {p.captures.map((c) => (
               <li key={c.id} className="overflow-hidden rounded-[20px] border-[1.5px] border-trait bg-papier">
                 <Scene3D mini rarity={c.rarete} nom={c.nom} model={c.model} debloque className="aspect-square" />

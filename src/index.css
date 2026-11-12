@@ -46,7 +46,9 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 @utility btn { @apply inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-bold transition active:scale-[.97] disabled:opacity-50; }
 .btn-encre { @apply btn bg-encre text-creme; }
 .btn-ligne { @apply btn border-[1.5px] border-encre bg-papier text-encre; }
-.champ { @apply min-h-13 w-full rounded-2xl border-[1.5px] border-trait bg-papier px-4 text-base outline-none transition placeholder:text-doux/60 focus:border-encre; }
+.champ { @apply min-h-13 w-full min-w-0 appearance-none rounded-2xl border-[1.5px] border-trait bg-papier px-4 text-base outline-none transition placeholder:text-doux/60 focus:border-encre; }
+/* iOS : les champs date/heure gardent une largeur propre et débordaient de leur carte */
+input.champ[type='date'], input.champ[type='datetime-local'], input.champ[type='time'] { display: block; max-width: 100%; line-height: 3.25rem; }
 .cq { container-type: inline-size; }
 .arche { border-radius: 50cqw 50cqw var(--bas, 16px) var(--bas, 16px); }
 

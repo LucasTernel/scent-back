@@ -87,7 +87,7 @@ export function GalleryCollection() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Chercher un lapin…" aria-label="Chercher un lapin" className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-doux" />
       </label>
 
-      <ul className="grid grid-cols-2 gap-3">
+      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
         {liste.map((s, i) => {
           const c = trouve(s.id)
           const img = c?.photo ?? s.image

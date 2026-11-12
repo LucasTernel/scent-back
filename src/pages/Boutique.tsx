@@ -74,8 +74,8 @@ export default function Boutique() {
       )}
 
       <section aria-labelledby="lots" className="flex flex-col gap-2.5">
-        <h2 id="lots" className="font-serif text-lg font-bold">Récompenses <span className="text-sm font-normal text-doux">· contre tes points</span></h2>
-        <ul className="grid grid-cols-2 gap-3">
+        <h2 id="lots" className={`font-serif text-lg font-bold ${ouverte ? '' : 'sr-only'}`}>Récompenses <span className="text-sm font-normal text-doux">· contre tes points</span></h2>
+        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
           {lots.map((l, i) => {
             const manque = l.cost - solde, ok = manque <= 0 && l.stock > 0
             return (

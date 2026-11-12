@@ -191,7 +191,7 @@ export function AdminCollections() {
   return (
     <div className="flex flex-col gap-5">
       <Tete sous="Espace admin" titre="Collections" action={<BoutonAjout to="/collections/nouvelle" label="Collection" />} />
-      <ul className="grid grid-cols-2 gap-3">
+      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
         {cols?.map((c, i) => (
           <li key={c.id} className="monte" style={{ animationDelay: `${i * 45}ms` }}>
             <Link viewTransition to={`/collections/${c.id}`} className="relative flex aspect-[4/5] flex-col justify-end gap-1 overflow-hidden rounded-[22px] bg-encre p-4 text-creme">
@@ -290,7 +290,7 @@ export function AdminCollection() {
         ))}
         {id !== 'aucune' && <Link viewTransition to={`/collections/${id}/modifier`} className="ml-auto rounded-full border-[1.5px] border-trait bg-papier px-3.5 py-1.5 text-xs font-bold">Modifier la collection</Link>}
       </div>
-      <ul className="grid grid-cols-2 gap-3">
+      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
         {statues.map((s, i) => (<Fragment key={s.id}>
           {(i === 0 || statues[i - 1].rarity !== s.rarity) && (
                 <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
@@ -592,7 +592,7 @@ export function AdminBoutique() {
           <button onClick={() => setEdition(edition === 'nouveau' ? undefined : 'nouveau')} className="flex min-h-11 items-center gap-1 rounded-full bg-encre px-4 text-sm font-bold text-creme"><Icon name="plus" size={18} />Ajouter</button>
         </div>
         {edition === 'nouveau' && <Carton><FormLot fini={fini} /></Carton>}
-        <ul className="grid grid-cols-2 gap-3">
+        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
           {lots.map((l) => {
             const max = Math.max(...lots.map((x) => x.stock), 1)
             return (

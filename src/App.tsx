@@ -28,16 +28,22 @@ function Layout({ admin }: { admin?: boolean }) {
   const carte = !admin && pathname === '/'
   // Nouvelle page → on repart en haut (sauf retour arrière, où le navigateur garde la position)
   const type = useNavigationType()
-  useEffect(() => { if (type !== 'POP') window.scrollTo(0, 0) }, [pathname, type]) // la carte de chasse prend tout l'écran
+  useEffect(() => { if (type !== 'POP') window.scrollTo(0, 0) }, [pathname, type])
+  // Rotation du téléphone : petit effet de pivot pendant que la mise en page s'adapte
+  useEffect(() => {
+    const m = matchMedia('(orientation: landscape)')
+    const pivot = () => { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('main')?.animate([{ transform: `rotate(${m.matches ? 8 : -8}deg) scale(.92)`, opacity: .4 }, { transform: 'none', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(.2,.8,.2,1)' }) }
+    m.addEventListener('change', pivot); return () => m.removeEventListener('change', pivot)
+  }, []) // la carte de chasse prend tout l'écran
   return (
-    <div className="mx-auto min-h-dvh max-w-md lg:max-w-3xl">
+    <div className="mx-auto min-h-dvh max-w-md lg:max-w-3xl max-lg:landscape:max-w-none">
       {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
       {carte
         ? <LogoMarque className="pointer-events-none fixed top-[calc(env(safe-area-inset-top)_-_14px)] left-1/2 z-30 h-[92px] w-auto -translate-x-1/2" />
         : <header className="sticky top-0 z-30 flex justify-center bg-creme pt-[env(safe-area-inset-top)]">
-            <LogoMarque className="-my-5 h-[92px] w-auto" />
+            <LogoMarque className="-my-5 h-[92px] w-auto max-lg:landscape:-my-3 max-lg:landscape:h-[60px]" />
           </header>}
-      <main className="px-5 pt-4 pb-36"><Outlet /></main>
+      <main className="px-5 pt-4 pb-36 landscape:px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))]"><Outlet /></main>
       <TabBar tabs={admin ? tabsAdmin : undefined} fondu={!carte} />
     </div>
   )
