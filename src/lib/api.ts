@@ -232,6 +232,25 @@ export async function echangerLot(lot: Lot): Promise<{ code: string; lot: string
   return data
 }
 
+/* ---------- Boutique côté admin ---------- */
+export async function enregistrerLot(id: string | undefined, v: { name: string; cost: number; stock: number; image_url?: string }) {
+  const { error } = id ? await supabase.from('rewards').update(v).eq('id', id) : await supabase.from('rewards').insert(v)
+  if (error) throw error
+}
+export async function supprimerLot(id: string) {
+  const { error } = await supabase.from('rewards').delete().eq('id', id)
+  if (error) throw new Error(error.code === '23503' ? 'Des bons existent pour ce lot : mets plutôt son stock à 0.' : error.message)
+}
+/** Cherche un bon par son code et le marque comme récupéré. */
+export async function validerBon(code: string): Promise<{ lot: string; joueur: string; deja: boolean }> {
+  const { data, error } = await supabase.from('commandes').select('id, retire, rewards(name), profiles(username)').eq('code', code.trim().toUpperCase()).maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Aucun bon avec ce code.')
+  const info = { lot: (data.rewards as unknown as { name: string })?.name ?? 'Lot', joueur: (data.profiles as unknown as { username: string })?.username ?? '?', deja: data.retire }
+  if (!data.retire) { const { error: e } = await supabase.from('commandes').update({ retire: true }).eq('id', data.id); if (e) throw e }
+  return info
+}
+
 export const resetMock = () => { for (const k of ['captures', 'txs', 'bons']) localStorage.removeItem(k) }
 
 /* ---------- Utilitaires capture ---------- */

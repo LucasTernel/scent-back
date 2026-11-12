@@ -8,7 +8,7 @@ import Classement from './pages/Classement'
 import Legal from './pages/Legal'
 import Consentement from './components/Consentement'
 import Detail from './pages/Detail'
-import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminFormStatue, AdminStatue } from './pages/Admin'
+import { AdminAccueil, AdminCollection, AdminCollections, AdminFormCollection, AdminFormStatue, AdminBoutique, AdminStatue } from './pages/Admin'
 import Claim from './pages/Claim'
 import Login from './pages/Login'
 import Landing, { SiteDesktop } from './pages/Landing'
@@ -84,6 +84,7 @@ export default function App() {
             <Route path="collections/:id" element={<AdminCollection />} />
             <Route path="collections/:id/ajouter" element={<AdminFormStatue />} />
             <Route path="statuette/:sid/modifier" element={<AdminFormStatue />} />
+            <Route path="boutique" element={<AdminBoutique />} />
             <Route path="statuette/:id" element={<AdminStatue />} />
             <Route path="compte" element={<Account />} />
             <Route path="legal/:page" element={<Legal />} />

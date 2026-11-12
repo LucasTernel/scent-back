@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue,
+  adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue, enregistrerLot, getLots, supprimerLot, validerBon, type Lot,
   getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity,
 } from '../lib/api'
 import { useData } from '../lib/useData'
@@ -418,6 +418,96 @@ export function AdminStatue() {
           <button onClick={() => ecrireNfc(s.code).catch((e) => alert(e.message))} className="min-h-11 shrink-0 rounded-full bg-encre px-4 text-xs font-bold text-creme">Lier NFC</button>
         </Carton>
       </div>
+    </div>
+  )
+}
+
+/* ---------- 5. Boutique : valider les bons + gérer les lots ---------- */
+function FormLot({ lot, fini }: { lot?: Lot; fini: () => void }) {
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  async function envoyer(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); setBusy(true); setMsg('')
+    const f = new FormData(e.currentTarget)
+    try {
+      const img = f.get('image') as File
+      await enregistrerLot(lot?.id, { name: String(f.get('name')).trim(), cost: Number(f.get('cost')), stock: Number(f.get('stock')), ...(img?.size ? { image_url: await uploadMedia(img) } : {}) })
+      fini()
+    } catch (err) { setMsg((err as Error).message); setBusy(false) }
+  }
+  return (
+    <form onSubmit={envoyer} className="flex flex-col gap-2.5 border-t border-creme-2 p-4">
+      {msg && <p role="alert" className="text-sm text-sceau">{msg}</p>}
+      <Champ label="Nom du lot" name="name" required defaultValue={lot?.name} />
+      <div className="grid grid-cols-2 gap-2.5">
+        <Champ label="Prix (points)" name="cost" type="number" min={1} required defaultValue={lot?.cost ?? 100} />
+        <Champ label="Stock" name="stock" type="number" min={0} required defaultValue={lot?.stock ?? 10} />
+      </div>
+      <Champ label={lot?.image_url ? 'Image (laisser vide pour garder l\'actuelle)' : 'Image'} name="image" type="file" accept="image/*" />
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={fini} className="btn-ligne">Annuler</button>
+        <button disabled={busy} className="btn btn-encre">{busy ? '…' : 'Enregistrer'}</button>
+      </div>
+    </form>
+  )
+}
+
+export function AdminBoutique() {
+  const [v, setV] = useState(0)
+  const lots = useData(getLots, v) ?? []
+  const [edition, setEdition] = useState<string>() // id du lot édité, ou 'nouveau'
+  const [code, setCode] = useState('')
+  const [bon, setBon] = useState<{ ok: boolean; texte: string }>()
+  const fini = () => { setEdition(undefined); setV(v + 1) }
+
+  async function valider(e: FormEvent) {
+    e.preventDefault()
+    try {
+      const r = await validerBon(code)
+      setBon(r.deja ? { ok: false, texte: `Déjà utilisé : ${r.lot} (${r.joueur})` } : { ok: true, texte: `À remettre : ${r.lot} à ${r.joueur}` })
+      if (!r.deja) setCode('')
+    } catch (err) { setBon({ ok: false, texte: (err as Error).message }) }
+  }
+  const supprimer = async (l: Lot) => {
+    if (!confirm(`Supprimer « ${l.name} » ?`)) return
+    try { await supprimerLot(l.id); setV(v + 1) } catch (err) { alert((err as Error).message) }
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <Tete sous="Espace admin" titre="Boutique" action={<button onClick={() => setEdition('nouveau')} className="flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-flamme px-4 text-sm font-bold text-encre shadow-md"><Icon name="plus" size={18} />Lot</button>} />
+
+      <Carton className="p-4">
+        <h2 className="font-serif text-lg font-bold">Valider un bon</h2>
+        <p className="mb-3 text-xs text-doux">Le joueur te montre son code au pop-up store.</p>
+        <form onSubmit={valider} className="flex gap-2">
+          <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setBon(undefined) }} aria-label="Code du bon" placeholder="AB12CD" maxLength={6}
+            className="champ flex-1 text-center font-mono text-lg tracking-[.3em] uppercase" autoComplete="off" autoCapitalize="characters" />
+          <button disabled={code.length < 6} className="btn btn-encre !w-auto px-5">Valider</button>
+        </form>
+        {bon && <p role="status" className={`mt-3 rounded-2xl px-4 py-3 text-sm font-bold ${bon.ok ? 'bg-flamme/15' : 'bg-sceau/10 text-sceau'}`}>{bon.ok ? '✓ ' : ''}{bon.texte}</p>}
+      </Carton>
+
+      <Carton className="overflow-hidden">
+        <h2 className="px-4 pt-3.5 pb-2 font-serif text-lg font-bold">Lots ({lots.length})</h2>
+        {edition === 'nouveau' && <FormLot fini={fini} />}
+        {lots.map((l) => (
+          <div key={l.id} className="border-t border-creme-2">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-creme-2">
+                {l.image_url ? <img src={l.image_url} alt="" className="size-full object-cover" /> : <Icon name="boutique" size={22} className="text-doux" />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold">{l.name}</p>
+                <p className="text-xs text-doux">{l.cost} pts · {l.stock === 0 ? <b className="text-sceau">rupture</b> : `${l.stock} en stock`}</p>
+              </div>
+              <button onClick={() => setEdition(edition === l.id ? undefined : l.id)} className="min-h-10 rounded-full border-[1.5px] border-trait px-3 text-xs font-bold">Modifier</button>
+              <button onClick={() => supprimer(l)} aria-label={`Supprimer ${l.name}`} className="grid size-10 place-items-center rounded-full text-sceau"><span aria-hidden className="text-lg">×</span></button>
+            </div>
+            {edition === l.id && <FormLot lot={l} fini={fini} />}
+          </div>
+        ))}
+      </Carton>
     </div>
   )
 }
