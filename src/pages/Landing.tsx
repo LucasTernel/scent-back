@@ -111,13 +111,26 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <div className="flex-1">{children}</div>
-      <footer className="relative z-10 border-t border-trait bg-creme">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-doux md:flex-row md:items-center md:justify-between md:px-8">
-          <div className="flex items-center gap-4"><LogoMarque className="-my-4 h-24 w-auto" /><p>Scent Back · projet étudiant BUT MMI</p></div>
-          <nav aria-label="Informations légales" className="flex flex-wrap gap-x-5 gap-y-2">
-            {LEGAL.map(([k, l]) => <a key={k} href={`/legal/${k}`} className="inline-flex min-h-10 items-center hover:text-encre hover:underline">{l}</a>)}
+      <footer className="relative z-10 overflow-hidden bg-[#011A22] text-[#FCF5E3]">
+        <div className="mx-auto grid max-w-6xl gap-12 px-8 pt-20 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <img src="/logo-orange.png" alt="Scent Back" className="-ml-6 -mt-6 w-56" />
+            <p className="mt-2 max-w-sm text-lg leading-relaxed text-[#FCF5E3]/70">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
+            <p className="mt-6 text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
+          </div>
+          <nav aria-label="Découvrir" className="flex flex-col gap-3">
+            <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">Découvrir</p>
+            <a href="/boutique" className="hover:text-flamme">La boutique</a>
+            <button onClick={() => setTuto(true)} className="w-fit hover:text-flamme">Installer l'appli</button>
+            <a href="/#contenu" className="hover:text-flamme">L'expérience</a>
+          </nav>
+          <nav aria-label="Informations légales" className="flex flex-col gap-3">
+            <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">Légal</p>
+            {LEGAL.map(([k, l]) => <a key={k} href={`/legal/${k}`} className="hover:text-flamme">{l}</a>)}
           </nav>
         </div>
+        <p aria-hidden className="titre pointer-events-none -mb-[3vw] text-center text-[12.5vw] leading-none whitespace-nowrap text-[#FCF5E3]/[.04]">SCENT BACK</p>
+        <div className="border-t border-[#FCF5E3]/10"><p className="mx-auto max-w-6xl px-8 py-5 text-xs text-[#FCF5E3]/50">© 2026 Scent Back · projet étudiant BUT MMI · prototype pédagogique</p></div>
       </footer>
       {tuto && <TutoInstallation fermer={() => setTuto(false)} />}
       <div className="fixed right-6 bottom-6 z-50"><Accessibilite rond /></div>

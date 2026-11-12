@@ -165,7 +165,7 @@ export default function SceneBougie() {
 
       // bascule bougie → lapin entre les chapitres 6,4 et 6,9
       const bascule = Math.min(1, Math.max(0, (f - 6.4) / .5))
-      bougieObjets.forEach((o) => { o.visible = bascule < .5; o.scale.setScalar(o === bougieObjets[0] && o !== groupeFlamme ? 10 * Math.max(.001, 1 - bascule * 2) : o.scale.x) })
+      bougieObjets.forEach((o) => { o.visible = bascule < .5 }) // on ne touche PAS aux échelles (la cire fond via scale.y)
       flamme.visible = bascule < .5
       if (lapin) { lapin.visible = bascule > .5; lapin.rotation.y = Math.atan2(camera.position.x, camera.position.z) + Math.sin(t * .8) * .35; const s = Math.max(.001, (bascule - .5) * 2); lapin.userData.s ??= lapin.scale.x; lapin.scale.setScalar(lapin.userData.s * s) }
       // flamme vivante
