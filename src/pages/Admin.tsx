@@ -81,7 +81,7 @@ export function AdminAccueil() {
   const aujourdhui = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:[&>*:first-child]:col-span-2">
       <header className="monte">
         <p className="text-sm font-medium text-doux first-letter:uppercase">{aujourdhui}</p>
         <h1 className="titre text-[26px] leading-tight">Salut {p?.username ?? '…'}</h1>
