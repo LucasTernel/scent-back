@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getLots, type Lot } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, LogoMarque } from '../ui'
+import { PRODUITS, euros } from './BoutiqueSite'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
@@ -192,61 +193,51 @@ const Chapitre = ({ n, titre, clair = false }: { n: string; titre: string; clair
     <span className="font-serif text-flamme">{n}</span><span aria-hidden className={`h-px flex-1 ${clair ? 'bg-[#FCF5E3]/25' : 'bg-trait'}`} /><span>{titre}</span>
   </div>
 )
-/** Loader du site : la cire fond en ~2 s, la flamme s'éteint, puis fondu vers le site. Une fois par session. */
+/** Loader : la vraie bougie 3D tourne, flamme allumée ; la barre suit le chargement réel du modèle.
+ *  Se ferme quand c'est prêt (min 1,6 s), au plus tard après 5 s, au clic ou avec Échap. Une fois par session. */
 function LoaderBougie() {
-  const [cire, setCire] = useState(1)
-  const [fini, setFini] = useState(() => {
-    try { return sessionStorage.getItem('loader-vu') === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches } catch { return false }
-  })
+  const [fini, setFini] = useState(() => { try { return sessionStorage.getItem('loader-vu') === '1' } catch { return false } })
   const [parti, setParti] = useState(fini)
+  const [prog, setProg] = useState(0)
+  const mv = useRef<HTMLElement>(null)
+  const passer = useRef(() => {})
+  passer.current = () => { setFini(true); try { sessionStorage.setItem('loader-vu', '1') } catch { /* rien */ } setTimeout(() => setParti(true), 800) }
   useEffect(() => {
     if (fini) return
-    let raf = 0; const debut = performance.now(), duree = 2200
-    const pas = (now: number) => {
-      const t = Math.min(1, (now - debut) / duree)
-      setCire(1 - (1 - (1 - t) ** 2)) // fonte qui ralentit vers la fin
-      if (t < 1) raf = requestAnimationFrame(pas)
-      else setTimeout(passer, 450)
-    }
-    raf = requestAnimationFrame(pas)
-    // filet de sécurité : jamais plus de 3 s (onglet en arrière-plan = animations en pause)
-    const secours = setTimeout(passer, 3000)
-    const touche = (e: KeyboardEvent) => e.key === 'Escape' && passer()
+    const debut = performance.now()
+    const el = mv.current
+    const surProg = (e: Event) => setProg((e as CustomEvent<{ totalProgress: number }>).detail.totalProgress)
+    const surCharge = () => { setProg(1); setTimeout(() => passer.current(), Math.max(0, 1600 - (performance.now() - debut)) + 500) }
+    el?.addEventListener('progress', surProg); el?.addEventListener('load', surCharge)
+    const secours = setTimeout(() => passer.current(), 5000)
+    const touche = (e: KeyboardEvent) => e.key === 'Escape' && passer.current()
     addEventListener('keydown', touche)
-    return () => { cancelAnimationFrame(raf); clearTimeout(secours); removeEventListener('keydown', touche) }
-  }, [fini]) // eslint-disable-line react-hooks/exhaustive-deps
-  function passer() {
-    setFini(true); try { sessionStorage.setItem('loader-vu', '1') } catch { /* rien */ }
-    setTimeout(() => setParti(true), 700)
-  }
+    return () => { el?.removeEventListener('progress', surProg); el?.removeEventListener('load', surCharge); clearTimeout(secours); removeEventListener('keydown', touche) }
+  }, [fini])
   if (parti) return null
   return (
-    <div role="status" aria-label="Chargement de Scent Back" onClick={passer} className="fixed inset-0 z-[60] grid cursor-pointer place-items-center bg-[#011A22] transition-opacity duration-700" style={{ opacity: fini ? 0 : 1, pointerEvents: fini ? 'none' : undefined }}>
-      <div className="flex flex-col items-center gap-6">
-        <Bougie cire={Math.max(cire, .015)} className="w-36" />
-        <img src="/logo-orange.png" alt="" className="-my-8 w-44" />
-        <p className="font-mono text-sm text-[#FCF5E3]/50" aria-hidden>{Math.round(cire * 140)} g</p>
-        <p className="text-xs text-[#FCF5E3]/35">Cliquer pour passer</p>
+    <div role="status" aria-label="Chargement de Scent Back" onClick={() => passer.current()}
+      className="fixed inset-0 z-[60] grid cursor-pointer place-items-center bg-[#011A22] transition-opacity duration-700" style={{ opacity: fini ? 0 : 1, pointerEvents: fini ? 'none' : undefined }}>
+      <div aria-hidden className="absolute top-1/2 left-1/2 size-[480px] -translate-1/2 rounded-full bg-[radial-gradient(circle,#FF772233,transparent_65%)]" />
+      <div className="relative flex flex-col items-center">
+        <model-viewer ref={mv} src="/models/bougie-rhum-marin.glb" alt="" auto-rotate auto-rotate-delay="0" rotation-per-second="40deg" interaction-prompt="none"
+          camera-orbit="0deg 74deg 165%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" disable-zoom
+          style={{ width: 300, height: 340, ['--poster-color' as string]: 'transparent' }}>
+          <div slot="progress-bar" />
+          <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" className="flamme-3d"><span /></div>
+        </model-viewer>
+        <img src="/logo-orange.png" alt="" className="-mt-10 -mb-6 w-44" />
+        <div className="mt-2 h-[3px] w-48 overflow-hidden rounded-full bg-[#FCF5E3]/15"><div className="h-full bg-flamme transition-[width] duration-300" style={{ width: `${Math.round(prog * 100)}%` }} /></div>
+        <p className="mt-3 font-mono text-xs text-[#FCF5E3]/50">Allumage… {Math.round(prog * 100)} %</p>
+        <p className="mt-6 text-xs text-[#FCF5E3]/30">Cliquer pour passer</p>
       </div>
     </div>
   )
 }
 
-/** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
-export default function Landing() {
-  useApparition()
-  useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
-  const lots = useData(getLots) ?? []
-  const [demo, setDemo] = useState<Lot>()
+/** 03 — Le défi : la cire fond pendant qu'on défile. Composant isolé : lui seul se redessine au défilement. */
+function Defi() {
   const [refDefi, p] = useProgression()
-  const racine = useRef<HTMLElement>(null)
-  const [loaderAffiche] = useState(() => { try { return sessionStorage.getItem('loader-vu') !== '1' } catch { return true } })
-  useEffect(() => {
-    import('@google/model-viewer')
-    let stop = () => {}
-    import('../lib/animations').then(({ lancerAnimations }) => racine.current && lancerAnimations(racine.current).then((s) => { stop = s }))
-    return () => stop()
-  }, [])
   const etapesDefi = [
     ['Allumez', 'Installez-vous dans une lumière douce, allumez la mèche et respirez : l\'ambiance revient avant même que l\'écran s\'allume.'],
     ['Jouez', 'Elle compte le temps avec vous. Plus la cire fond, plus la fin approche.'],
@@ -254,93 +245,7 @@ export default function Landing() {
     ['Gagnez', 'Si vous finissez l\'aventure avant la dernière goutte de cire, c\'est gagné.'],
   ]
   const etape = Math.min(etapesDefi.length - 1, Math.floor(p * etapesDefi.length))
-  const sommaire = [['01', 'Le sens manquant', '#sens'], ['02', 'La box', '#box'], ['03', 'Le défi', '#defi'], ['04', 'La chasse', '#chasse'], ['05', 'La boutique', '#boutique']]
-
   return (
-    <SiteDesktop>
-      <LoaderBougie />
-      <main id="contenu" ref={racine} data-curseur>
-        {/* Ouverture : grand titre + sommaire à gauche, la box dans une arche à droite */}
-        <section className="mx-auto grid max-w-6xl gap-12 px-5 pt-10 pb-20 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-end">
-          <div className="flex flex-col gap-8">
-            <p className="apparait text-sm font-bold tracking-[.22em] text-doux uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
-            <h1 data-split={loaderAffiche ? 'loader' : ''} className="titre text-[clamp(3.4rem,8vw,7.2rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
-            <p className="apparait max-w-md text-xl leading-relaxed">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… <b>et pourtant, vous ne les avez jamais sentis.</b></p>
-            <nav aria-label="Chapitres" className="apparait mt-2 border-t-2 border-encre">
-              {sommaire.map(([n, l, h]) => (
-                <a key={n} href={h} className="group flex items-center gap-5 border-b border-trait py-3.5 transition hover:pl-2">
-                  <span className="font-serif text-sm font-bold text-flamme">{n}</span>
-                  <span className="flex-1 text-lg font-medium">{l}</span>
-                  <span aria-hidden className="text-doux transition group-hover:translate-x-1 group-hover:text-encre">→</span>
-                </a>
-              ))}
-            </nav>
-          </div>
-          <div className="apparait relative" style={{ ['--d' as string]: '.15s' }}>
-            <div data-parallax=".12" className="relative overflow-hidden rounded-t-full border-4 border-encre bg-[radial-gradient(circle_at_50%_40%,#ffffff,#F2E7CB)]">
-              <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D, 140 g de cire 100 % végétale. Faites-la tourner."
-                camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="16deg" interaction-prompt="none" disable-zoom disable-pan
-                camera-orbit="25deg 72deg 165%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.05" shadow-intensity="1" shadow-softness=".9"
-                min-camera-orbit="auto 40deg auto" max-camera-orbit="auto 95deg auto"
-                style={{ display: 'block', width: '100%', height: 'min(64vh, 600px)', cursor: 'grab', ['--poster-color' as string]: 'transparent' }}>
-                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
-              </model-viewer>
-              <p className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-[8px] bg-[#023341]/80 px-3 py-1.5 text-[11px] font-bold text-[#FCF5E3]">↻ Faites-la tourner</p>
-            </div>
-            <p className="mt-3 flex justify-between text-xs font-bold tracking-[.18em] text-doux uppercase"><span>Fig. 1 — Rhum Marin</span><span>140 g · cire végétale</span></p>
-          </div>
-        </section>
-
-
-        {/* 01 — Le sens manquant : un tableau, pas des cartes */}
-        <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
-          <Chapitre n="01" titre="Le sens manquant" />
-          <h2 className="apparait titre mt-10 max-w-4xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Dans un jeu, on voit et on entend le monde. On ne le sent jamais.</h2>
-          <dl className="mt-16 border-t-2 border-encre">
-            {[['Voir', 'L\'image', 'Ubisoft', true], ['Entendre', 'Le son', 'Ubisoft', true], ['Sentir', 'L\'odeur', 'La Belle Mèche', false]].map(([verbe, sens, qui, deja], i) => (
-              <div key={verbe as string} className={`apparait grid grid-cols-[1fr_auto] items-baseline gap-6 border-b border-trait py-7 md:grid-cols-[180px_1fr_auto] ${deja ? '' : 'bg-flamme/10 px-4 -mx-4'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
-                <dt className="titre text-4xl md:text-5xl">{verbe as string}</dt>
-                <dd className="hidden text-lg text-doux md:block">{sens as string}</dd>
-                <dd className={`text-right text-sm font-bold tracking-[.16em] uppercase ${deja ? 'text-doux' : 'text-flamme'}`}>{deja ? `✓ ${qui}` : `Le sens manquant — ${qui}`}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="apparait mt-12 ml-auto max-w-xl text-xl leading-relaxed">Ubisoft fait voyager par l'image et le son. La Belle Mèche, par l'odeur et la lumière. Scent Back réunit les deux et ajoute ce qui manquait : <b>l'odorat.</b></p>
-        </section>
-
-        {/* 02 — La box : photo pleine largeur + légendes en colonnes */}
-        <section id="box" className="bg-[#011A22] text-[#FCF5E3]">
-          <div className="mx-auto max-w-6xl px-5 pt-28 md:px-8">
-            <Chapitre n="02" titre="La box" clair />
-            <h2 className="apparait titre mt-10 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Un jeu culte. Une bougie qui a l'odeur de son monde.</h2>
-          </div>
-          <div className="mx-auto max-w-6xl px-5 md:px-8">
-            <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="mt-14 w-full rounded-[18px]" />
-          </div>
-          <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-3 md:px-8">
-            {[['Le jeu', 'Assassin\'s Creed IV Black Flag. La piraterie, les Caraïbes, le pont du Jackdaw.'], ['La bougie', 'Rhum Marin. 140 g de cire 100 % végétale, coulée en France par La Belle Mèche.'], ['L\'écrin', 'Une box en forme de logo Assassin\'s Creed, faite pour rester sur le bureau.']].map(([k, v], i) => (
-              <div key={k} className="apparait border-t-2 border-flamme pt-5" style={{ ['--d' as string]: `${i * .1}s` }}>
-                <p className="text-xs font-bold tracking-[.2em] text-flamme uppercase">Fig. 2.{i + 1}</p>
-                <p className="titre mt-2 text-2xl">{k}</p>
-                <p className="mt-2 leading-relaxed text-[#FCF5E3]/70">{v}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* La Confrérie : le lapin 3D tourne pendant que les mots glissent derrière (section épinglée) */}
-        <section data-lapin className="relative grid h-dvh place-items-center overflow-hidden bg-[#011A22] text-[#FCF5E3]" aria-label="Le lapin de la Confrérie">
-          <div aria-hidden className="pointer-events-none absolute inset-0 flex flex-col justify-center gap-2 leading-[.85] select-none">
-            <p data-glisse className="titre text-center text-[clamp(5rem,15vw,15rem)] whitespace-nowrap">LE TEMPS</p>
-            <p data-glisse className="titre texte-contour text-center text-[clamp(5rem,15vw,15rem)] whitespace-nowrap">D'UNE BOUGIE</p>
-          </div>
-          <model-viewer src="/models/lapin-ultimate.glb" alt="Le Lapin Ultimate, mascotte de la Confrérie, en 3D" camera-orbit="-30deg 80deg 150%" camera-target="0m auto 0m"
-            field-of-view="30deg" exposure="1.1" shadow-intensity="1" interaction-prompt="none" disable-zoom
-            style={{ position: 'relative', width: 'min(52vw, 620px)', height: '86vh', ['--poster-color' as string]: 'transparent' }} />
-          <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.22em] text-[#FCF5E3]/50 uppercase">Le Lapin Ultimate · légendaire</p>
-        </section>
-
-        {/* 03 — Le défi : la cire fond au fil du défilement, règle graduée en heures */}
         <section id="defi" ref={refDefi} className="relative h-[300vh] bg-creme" aria-labelledby="titre-defi">
           <div className="sticky top-0 flex h-dvh flex-col justify-center overflow-hidden">
             <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
@@ -372,6 +277,101 @@ export default function Landing() {
           </div>
         </section>
 
+  )
+}
+
+/** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
+export default function Landing() {
+  useApparition()
+  useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
+  const lots = useData(getLots) ?? []
+  const [demo, setDemo] = useState<Lot>()
+  const racine = useRef<HTMLElement>(null)
+  const [loaderAffiche] = useState(() => { try { return sessionStorage.getItem('loader-vu') !== '1' } catch { return true } })
+  useEffect(() => {
+    import('@google/model-viewer')
+    let stop = () => {}
+    import('../lib/animations').then(({ lancerAnimations }) => racine.current && lancerAnimations(racine.current).then((s) => { stop = s }))
+    return () => stop()
+  }, [])
+
+  return (
+    <SiteDesktop>
+      <LoaderBougie />
+      <main id="contenu" ref={racine} data-curseur>
+        {/* Ouverture en grille de blocs (réf. August & Piers) : titre + arche « Boutique » | bougie 3D | box + « Installer l'appli » */}
+        <section data-ouverture className="grid min-h-[calc(100dvh-5.5rem)] grid-cols-[1.15fr_1fr_.85fr] grid-rows-[1fr_auto] bg-[#011A22] text-[#FCF5E3]">
+          <div className="relative row-span-2 flex flex-col justify-between gap-8 border-r border-[#FCF5E3]/15 p-10 pb-0">
+            <p className="text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
+            <div>
+              <h1 data-split={loaderAffiche ? 'loader' : ''} className="titre text-[clamp(3rem,6.4vw,6.4rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+              <p className="mt-6 max-w-sm leading-relaxed text-[#FCF5E3]/75">Ces mondes, vous les avez parcourus pendant des heures… mais vous ne les avez jamais sentis. Une box, un jeu culte, une bougie qui a l'odeur de son monde.</p>
+            </div>
+            <a href="/boutique" className="grid h-28 place-items-center rounded-t-[999px] border-x border-t border-[#FCF5E3]/30 transition hover:bg-flamme hover:text-[#023341]">
+              <span className="titre text-2xl tracking-wide">Boutique →</span>
+            </a>
+          </div>
+          <div className="relative row-span-2 overflow-hidden border-r border-[#FCF5E3]/15 bg-[radial-gradient(circle_at_50%_45%,#16323d,#011A22_70%)]">
+            <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D" auto-rotate auto-rotate-delay="0" rotation-per-second="12deg" interaction-prompt="none" disable-zoom
+                camera-orbit="20deg 72deg 150%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" data-bougie-hero
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
+                <div slot="progress-bar" />
+                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
+              </model-viewer>
+            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.2em] text-[#FCF5E3]/60 uppercase">Rhum Marin · 140 g</p>
+          </div>
+          <img src="/site/box.webp" alt="La box Assassin's Creed IV Black Flag" className="size-full min-h-0 object-cover object-[30%_50%]" />
+          <button onClick={ouvrirTuto} className="flex items-center justify-between gap-4 border-t border-[#FCF5E3]/15 p-8 text-left transition hover:bg-flamme hover:text-[#023341]">
+            <span><span className="block text-xs font-bold tracking-[.2em] uppercase opacity-70">L'appli de chasse</span><span className="titre mt-1 block text-2xl">Installer l'appli</span></span>
+            <Icon name="nfc" size={28} />
+          </button>
+        </section>
+
+        {/* La collab (réf. « Our philosophy ») : mots géants, la bougie 3D penchée en travers */}
+        <section className="relative overflow-hidden bg-[#011A22] py-28 text-[#FCF5E3]">
+          <div className="relative mx-auto max-w-6xl px-8">
+            <p data-glisse className="titre text-[clamp(4rem,11vw,10rem)] leading-[.88]">UBISOFT</p>
+            <p data-glisse className="titre texte-contour text-right text-[clamp(4rem,11vw,10rem)] leading-[.88]">× LA BELLE</p>
+            <p data-glisse className="titre text-[clamp(4rem,11vw,10rem)] leading-[.88]">MÈCHE</p>
+            <div className="pointer-events-none absolute top-1/2 left-[52%] h-[420px] w-[340px] -translate-1/2 rotate-[-14deg]">
+              <model-viewer src="/models/bougie-rhum-marin.glb" alt="" auto-rotate auto-rotate-delay="0" rotation-per-second="0deg" interaction-prompt="none" disable-zoom
+                camera-orbit="-10deg 70deg 150%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" 
+                style={{ width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
+                <div slot="progress-bar" />
+                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
+              </model-viewer>
+            </div>
+          </div>
+          <div className="mx-auto mt-16 grid max-w-6xl gap-10 px-8 md:grid-cols-2">
+            <p className="apparait text-xl leading-relaxed">La Belle Mèche coule des bougies parfumées naturelles en France. Ubisoft crée des mondes. Les deux font voyager : l'un par l'image et le son, l'autre par l'odeur et la lumière.</p>
+            <p className="apparait leading-relaxed text-[#FCF5E3]/70" style={{ ['--d' as string]: '.12s' }}>Notre collaboration remet au goût du jour les jeux cultes d'Ubisoft : chaque box réunit un jeu et une bougie au parfum de son univers, calculée pour brûler le temps de l'aventure. Premier pack : Assassin's Creed. Ensuite, chaque grande licence aura le sien dans la collection All Stars.</p>
+          </div>
+        </section>
+
+        {/* Photo plein cadre */}
+        <figure className="bg-[#011A22]">
+          <img src="/site/box.webp" alt="La box Scent Back sur un bureau de joueur : l'écrin Assassin's Creed, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="h-[88vh] w-full object-cover" />
+        </figure>
+
+        {/* 01 — Le sens manquant : un tableau, pas des cartes */}
+        <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
+          <Chapitre n="01" titre="Le sens manquant" />
+          <h2 className="apparait titre mt-10 max-w-4xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Dans un jeu, on voit et on entend le monde. On ne le sent jamais.</h2>
+          <dl className="mt-16 border-t-2 border-encre">
+            {[['Voir', 'L\'image', 'Ubisoft', true], ['Entendre', 'Le son', 'Ubisoft', true], ['Sentir', 'L\'odeur', 'La Belle Mèche', false]].map(([verbe, sens, qui, deja], i) => (
+              <div key={verbe as string} className={`apparait grid grid-cols-[1fr_auto] items-baseline gap-6 border-b border-trait py-7 md:grid-cols-[180px_1fr_auto] ${deja ? '' : 'bg-flamme/10 px-4 -mx-4'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
+                <dt className="titre text-4xl md:text-5xl">{verbe as string}</dt>
+                <dd className="hidden text-lg text-doux md:block">{sens as string}</dd>
+                <dd className={`text-right text-sm font-bold tracking-[.16em] uppercase ${deja ? 'text-doux' : 'text-flamme'}`}>{deja ? `✓ ${qui}` : `Le sens manquant — ${qui}`}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="apparait mt-12 ml-auto max-w-xl text-xl leading-relaxed">Ubisoft fait voyager par l'image et le son. La Belle Mèche, par l'odeur et la lumière. Scent Back réunit les deux et ajoute ce qui manquait : <b>l'odorat.</b></p>
+        </section>
+
+
+        <Defi />
+
         {/* Règle d'or : chiffre géant en contour */}
         <section className="border-y-2 border-encre bg-papier">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-[1.3fr_1fr]">
@@ -384,28 +384,37 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Valeurs : citation + deux colonnes séparées par un filet */}
-        <section className="mx-auto max-w-6xl px-5 py-28 md:px-8">
-          <blockquote className="apparait titre max-w-4xl text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1]">« Une odeur suffit à faire revenir un souvenir, et l'émotion qui va avec. »</blockquote>
-          <div className="mt-16 grid gap-10 md:grid-cols-2 md:divide-x-2 md:divide-encre">
-            {[['Nostalgie', 'C\'est l\'effet « madeleine de Proust » : un parfum de rhum et d\'embruns, et vous êtes de retour sur le pont du Jackdaw.'], ['Communauté', 'On partage ses souvenirs de jeu ensemble : en ligne, sur les réseaux et dans l\'appli, et en vrai, au pop-up store parisien.']].map(([t, d], i) => (
-              <div key={t} className={`apparait ${i ? 'md:pl-10' : 'md:pr-10'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
-                <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">Valeur 0{i + 1}</p>
+        {/* Le pop-up store */}
+        <section id="popup" className="bg-[#011A22] text-[#FCF5E3]">
+          <div className="mx-auto max-w-6xl px-8 pt-28">
+            <Chapitre n="04" titre="Le pop-up store" clair />
+            <h2 className="apparait titre mt-10 text-[clamp(3rem,8vw,7rem)] leading-[.88]">Paris.<br /><span className="text-flamme">En vrai.</span></h2>
+          </div>
+          <div className="mx-auto mt-16 grid max-w-6xl border-t border-[#FCF5E3]/15 md:grid-cols-3">
+            {[['Sentir', 'Toutes les bougies de la collection, à respirer avant de choisir. Le rhum marin, la figue tabacée… et les surprises à venir.'],
+              ['Jouer', 'Les box Scent Back à manipuler, les jeux en démo, et les statuettes des lapins encapuchonnés à retrouver dans Paris.'],
+              ['Récupérer', 'Vos commandes de la boutique et les lots gagnés dans l\'appli, avec votre bon. La communauté se retrouve ici.']].map(([t, d], i) => (
+              <div key={t} className={`apparait p-10 ${i ? 'md:border-l border-[#FCF5E3]/15' : ''}`} style={{ ['--d' as string]: `${i * .1}s` }}>
+                <p className="font-serif text-sm font-bold text-flamme">0{i + 1}</p>
                 <h3 className="titre mt-3 text-4xl">{t}</h3>
-                <p className="mt-4 text-lg leading-relaxed text-doux">{d}</p>
+                <p className="mt-4 leading-relaxed text-[#FCF5E3]/70">{d}</p>
               </div>
             ))}
           </div>
         </section>
 
-
-        {/* 04 — La chasse : texte + QR dans une étiquette, aperçu de l'appli */}
-        <section id="chasse" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
-          <Chapitre n="04" titre="La chasse" />
-          <div className="mt-10 grid items-center gap-14 lg:grid-cols-[1.1fr_.9fr]">
+        {/* L'appli */}
+        <section id="chasse" className="bg-creme">
+          <div className="mx-auto grid max-w-6xl items-center gap-14 px-8 py-28 lg:grid-cols-[1.1fr_.9fr]">
             <div className="flex flex-col gap-8">
-              <h2 className="apparait titre text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La chasse est ouverte. Sur votre téléphone.</h2>
-              <p className="apparait max-w-xl text-lg leading-relaxed text-doux">Des lapins encapuchonnés se cachent dans Paris. Un radar fait vibrer le téléphone quand on approche, on scanne la puce NFC cachée sous la statuette, et chaque capture rapporte des points à dépenser au pop-up store.</p>
+              <Chapitre n="05" titre="L'application" />
+              <h2 className="apparait titre text-[clamp(3rem,7vw,6rem)] leading-[.88]">La<br />chasse<span className="text-flamme">.</span></h2>
+              <p className="apparait max-w-xl text-lg leading-relaxed text-doux">Des lapins encapuchonnés se cachent dans Paris. Un radar fait vibrer le téléphone quand on approche, on scanne la puce NFC sous la statuette, chaque capture devient une carte 3D et rapporte des points à échanger au pop-up store.</p>
+              <ul className="apparait grid max-w-xl grid-cols-3 border-y-2 border-encre">
+                {[['Radar', 'qui vibre'], ['NFC', 'à scanner'], ['Points', 'à échanger']].map(([a, b], i) => (
+                  <li key={a} className={`py-5 ${i ? 'border-l border-trait pl-5' : ''}`}><p className="titre text-2xl">{a}</p><p className="text-sm text-doux">{b}</p></li>
+                ))}
+              </ul>
               <Etiquette className="apparait w-full max-w-md" corps="flex items-center gap-5 p-5" larg="30%" arche="1.9rem">
                 <img src="/qr-app.svg" alt={`QR code qui ouvre ${ADRESSE} sur votre téléphone`} className="size-32 shrink-0" />
                 <div className="flex flex-col gap-2">
@@ -425,62 +434,26 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* 05 — La boutique : chaque lot dans une étiquette */}
-        <section id="boutique" className="border-t-2 border-encre bg-creme-2/50 py-28" aria-labelledby="titre-boutique">
-          <div className="mx-auto max-w-6xl px-5 md:px-8">
-            <Chapitre n="05" titre="La boutique" />
-            <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <h2 id="titre-boutique" className="apparait titre max-w-2xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Vos points valent de vrais lots.</h2>
-              <div className="apparait max-w-sm">
-                <p className="leading-relaxed text-doux">Échangez vos points dans l'appli, puis récupérez le lot au pop-up store avec votre bon.</p>
-                <a href="/boutique" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#023341] px-5 font-bold text-[#FCF5E3] dark:bg-flamme dark:text-[#023341]">Voir la boutique et commander →</a>
-              </div>
+        {/* Shop (réf.) : rangée de produits + lots en points */}
+        <section id="boutique" className="bg-[#011A22] py-28 text-[#FCF5E3]">
+          <div className="mx-auto max-w-6xl px-8">
+            <div className="flex items-end justify-between gap-6 border-b border-[#FCF5E3]/20 pb-6">
+              <h2 className="titre text-[clamp(3rem,7vw,6rem)] leading-[.88]">Shop<span className="text-flamme">.</span></h2>
+              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique et commander →</a>
             </div>
-            <ul className="mt-14 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-              {lots.map((l, i) => (
-                <li key={l.id} className="apparait" style={{ ['--d' as string]: `${i * .08}s` }}>
-                  <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="34%" arche="1.6rem" fond="#FFFCF4">
-                    <div className="relative grid aspect-square place-items-center overflow-hidden rounded-[10px] bg-creme-2">
-                      {l.image_url ? <img src={l.image_url} alt="" className="absolute inset-0 size-full object-cover" /> : <Icon name="boutique" size={52} className="text-doux" />}
+            <ul className="mt-12 grid gap-6 md:grid-cols-3">
+              {PRODUITS.map((pr, i) => (
+                <li key={pr.id} className="apparait group" style={{ ['--d' as string]: `${i * .08}s` }}>
+                  <a href="/boutique" className="block">
+                    <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]">
+                      <img src={pr.image} alt={pr.nom} loading="lazy" className={`aspect-[4/5] w-full transition duration-700 group-hover:scale-105 ${pr.id === 'box-ac4' ? 'object-cover' : 'object-contain p-6'}`} />
                     </div>
-                    <p className="titre mt-4 min-h-[2.4em] text-center text-base leading-tight">{l.name}</p>
-                    <span aria-hidden className="mx-auto my-3 block h-[3px] w-8 bg-encre" />
-                    <p className="text-center text-sm font-bold">{l.cost} points</p>
-                    <button onClick={() => setDemo(l)} disabled={l.stock === 0} className="mt-4 min-h-11 rounded-[10px] border-2 border-encre text-sm font-bold transition hover:bg-[#023341] hover:text-[#FCF5E3] disabled:opacity-40">
-                      {l.stock === 0 ? 'Rupture de stock' : 'Réserver (démo)'}
-                    </button>
-                  </Etiquette>
+                    <div className="mt-4 flex items-baseline justify-between gap-3"><p className="titre text-lg">{pr.nom}</p><p className="font-bold text-flamme">{pr.dispo ? euros(pr.prix) : 'Bientôt'}</p></div>
+                  </a>
                 </li>
               ))}
             </ul>
-          </div>
-        </section>
-
-        {/* All Stars : galerie horizontale épinglée */}
-        <section data-horizontal className="flex h-dvh flex-col justify-center overflow-hidden bg-creme">
-          <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
-            <Chapitre n="06" titre="La suite" />
-            <h2 className="titre mt-6 text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La collection All Stars.</h2>
-          </div>
-          <div data-piste className="mt-10 flex w-max gap-8 pr-[10vw] pl-[max(1.25rem,calc((100vw-72rem)/2+2rem))]">
-            <div className="flex w-[360px] shrink-0 flex-col justify-end">
-              <p className="text-xl leading-relaxed text-doux">Assassin's Creed ouvre le bal. Ensuite, chaque grande licence Ubisoft aura sa box et sa bougie, au parfum de son monde.</p>
-              <p className="mt-6 text-sm font-bold tracking-[.2em] text-flamme uppercase">Défilez →</p>
-            </div>
-            {[['/site/etiquette-ac.webp', 'Rhum Marin', 'Assassin\'s Creed IV — disponible'], ['/site/etiquette-pop.webp', 'Figue Tabacée', 'Prochainement']].map(([img, nom, info]) => (
-              <figure key={nom} className="w-[360px] shrink-0">
-                <img src={img} alt={`Étiquette de la bougie ${nom}`} loading="lazy" className="w-full" />
-                <figcaption className="mt-3 border-t border-trait pt-2 text-sm"><b>{nom}</b> · <span className="text-doux">{info}</span></figcaption>
-              </figure>
-            ))}
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="w-[360px] shrink-0">
-                <Etiquette couleur="#DCD2BA" fond="transparent" className="aspect-[700/832]" corps="grid place-items-center border-dashed" larg="40%">
-                  <span className="titre text-6xl text-trait">?</span>
-                </Etiquette>
-                <p className="mt-3 border-t border-trait pt-2 text-sm text-doux">Licence mystère</p>
-              </div>
-            ))}
+            <p className="mt-12 border-t border-[#FCF5E3]/20 pt-6 text-sm text-[#FCF5E3]/60">Et dans l'appli : les points de la chasse s'échangent contre des lots ({lots.map((l) => l.name).join(', ')}) à récupérer au pop-up.</p>
           </div>
         </section>
 

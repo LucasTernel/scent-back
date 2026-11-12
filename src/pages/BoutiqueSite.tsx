@@ -4,12 +4,12 @@ import { Icon } from '../ui'
 
 /** Boutique du site (ordinateur) — démonstration : panier + commande fictive, aucun paiement, aucune donnée bancaire. */
 type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean }
-const PRODUITS: Produit[] = [
+export const PRODUITS: Produit[] = [
   { id: 'box-ac4', nom: 'Box Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 + la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo.', prix: 59.9, image: '/site/box.webp', dispo: true },
   { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale · coulée en France. Brûle le temps du jeu.', prix: 24.9, image: '/site/bougie.webp', dispo: true },
   { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '70 g · cire 100 % végétale. La prochaine licence de la collection All Stars.', prix: 16.9, image: '/site/etiquette-pop.webp', dispo: false },
 ]
-const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+export const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 type Panier = Record<string, number>
 const lirePanier = (): Panier => { try { return JSON.parse(localStorage.getItem('panier') || '{}') } catch { return {} } }
 

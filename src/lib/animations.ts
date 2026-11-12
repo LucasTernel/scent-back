@@ -60,23 +60,39 @@ export async function lancerAnimations(racine: HTMLElement) {
         scrollTrigger: { trigger: el, start: 'top 90%', end: 'top 25%', scrub: .6 },
       })
     })
-    // Galerie horizontale épinglée
+    // Galerie horizontale : la section a une hauteur = largeur à parcourir, son contenu reste collé (CSS sticky).
+    // Pas de « pin » GSAP : il déplacerait les nœuds DOM gérés par React.
     racine.querySelectorAll<HTMLElement>('[data-horizontal]').forEach((sec) => {
       const piste = sec.querySelector<HTMLElement>('[data-piste]')
       if (!piste) return
-      const distance = () => piste.scrollWidth - innerWidth + 64
-      gsap.to(piste, { x: () => -distance(), ease: 'none', scrollTrigger: { trigger: sec, start: 'top top', end: () => `+=${distance()}`, pin: true, scrub: .8, invalidateOnRefresh: true } })
+      const distance = () => Math.max(0, piste.scrollWidth - innerWidth + 64)
+      const hauteur = () => { sec.style.height = `${innerHeight + distance()}px` }
+      hauteur(); ScrollTrigger.addEventListener('refreshInit', hauteur)
+      gsap.to(piste, { x: () => -distance(), ease: 'none', scrollTrigger: { trigger: sec, start: 'top top', end: 'bottom bottom', scrub: .8, invalidateOnRefresh: true } })
     })
-    // Lapin 3D qui tourne avec le défilement (section épinglée)
+    // Lapin 3D qui tourne avec le défilement (contenu sticky en CSS)
     racine.querySelectorAll<HTMLElement>('[data-lapin]').forEach((sec) => {
-      const mv = sec.querySelector('model-viewer') as (HTMLElement & { cameraOrbit?: string }) | null
-      const titres = sec.querySelectorAll('[data-glisse]')
-      ScrollTrigger.create({
-        trigger: sec, start: 'top top', end: '+=180%', pin: true, scrub: true,
-        onUpdate: (st) => { if (mv) mv.setAttribute('camera-orbit', `${-30 + st.progress * 390}deg ${80 - st.progress * 12}deg 150%`) },
-      })
-      titres.forEach((t, i) => gsap.fromTo(t, { xPercent: i % 2 ? 30 : -30 }, { xPercent: i % 2 ? -30 : 30, ease: 'none', scrollTrigger: { trigger: sec, start: 'top top', end: '+=180%', scrub: true } }))
+      const mv = sec.querySelector('model-viewer')
+      const st = { trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true }
+      ScrollTrigger.create({ ...st, onUpdate: (s) => mv?.setAttribute('camera-orbit', `${-30 + s.progress * 390}deg ${80 - s.progress * 12}deg 150%`) })
+      sec.querySelectorAll('[data-glisse]').forEach((el, i) => gsap.fromTo(el, { xPercent: i % 2 ? 25 : -25 }, { xPercent: i % 2 ? -25 : 25, ease: 'none', scrollTrigger: st }))
     })
+    // Mots géants qui glissent en sens opposés au défilement (hors section lapin)
+    racine.querySelectorAll<HTMLElement>('[data-glisse]').forEach((el, i) => {
+      if (el.closest('[data-lapin]')) return
+      gsap.fromTo(el, { xPercent: i % 2 ? 8 : -8 }, { xPercent: i % 2 ? -8 : 8, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } })
+    })
+    // Bougie de l'ouverture : suit doucement la souris (en plus de sa rotation lente)
+    const bougie = racine.querySelector<HTMLElement>('[data-bougie-hero]')
+    const ouverture = racine.querySelector<HTMLElement>('[data-ouverture]')
+    if (bougie && ouverture) {
+      const etat = { x: 0, y: 0 }
+      const vers = gsap.quickTo(etat, 'x', { duration: 1.2, ease: 'power3', onUpdate: () => bougie.setAttribute('camera-orbit', `${20 + etat.x * 40}deg ${74 - etat.y * 10}deg 165%`) })
+      const versY = gsap.quickTo(etat, 'y', { duration: 1.2, ease: 'power3' })
+      ouverture.addEventListener('pointermove', (e) => { const r = ouverture.getBoundingClientRect(); vers((e.clientX - r.left) / r.width - .5); versY((e.clientY - r.top) / r.height - .5) })
+      bougie.removeAttribute('auto-rotate')
+      gsap.to(bougie, { yPercent: 18, ease: 'none', scrollTrigger: { trigger: ouverture, start: 'top top', end: 'bottom top', scrub: true } })
+    }
   }, racine)
 
   // Curseur personnalisé : un point qui suit la souris et grossit sur les éléments cliquables
