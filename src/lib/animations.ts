@@ -98,6 +98,40 @@ export async function lancerAnimations(racine: HTMLElement) {
       el.replaceChildren(...el.dataset.origine.split(/(\s+)/).map((m) => { const s = document.createElement('span'); s.textContent = m; if (m.trim()) s.className = 'mot'; return s }))
       gsap.fromTo(el.querySelectorAll('.mot'), { opacity: .14 }, { opacity: 1, stagger: .08, ease: 'none', scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true } })
     })
+    // Expérience bougie : chaque texte apparaît comme une flamme qui s'allume, puis FOND comme de la cire en partant
+    const fondre = (el: HTMLElement) => {
+      if (el.dataset.fondu) return
+      el.dataset.fondu = '1'
+      const lettres: HTMLElement[] = []
+      const couper = (n: Node) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment()
+          for (const mot of (n.textContent ?? '').split(/(\s+)/)) {
+            if (!mot) continue
+            if (/^\s+$/.test(mot)) { frag.append(mot); continue }
+            const m = document.createElement('span'); m.className = 'inline-block whitespace-nowrap'
+            for (const c of mot) { const s = document.createElement('span'); s.className = 'inline-block'; s.textContent = c; m.append(s); lettres.push(s) }
+            frag.append(m)
+          }
+          n.parentNode!.replaceChild(frag, n)
+        } else [...n.childNodes].forEach(couper)
+      }
+      couper(el)
+      return lettres
+    }
+    racine.querySelectorAll<HTMLElement>('[data-experience] > section').forEach((sec, i) => {
+      const lettres = [...sec.querySelectorAll<HTMLElement>('h1, h2, p:not([data-mots])')].flatMap((el) => fondre(el) ?? [])
+      if (!lettres.length) return
+      const coulure = lettres.map(() => 40 + Math.random() * 140)
+      const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: .5 } })
+      if (i > 0) tl.fromTo(lettres, { opacity: 0, y: -24, filter: 'blur(10px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', stagger: { each: .006, from: 'random' }, duration: .3, ease: 'power2.out' }, 0)
+      else tl.set({}, {}, .3)
+      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { each: .004, from: 'random' }, duration: .3, ease: 'power2.in' }, .65)
+      tl.to(sec.querySelectorAll('a, button'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2 }, .65)
+    })
+    // 1er écran : allumage au chargement (après le loader)
+    const premiers = document.querySelectorAll<HTMLElement>('[data-experience] > section:first-child .inline-block .inline-block')
+    gsap.fromTo(premiers, { opacity: 0, y: -30, filter: 'blur(12px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', duration: 1.2, ease: 'power3.out', stagger: { each: .025, from: 'center' }, delay: .4 })
     // La box : la photo s'ouvre en plein écran, le titre géant s'efface, puis les 3 éléments arrivent
     racine.querySelectorAll<HTMLElement>('[data-box]').forEach((sec) => {
       const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top top', end: 'bottom bottom', scrub: .6 } })
