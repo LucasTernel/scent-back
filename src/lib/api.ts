@@ -193,6 +193,7 @@ export async function createStatue(v: Record<string, unknown>) {
 {
   const n = { commune: 0, rare: 0, legendaire: 0 }
   const m = { commune: ['novice', 'eclaireur'], rare: ['templier', 'ombre'], legendaire: ['maitre', 'maitre'] }
+  const revo = statues.find((s) => s.id === 'BASTI-4GN'); if (revo) revo.model = '/models/lapin-revolutionnaire.glb'
   for (const s of statues) if (!s.model) s.model = `/models/lapin-${m[s.rarity][n[s.rarity]++ % 2]}.glb`
 }
 
