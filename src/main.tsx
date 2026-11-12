@@ -5,9 +5,10 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App'
-import { appliquerTheme } from './lib/theme'
+import { appliquerTaille, appliquerTheme } from './lib/theme'
 
 appliquerTheme()
+if (window.self === window.top) appliquerTaille() // pas dans l'aperçu de la landing (cadre du téléphone)
 
 // iPhone (appli installée) : au 1er affichage la hauteur d'écran est mal calculée et le menu flotte trop haut.
 // Un micro-défilement aller-retour force iOS à recalculer (comme quand on change de page).

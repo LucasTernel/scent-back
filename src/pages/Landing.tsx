@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getLots } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, LogoMarque } from '../ui'
+import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
 const LEGAL = [['mentions', 'Mentions légales'], ['conditions', 'Conditions d\'utilisation'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
@@ -46,6 +47,54 @@ function TutoInstallation({ fermer }: { fermer: () => void }) {
   )
 }
 
+/** Bouton Accessibilité : thème (auto / clair / sombre) + taille du texte (A à A+++), mémorisés. */
+function Accessibilite() {
+  const [ouvert, setOuvert] = useState(false)
+  const [theme, setTheme] = useState(lireTheme)
+  const [taille, setTaille] = useState(lireTaille)
+  const zone = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!ouvert) return
+    const dehors = (e: MouseEvent) => { if (!zone.current?.contains(e.target as Node)) setOuvert(false) }
+    const echap = (e: KeyboardEvent) => e.key === 'Escape' && setOuvert(false)
+    addEventListener('mousedown', dehors); addEventListener('keydown', echap)
+    return () => { removeEventListener('mousedown', dehors); removeEventListener('keydown', echap) }
+  }, [ouvert])
+  const choix = (actif: boolean) => `min-h-11 rounded-full px-3 text-sm font-bold transition ${actif ? 'bg-[#023341] text-[#FCF5E3] dark:bg-[#FCF5E3] dark:text-[#023341]' : 'text-doux hover:text-encre'}`
+
+  return (
+    <div ref={zone} className="relative">
+      <button onClick={() => setOuvert(!ouvert)} aria-expanded={ouvert} aria-controls="panneau-a11y"
+        className="flex items-center gap-2 rounded-full border-[1.5px] border-trait px-4 py-2.5 text-sm font-bold transition hover:border-encre">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="4.5" r="1.8" /><path d="M5 8.5l7 1.5 7-1.5M12 10v5m0 0l-3.5 6M12 15l3.5 6" /></svg>
+        Accessibilité
+      </button>
+      {ouvert && (
+        <div id="panneau-a11y" role="group" aria-label="Réglages d'accessibilité" className="pop absolute top-full right-0 z-40 mt-2 flex w-80 flex-col gap-5 rounded-[24px] border-[1.5px] border-trait bg-papier p-5 shadow-2xl">
+          <fieldset>
+            <legend className="mb-2 font-serif text-sm font-bold">Thème</legend>
+            <div className="grid grid-cols-3 gap-1 rounded-full bg-creme-2 p-1">
+              {([['auto', 'Auto'], ['clair', 'Clair'], ['sombre', 'Sombre']] as [Choix, string][]).map(([k, l]) => (
+                <button key={k} role="radio" aria-checked={theme === k} onClick={() => { choisirTheme(k); setTheme(k) }} className={choix(theme === k)}>{l}</button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-doux">Auto suit le réglage de ton ordinateur.</p>
+          </fieldset>
+          <fieldset>
+            <legend className="mb-2 font-serif text-sm font-bold">Taille du texte</legend>
+            <div className="grid grid-cols-4 gap-1 rounded-full bg-creme-2 p-1">
+              {['A', 'A+', 'A++', 'A+++'].map((l, n) => (
+                <button key={l} role="radio" aria-checked={taille === n} aria-label={n ? `Texte agrandi ${n} fois` : 'Texte normal'}
+                  onClick={() => { choisirTaille(n); setTaille(n) }} className={choix(taille === n)} style={{ fontSize: `${14 + n * 2}px` }}>{l}</button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /** Habillage des pages vues sur ordinateur (landing, pages légales) : en-tête + pied, responsive. */
 export function SiteDesktop({ children }: { children: React.ReactNode }) {
   const [tuto, setTuto] = useState(false)
@@ -55,7 +104,10 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 md:px-8">
         <a href="/" aria-label="Accueil Scent Back"><LogoMarque className="-my-6 -ml-4 h-24 w-auto md:h-28" /></a>
-        <button onClick={() => setTuto(true)} className="flex items-center gap-2 rounded-full bg-[#023341] px-4 py-2.5 text-sm font-bold text-[#FCF5E3] shadow-md transition hover:bg-[#0E4D61] md:px-5"><Icon name="nfc" size={18} />Installer l'appli</button>
+        <div className="flex items-center gap-2">
+        <Accessibilite />
+        <button onClick={() => setTuto(true)} className="flex items-center gap-2 rounded-full bg-[#023341] px-4 py-2.5 text-sm font-bold text-[#FCF5E3] shadow-md transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
+        </div>
       </header>
       <div className="flex-1">{children}</div>
       <footer className="border-t border-trait">

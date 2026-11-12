@@ -15,3 +15,12 @@ export function choisirTheme(c: Choix) {
   appliquerTheme()
 }
 media.addEventListener('change', appliquerTheme) // le téléphone passe en sombre → l'appli suit
+
+/** Taille du texte (accessibilité) : 0 = normal, 1 = A+, 2 = A++, 3 = A+++ (agrandit tout ce qui est en rem). */
+export const TAILLES = ['100%', '112.5%', '125%', '140%']
+export const lireTaille = () => { try { return Math.min(3, Math.max(0, Number(localStorage.getItem('taille')) || 0)) } catch { return 0 } }
+export function appliquerTaille() { document.documentElement.style.fontSize = TAILLES[lireTaille()] }
+export function choisirTaille(n: number) {
+  try { localStorage.setItem('taille', String(n)) } catch { /* navigation privée */ }
+  appliquerTaille()
+}
