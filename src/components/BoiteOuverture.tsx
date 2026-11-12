@@ -40,11 +40,11 @@ export default function BoiteOuverture() {
       t += 1 / 60
       const p = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)))
       const o = Math.min(1, p / .7), k = o * o * (3 - 2 * o)
-      if (couvercle) { couvercle.position.set(pos0.x, pos0.y + k * .02, pos0.z)
-        couvercle.rotation.x = -k * 1.0 }
+      if (couvercle) { couvercle.position.set(pos0.x, pos0.y + k * .14, pos0.z - k * .36)
+        couvercle.rotation.x = k * .95 } // il flotte au-dessus, illustration toujours visible
       if (boite) boite.rotation.y = -.45 + p * .55 + Math.sin(t * .6) * .03
-      const d = 1.3 + k * .45
-      cam.position.set(0, .5 + k * .2, d); cam.lookAt(0, .05 + k * .14, -k * .05)
+      const d = 1.3 + k * .3
+      cam.position.set(0, .5 + k * 1.05, d); cam.lookAt(0, .02 + k * .06, -k * .1)
       renderer.render(scene, cam)
     }
     boucle()
