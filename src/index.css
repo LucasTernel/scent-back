@@ -171,10 +171,10 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 @media (prefers-reduced-motion: reduce) { .defile { animation: none; } }
 
 /* Curseur personnalisé du site vitrine */
-.curseur { position: fixed; top: 0; left: 0; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #FF7722; pointer-events: none; z-index: 70;
-  mix-blend-mode: difference; opacity: 0; transition: width .25s, height .25s, margin .25s, opacity .3s; }
+.curseur { position: fixed; top: 0; left: 0; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; pointer-events: none; z-index: 90;
+  background: #FF7722; box-shadow: 0 0 0 2px #FCF5E3; opacity: 0; transition: width .25s, height .25s, margin .25s, opacity .3s, background .25s; }
 .curseur.curseur-vu { opacity: 1; }
-.curseur.curseur-actif { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
+.curseur.curseur-actif { width: 46px; height: 46px; margin: -23px 0 0 -23px; background: transparent; box-shadow: 0 0 0 2px #FF7722; }
 .texte-contour { color: transparent; -webkit-text-stroke: 2px var(--color-creme); }
 
 /* Flamme accrochée à la mèche de la bougie 3D (hotspot model-viewer) */
