@@ -50,7 +50,8 @@ function Layout({ admin }: { admin?: boolean }) {
             </NavLink>
           ))}
         </nav>
-        <p className="mt-auto text-xs text-[#FCF5E3]/50">Scent Back · Ubisoft × La Belle Mèche</p>
+        <a href="/" onClick={() => { try { sessionStorage.removeItem('ordi-admin') } catch { /* rien */ } }} className="mt-auto flex min-h-11 items-center gap-2 rounded-[12px] px-4 text-sm font-bold text-[#FCF5E3]/80 hover:bg-[#FCF5E3]/10"><Icon name="retour" size={18} />Voir le site</a>
+        <p className="text-xs text-[#FCF5E3]/50">Scent Back · Ubisoft × La Belle Mèche</p>
       </aside>
       <div className="mx-auto w-full max-w-md lg:max-w-6xl max-lg:landscape:max-w-none">
         <header className="sticky top-0 z-30 flex justify-center bg-creme pt-[env(safe-area-inset-top)] lg:hidden">
@@ -100,6 +101,8 @@ export default function App() {
   const navigate = useNavigate()
   const avant = useRef(session)
   useEffect(() => {
+    // déconnexion : on quitte l'espace admin (sur ordinateur on revient à la landing)
+    if (avant.current && !session) { try { sessionStorage.removeItem('ordi-admin') } catch { /* rien */ } }
     if (avant.current !== undefined && !!avant.current !== !!session) navigate('/', { replace: true })
     avant.current = session
   }, [session, navigate])

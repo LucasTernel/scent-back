@@ -5,8 +5,8 @@ import { getStatues, supabase, verifierPseudo, type Statue } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Carte } from '../ui'
 
-const s = (name: string, district: string, rarity: Statue['rarity'], points: number): Statue => ({ id: name, name, district, rarity, points, description: '', hint: '', lat: 0, lng: 0 })
-const exemples = [s('Lapin Gargouille', 'Île de la Cité', 'rare', 80), s('Lapin de la Pyramide', 'Louvre', 'legendaire', 150), s('Lapin Falafel', 'Le Marais', 'commune', 30)]
+const s = (name: string, district: string, rarity: Statue['rarity'], points: number, m: string): Statue => ({ id: name, name, district, rarity, points, description: '', hint: '', lat: 0, lng: 0, model: `/models/lapin-${m}.glb` })
+const exemples = [s('Lapin Gargouille', 'Île de la Cité', 'rare', 80, 'ndame'), s('Lapin de la Pyramide', 'Louvre', 'legendaire', 150, 'louvre'), s('Lapin Falafel', 'Le Marais', 'commune', 30, 'marais')]
 
 export default function Login() {
   const [mode, setMode] = useState<'signup' | 'login'>('signup')

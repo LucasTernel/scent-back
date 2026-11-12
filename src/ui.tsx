@@ -69,11 +69,16 @@ export function Sceau({ rarity, size = 44, className = '' }: { rarity: Rarity; s
 }
 
 /** Carte trouvée (arche). */
+/** Rendu fixe du modèle 3D d'un lapin (public/avatars/corps). */
+const corps = (model?: string) => { const m = model?.match(/(lapin-[a-z0-9-]+)\.glb/)?.[1]; return m && `/avatars/corps/${m}.webp` }
+
 export function Carte({ statue, photo, className = '' }: { statue: Statue; photo?: string; className?: string }) {
   return (
     <article className={`arche cq relative flex flex-col gap-2 border-[1.5px] border-encre bg-papier p-2 pb-3 shadow-[0_4px_0_#023341] ${className}`}>
       <div className="relative grid aspect-[144/140] place-items-end justify-center overflow-hidden bg-creme-2" style={{ borderRadius: 'calc(50cqw - 8px) calc(50cqw - 8px) 10px 10px' }}>
-        {photo ? <img src={photo} alt={`Photo de ${statue.name}`} loading="lazy" className="absolute inset-0 size-full object-cover" /> : <Lapin className="w-[56%]" />}
+        {photo ? <img src={photo} alt={`Photo de ${statue.name}`} loading="lazy" className="absolute inset-0 size-full object-cover" />
+          : corps(statue.model) ? <img src={corps(statue.model)} alt={statue.name} loading="lazy" className="absolute inset-x-0 bottom-0 h-[112%] w-full object-contain object-bottom drop-shadow-[0_8px_12px_rgba(0,0,0,.35)]" />
+          : <Lapin className="w-[56%]" />}
       </div>
       <Sceau rarity={statue.rarity} className="absolute right-1 top-[46%]" />
       <h3 className="px-1 font-serif text-[15px] leading-tight font-semibold">{statue.name}</h3>
