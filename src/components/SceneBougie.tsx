@@ -18,7 +18,7 @@ const VUES: { pos: [number, number, number]; cible: [number, number, number] }[]
   { pos: [0, 0.62, 3.3], cible: [0, 0.48, 0] },        // 0 · Fermez les yeux : la flamme dans le noir
   { pos: [1.5, 0.95, 2.2], cible: [-0.55, 0.5, 0] },   // 1 · manifeste (texte à gauche)
   { pos: [-1.3, 0.55, 1.6], cible: [0.5, 0.45, 0] },   // 2 · voir / entendre / sentir (texte à droite)
-  { pos: [0.5, 1.6, 1.25], cible: [-0.3, 0.7, 0] },  // 3 · la mèche, vue de dessus
+  { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
   { pos: [0.05, 0.46, 1.25], cible: [0.38, 0.46, 0] }, // 4 · l'étiquette
   { pos: [1.3, 0.75, 1.75], cible: [-0.5, 0.42, 0] },  // 5 · le défi : la cire fond
   { pos: [0, 0.62, 3.1], cible: [0, 0.45, 0] },        // 6 · règle d'or : on recule
@@ -46,6 +46,7 @@ export default function SceneBougie() {
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1.35
     renderer.outputColorSpace = THREE.SRGBColorSpace
     el.appendChild(renderer.domElement)
 
@@ -55,9 +56,10 @@ export default function SceneBougie() {
     const cible = new THREE.Vector3(...VUES[0].cible)
 
     const ambiance = new THREE.AmbientLight(0xffffff, 0.08)
-    const lune = new THREE.DirectionalLight(0x9fc2ff, 0.25); lune.position.set(-3, 4, -2)
-    const flamme = new THREE.PointLight(0xffa860, 3.2, 7, 1.6); flamme.castShadow = false
-    scene.add(ambiance, lune, flamme)
+    const lune = new THREE.DirectionalLight(0xbfd6ff, 1.1); lune.position.set(-3, 4, -2)
+    const flamme = new THREE.PointLight(0xffa860, 1.4, 5, 2); flamme.castShadow = false
+    const face = new THREE.DirectionalLight(0xfff1dc, 0.9); face.position.set(1.5, 1.5, 4)
+    scene.add(ambiance, lune, flamme, face)
 
     // sol très sombre qui reçoit la lueur
     const sol = new THREE.Mesh(new THREE.CircleGeometry(6, 64), new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: .95 }))
@@ -65,9 +67,9 @@ export default function SceneBougie() {
 
     const appliquerTheme = () => {
       const s = sombre()
-      scene.background = new THREE.Color(s ? 0x03121a : 0xe9dfcb)
-      scene.fog = new THREE.Fog(s ? 0x03121a : 0xe9dfcb, 3, 8)
-      ambiance.intensity = s ? 0.07 : 0.9
+      scene.background = new THREE.Color(s ? 0x0a2530 : 0xe9dfcb)
+      scene.fog = new THREE.Fog(s ? 0x0a2530 : 0xe9dfcb, 4, 10)
+      ambiance.intensity = s ? 0.55 : 1.4
       ;(sol.material as THREE.MeshStandardMaterial).color.set(s ? 0x0b1a20 : 0xd9ccb0)
     }
     appliquerTheme()
@@ -144,7 +146,7 @@ export default function SceneBougie() {
       const vac = 1 + Math.sin(t * 13) * .05 + Math.sin(t * 29) * .04 + (Math.random() - .5) * .06
       groupeFlamme.position.set(sommetMeche.x, sommetMeche.y - baisse - .005, sommetMeche.z)
       flammeExt.scale.set(.085 * (2 - vac), .2 * vac, 1); flammeInt.scale.set(.045, .12 * vac, 1)
-      flamme.position.set(0, sommetMeche.y - baisse + .06, 0); flamme.intensity = 3.2 * vac
+      flamme.position.set(0, sommetMeche.y - baisse + .06, 0); flamme.intensity = 1.4 * vac
       // braises
       for (let n = 0; n < NB; n++) {
         vieB[n] += .006 + (n % 5) * .001
