@@ -14,19 +14,20 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
  */
 
 // Points de vue (unités de la scène : la bougie fait ~0,93 de haut). cible.x décale la bougie à l'écran.
+// Caméra presque toujours de face : seul le cadrage glisse (cible.x), peu de rotation → pas de tournis
 const VUES: { pos: [number, number, number]; cible: [number, number, number] }[] = [
-  { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },         // 0 · Fermez les yeux : la flamme dans le noir
-  { pos: [1.5, 0.95, 2.2], cible: [-0.55, 0.5, 0] },   // 1 · manifeste (texte à gauche)
-  { pos: [-1.3, 0.55, 1.6], cible: [0.5, 0.45, 0] },   // 2 · voir / entendre / sentir (texte à droite)
-  { pos: [1.1, 1.45, 2.1], cible: [-0.45, 0.6, 0] },  // 3 · la mèche, vue de dessus
-  { pos: [0.05, 0.46, 1.25], cible: [0.38, 0.46, 0] }, // 4 · l'étiquette
-  { pos: [1.3, 0.75, 1.75], cible: [-0.5, 0.42, 0] },  // 5 · le défi : la cire fond
-  { pos: [0, 0.9, 4.2], cible: [0, 1.35, 0] },        // 6
-  { pos: [1.6, 0.8, 2.6], cible: [-0.6, 0.45, 0] },  // 7 · la box (texte à gauche → bougie à droite)
-  { pos: [-1.8, 1.2, 2.8], cible: [0.65, 0.5, 0] },    // 8 · pop-up
-  { pos: [1.2, 0.4, 2.4], cible: [-0.6, 0.5, 0] },   // 9 · appli
-  { pos: [-1.4, 0.6, 2.4], cible: [0.6, 0.45, 0] },  // 10 · boutique
-  { pos: [0, 2.2, 3.4], cible: [0, 1.2, 0] },         // 11 · fin : vue plongeante, la flamme seule · règle d'or : on recule
+  { pos: [0, 0.5, 3.0], cible: [0, 0.3, 0] },          // 0 · Fermez les yeux
+  { pos: [0.3, 0.7, 2.6], cible: [-0.5, 0.45, 0] },    // 1 · manifeste (texte à gauche)
+  { pos: [-0.3, 0.7, 2.6], cible: [0.5, 0.45, 0] },    // 2 · voir / entendre / sentir (texte à droite)
+  { pos: [0.25, 1.3, 2.2], cible: [-0.45, 0.55, 0] },  // 3 · la mèche, un peu au-dessus
+  { pos: [-0.2, 0.5, 1.9], cible: [0.45, 0.46, 0] },   // 4 · l'étiquette
+  { pos: [0.3, 0.8, 2.2], cible: [-0.5, 0.42, 0] },    // 5 · le défi : la cire fond
+  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },          // 6 · règle d'or
+  { pos: [0.3, 0.7, 2.7], cible: [-0.6, 0.45, 0] },    // 7 · la box (bougie à droite)
+  { pos: [-0.3, 0.7, 2.7], cible: [0.6, 0.45, 0] },    // 8 · pop-up (bougie à gauche)
+  { pos: [0.3, 0.7, 2.7], cible: [-0.6, 0.45, 0] },    // 9 · appli
+  { pos: [-0.3, 0.7, 2.7], cible: [0.6, 0.45, 0] },    // 10 · boutique
+  { pos: [0, 1.8, 3.4], cible: [0, 1.2, 0] },          // 11 · fin
 ]
 
 /** Texture de flamme (dégradé en goutte) dessinée sur un canvas. */
@@ -144,8 +145,8 @@ export default function SceneBougie() {
       const f = p * (VUES.length - 1), i = Math.min(VUES.length - 2, Math.floor(f)), k = lisse(f - i)
       vPos.copy(a.set(...VUES[i].pos)).lerp(bb.set(...VUES[i + 1].pos), k)
       vCib.copy(a.set(...VUES[i].cible)).lerp(bb.set(...VUES[i + 1].cible), k)
-      vPos.x += souris.x * .18; vPos.y -= souris.y * .1
-      camera.position.lerp(vPos, .07); cible.lerp(vCib, .07); camera.lookAt(cible)
+      vPos.x += souris.x * .06; vPos.y -= souris.y * .04
+      camera.position.lerp(vPos, .05); cible.lerp(vCib, .05); camera.lookAt(cible)
 
       // le défi : la cire fond entre le chapitre 4,6 et 5,8 (puis reste basse)
       const viseFonte = Math.min(.85, Math.max(0, (f - 4.35) / .65) * .85) // fond pendant l'arrivée du texte « Le défi », finie quand il est centré
