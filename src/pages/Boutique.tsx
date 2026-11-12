@@ -1,6 +1,6 @@
 import ImageProduit from '../components/ImageProduit'
 import { useState } from 'react'
-import { echangerLot, getBons, getBoutiqueOuverte, getProduits, type Categorie, getLots, getWallet, type Lot } from '../lib/api'
+import { echangerLot, getBons, getBoutiqueOuverte, getProduitsVente, type Categorie, getLots, getWallet, type Lot } from '../lib/api'
 import { secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
@@ -15,7 +15,7 @@ export default function Boutique() {
   const lots = useData(getLots, v) ?? []
   const bons = useData(getBons, v) ?? []
   const ouverte = useData(getBoutiqueOuverte) ?? false
-  const tous = useData(getProduits) ?? []
+  const tous = useData(getProduitsVente) ?? []
   const [cat, setCat] = useState<Categorie | 'tout'>('tout')
   const PRODUITS = cat === 'tout' ? tous : tous.filter((p) => p.categorie === cat)
   const [choixOnglet, setOnglet] = useState<'boutique' | 'recompenses'>()

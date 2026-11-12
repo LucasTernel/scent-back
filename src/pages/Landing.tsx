@@ -1,6 +1,6 @@
 import ImageProduit from '../components/ImageProduit'
 import { useEffect, useRef, useState } from 'react'
-import { getBoutiqueOuverte, getPopup, getProduits, type Lot } from '../lib/api'
+import { getBoutiqueOuverte, getPopup, getProduitsVente, type Lot } from '../lib/api'
 import { BoutonPanier, euros } from './BoutiqueSite'
 import { useData } from '../lib/useData'
 import { Icon } from '../ui'
@@ -265,7 +265,7 @@ function LoaderBougie() {
 export default function Landing() {
   const boutique = useBoutique()
   const popup = useData(getPopup)
-  const produits = useData(getProduits)
+  const produits = useData(getProduitsVente)
   useApparition()
   useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
   const [demo, setDemo] = useState<Lot>()

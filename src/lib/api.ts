@@ -371,6 +371,22 @@ export const PRODUITS_DEFAUT: Produit[] = [
   { id: 'savon-prince-of-persia', nom: 'Savon Bwaaah · Prince of Persia', detail: 'Savon en forme de Lapin Crétin, rouge Prince of Persia.', prix: 8.9, image: '/site/savons/prince-of-persia.webp', dispo: true, ordre: 21, categorie: 'savon', licence: 'Prince of Persia' },
   { id: 'savon-the-division', nom: 'Savon Bwaaah · The Division', detail: 'Savon en forme de Lapin Crétin, anthracite The Division.', prix: 8.9, image: '/site/savons/the-division.webp', dispo: true, ordre: 22, categorie: 'savon', licence: 'The Division' },
 ]
+/** Licences lancées à la vente (ex. ["Assassin's Creed"]). Les autres produits restent « Prochainement ». */
+export async function getLancees(): Promise<string[]> {
+  if (MOCK) return JSON.parse(localStorage.getItem('licences_lancees') ?? '[]')
+  const { data } = await supabase.from('reglages').select('valeur').eq('cle', 'licences_lancees').maybeSingle()
+  return Array.isArray(data?.valeur) ? data.valeur : []
+}
+export async function setLancees(l: string[]) {
+  if (MOCK) return localStorage.setItem('licences_lancees', JSON.stringify(l))
+  const { error } = await supabase.from('reglages').upsert({ cle: 'licences_lancees', valeur: l })
+  if (error) throw error
+}
+/** Produits tels que vus par le public : en vente seulement si dispo ET licence lancée. */
+export async function getProduitsVente(): Promise<Produit[]> {
+  const [p, l] = await Promise.all([getProduits(), getLancees()])
+  return p.map((x) => ({ ...x, dispo: x.dispo && !!x.licence && l.includes(x.licence) }))
+}
 export async function getProduits(): Promise<Produit[]> {
   if (MOCK) return ((JSON.parse(localStorage.getItem('produits') ?? 'null') ?? PRODUITS_DEFAUT) as Produit[]).sort((a, b) => a.ordre - b.ordre)
   const { data } = await supabase.from('produits').select('*').order('ordre')

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
-import { getProduits, type Categorie, type Produit } from '../lib/api'
+import { getProduitsVente, type Categorie, type Produit } from '../lib/api'
 import { useData } from '../lib/useData'
 
 /** Boutique du site (ordinateur) — démonstration : vitrine, panier, commande fictive. Aucun paiement, aucune donnée bancaire. */
@@ -58,14 +58,14 @@ function Quantite({ q, nom, moins, plus }: { q: number; nom: string; moins: () =
 
 /* ---------- Vitrine ---------- */
 export default function BoutiqueSite() {
-  const tous = useData(getProduits) ?? []
+  const tous = useData(getProduitsVente) ?? []
   const [cat, setCat] = useState<Categorie | 'tout'>('tout')
   const { panier, changer } = usePanier()
   const [ajoute, setAjoute] = useState<string>()
   const [lic, setLic] = useState<string>()
   const licences = [...new Set(tous.map((p) => p.licence).filter(Boolean))] as string[]
   const liste = tous.filter((p) => (cat === 'tout' || p.categorie === cat) && (!lic || p.licence === lic))
-  const vedette = tous.find((p) => p.categorie === 'bundle' && p.dispo && !p.epuise)
+  const vedette = tous.find((p) => p.categorie === 'bundle' && p.dispo && !p.epuise) ?? tous.find((p) => p.categorie === 'bundle')
   const ajouter = (p: Produit) => { changer(p.id, 1); setAjoute(p.nom); setTimeout(() => setAjoute(undefined), 2200) }
 
   return (
@@ -81,7 +81,9 @@ export default function BoutiqueSite() {
             <p className="text-[#FCF5E3]/75">{vedette.detail.replace(' Dans la limite des 1 000 premières commandes.', '')}</p>
             <div className="mt-2 flex flex-wrap items-center gap-4">
               <p className="titre text-4xl">{euros(vedette.prix)}</p>
-              <button onClick={() => ajouter(vedette)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341] transition hover:brightness-110">Ajouter au panier</button>
+              {vedette.dispo && !vedette.epuise
+                ? <button onClick={() => ajouter(vedette)} className="min-h-12 rounded-[10px] bg-flamme px-6 font-bold text-[#023341] transition hover:brightness-110">Ajouter au panier</button>
+                : <span className="min-h-12 content-center rounded-[10px] border-2 border-[#FCF5E3]/40 px-6 font-bold">{vedette.epuise ? 'Victime de son succès' : 'Prochainement'}</span>}
             </div>
           </div>
         </section>
@@ -157,10 +159,10 @@ export default function BoutiqueSite() {
 
 /* ---------- Page panier ---------- */
 export function PanierSite() {
-  const tous = useData(getProduits) ?? []
+  const tous = useData(getProduitsVente) ?? []
   const { panier, changer, vider } = usePanier()
   const navigate = useNavigate()
-  const lignes = tous.filter((p) => panier[p.id])
+  const lignes = tous.filter((p) => panier[p.id] && p.dispo && !p.epuise)
   const total = lignes.reduce((s, p) => s + p.prix * panier[p.id], 0)
   const valider = () => { const num = 'SB-' + Math.random().toString(36).slice(2, 7).toUpperCase(); vider(); navigate(`/commande?num=${num}&total=${total.toFixed(2)}`) }
   return (
