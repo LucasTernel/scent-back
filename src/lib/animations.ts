@@ -142,6 +142,17 @@ export async function lancerAnimations(racine: HTMLElement) {
         .to(sec.querySelectorAll('[data-box-item]'), { opacity: 1, y: 0, stagger: .15, duration: .4 }, .9)
         .from(sec.querySelectorAll('[data-box-item]'), { y: 40, stagger: .15, duration: .4 }, .9)
     })
+    // Fin de page : une animation différente par chapitre
+    const st = (el: Element, s = 'top 85%', e = 'top 25%') => ({ trigger: el, start: s, end: e, scrub: .6 })
+    racine.querySelectorAll('[data-pont]').forEach((el) => gsap.fromTo(el, { opacity: 0, y: 60, letterSpacing: '.08em' }, { opacity: 1, y: 0, letterSpacing: '0em', ease: 'power2.out', scrollTrigger: st(el, 'top 90%', 'top 55%') }))
+    racine.querySelectorAll('[data-cercle]').forEach((el) => gsap.fromTo(el, { clipPath: 'circle(8% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)', ease: 'none', scrollTrigger: st(el, 'top bottom', 'top top') }))
+    racine.querySelectorAll('[data-croise]').forEach((el) => {
+      const [g, d] = [...el.children]
+      gsap.fromTo(g, { xPercent: -30, opacity: 0 }, { xPercent: 0, opacity: 1, ease: 'power2.out', scrollTrigger: st(el) })
+      if (d) gsap.fromTo(d, { xPercent: 40, rotate: 8, opacity: 0 }, { xPercent: 0, rotate: 0, opacity: 1, ease: 'power2.out', scrollTrigger: st(el) })
+    })
+    racine.querySelectorAll('[data-cascade]').forEach((el) => gsap.fromTo(el.querySelectorAll('a.group'), { y: 160, opacity: 0, rotate: (i: number) => (i - 1) * 4 }, { y: 0, opacity: 1, rotate: 0, stagger: .12, ease: 'power3.out', scrollTrigger: st(el, 'top 80%', 'top 20%') }))
+    racine.querySelectorAll('[data-zoom]').forEach((el) => gsap.fromTo(el.firstElementChild, { scale: .7, opacity: 0, filter: 'blur(12px)' }, { scale: 1, opacity: 1, filter: 'blur(0px)', ease: 'power2.out', scrollTrigger: st(el, 'top 90%', 'top 30%') }))
     // Mots géants qui glissent en sens opposés au défilement (hors section lapin)
     racine.querySelectorAll<HTMLElement>('[data-glisse]').forEach((el, i) => {
       if (el.closest('[data-lapin]')) return

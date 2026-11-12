@@ -315,11 +315,12 @@ export default function Landing() {
               <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">Assassin's<br />Creed IV<span className="text-flamme">.</span></h2>
               <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-[#FCF5E3]/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
               <div className="mt-8 flex gap-10 border-t border-[#FCF5E3]/20 pt-6">
-                {[['PS5', 'Black Flag'], ['140 g', 'Rhum Marin'], ['1', 'écrin logo']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
+                {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
               </div>
             </div>
           </section>
-          <section className="sticky top-0 grid h-dvh place-items-center rounded-t-[40px] bg-flamme px-[8vw] text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-[#011A22] text-[#FCF5E3]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Où la découvrir en premier ? <span className="text-flamme">Pas en magasin.</span> Au pop-up store, avant tout le monde.</p></div>
+          <section data-cercle className="relative grid min-h-dvh place-items-center bg-flamme px-[8vw] py-24 text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div>
               <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
               <h2 className="titre mt-4 text-[clamp(3.4rem,8vw,11rem)] leading-[.85]">13 novembre 2027<span className="text-[#FCF5E3]">.</span></h2>
@@ -328,7 +329,8 @@ export default function Landing() {
               <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>
           </section>
-          <section className="sticky top-0 grid h-dvh items-center gap-12 rounded-t-[40px] bg-creme px-[8vw] text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)] lg:grid-cols-[1.1fr_.9fr]">
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-flamme text-[#023341]"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Et en attendant le jour J ? <span className="text-[#FCF5E3]">La chasse commence déjà</span>, dans les rues de Paris.</p></div>
+          <section data-croise className="relative grid min-h-dvh items-center gap-12 overflow-hidden bg-creme px-[8vw] py-24 text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)] lg:grid-cols-[1.1fr_.9fr]">
             <div>
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 03 · L'application</p>
               <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">La chasse<br />est ouverte<span className="text-flamme">.</span></h2>
@@ -343,7 +345,8 @@ export default function Landing() {
               </div>
             </div>
           </section>
-          <section className="sticky top-0 grid h-dvh content-center rounded-t-[40px] bg-[#011A22] px-[8vw] text-[#FCF5E3] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+          <div className="relative grid place-items-center px-[8vw] py-20 text-center bg-creme text-encre"><p data-pont className="titre max-w-4xl text-[clamp(1.6rem,3vw,3.4rem)] leading-tight">Chaque lapin trouvé rapporte des points. <span className="text-flamme">Et la box, elle, se commande ici.</span></p></div>
+          <section data-cascade className="relative grid min-h-dvh content-center bg-[#011A22] px-[8vw] py-24 text-[#FCF5E3] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div><p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 04 · La boutique</p><h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">Ramenez-la<br />chez vous<span className="text-flamme">.</span></h2></div>
               <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique →</a>
@@ -357,7 +360,7 @@ export default function Landing() {
               ))}
             </div>
           </section>
-          <section className="sticky top-0 grid h-dvh place-items-center rounded-t-[40px] bg-creme px-[8vw] text-center text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+          <section data-zoom className="relative grid min-h-dvh place-items-center bg-creme px-[8vw] text-center text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div>
               <LogoMarque className="mx-auto -my-6 w-72" />
               <p className="mx-auto mt-4 max-w-[min(40rem,40vw)] text-3xl leading-snug">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
