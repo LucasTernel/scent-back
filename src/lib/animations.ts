@@ -126,13 +126,15 @@ export async function lancerAnimations(racine: HTMLElement) {
       // 1er écran : visible d'office, ne fond que quand on a vraiment commencé à descendre
       const tl = gsap.timeline({ scrollTrigger: i === 0 ? { trigger: sec, start: 'top+=15% top', end: 'bottom top', scrub: .5 } : { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: .5 } })
       if (i > 0) tl.fromTo(lettres, { opacity: 0, y: -24, filter: 'blur(10px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', stagger: { amount: .15, from: 'random' }, duration: .15, ease: 'power2.out' }, 0)
-      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { amount: .15, from: 'random' }, duration: .15, ease: 'power2.in', immediateRender: false }, i === 0 ? .1 : .7)
-      tl.to(sec.querySelectorAll('a, button, img'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2, immediateRender: false }, i === 0 ? .1 : .7)
+      // départ explicite (lettres entières) : en remontant, le texte se reforme toujours en entier,
+      // même si l'allumage du 1er écran n'était pas fini quand on a commencé à défiler
+      tl.fromTo(lettres, { y: 0, scaleY: 1, opacity: 1, filter: 'blur(0px)' }, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { amount: .15, from: 'random' }, duration: .15, ease: 'power2.in', immediateRender: false }, i === 0 ? .1 : .7)
+      tl.fromTo(sec.querySelectorAll('a, button, img'), { opacity: 1, y: 0, filter: 'blur(0px)' }, { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2, immediateRender: false }, i === 0 ? .1 : .7)
       tl.set({}, {}, 1) // durée totale fixe = 1 → apparition 0–0,3, lecture 0,3–0,7, fonte 0,7–1
     })
     // 1er écran : allumage au chargement (après le loader)
     const premiers = document.querySelectorAll<HTMLElement>('[data-experience] > section:first-child .inline-block .inline-block')
-    gsap.fromTo(premiers, { opacity: 0, y: -30, filter: 'blur(12px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', duration: 1.2, ease: 'power3.out', stagger: { each: .025, from: 'center' }, delay: .4 })
+    gsap.fromTo(premiers, { opacity: 0, y: -30, filter: 'blur(12px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', overwrite: 'auto', duration: 1.2, ease: 'power3.out', stagger: { each: .025, from: 'center' }, delay: .4 })
     // La box : la photo s'ouvre en plein écran, le titre géant s'efface, puis les 3 éléments arrivent
     racine.querySelectorAll<HTMLElement>('[data-box]').forEach((sec) => {
       const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top top', end: 'bottom bottom', scrub: .6 } })
