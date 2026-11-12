@@ -286,10 +286,10 @@ function Defi() {
 /** Anatomie de la bougie (réf. Opal Tadpole) : la bougie 3D reste à l'écran, la caméra va d'un détail à l'autre
  *  au fil du défilement, et une étiquette accrochée au modèle pointe la partie décrite. */
 const ETAPES_ANATOMIE: { titre: string; texte: string; orbite: string; cible: string; point?: string }[] = [
-  { titre: 'Une bougie, un monde.', texte: 'Rhum Marin, la bougie d\'Assassin\'s Creed IV Black Flag : l\'odeur des Caraïbes, du bois des navires et des embruns.', orbite: '20deg 72deg 270%', cible: '0m 0.05m 0m' },
-  { titre: 'La mèche.', texte: 'En coton. Une fois allumée, elle compte le temps avec vous : la bougie est pensée pour brûler toute la durée du jeu.', orbite: '10deg 30deg 175%', cible: '0m 0.075m 0m', point: '0m 0.085m 0m' },
-  { titre: 'L\'étiquette.', texte: 'En arche, comme toutes les bougies Scent Back. Un nom de parfum par licence, le logo de la collab, et le grammage.', orbite: '0deg 84deg 180%', cible: '0m 0.047m 0m', point: '0m 0.06m 0.039m' },
-  { titre: 'La cire.', texte: '140 g de cire 100 % végétale, coulée en France par La Belle Mèche, dans un verre épais à garder une fois la partie terminée.', orbite: '70deg 64deg 215%', cible: '0m 0.05m 0m', point: '0.034m 0.07m 0m' },
+  { titre: 'Une bougie, un monde.', texte: 'Rhum Marin, la bougie d\'Assassin\'s Creed IV Black Flag : l\'odeur des Caraïbes, du bois des navires et des embruns.', orbite: '20deg 72deg 235%', cible: '0m 0.05m 0m' },
+  { titre: 'La mèche.', texte: 'En coton. Une fois allumée, elle compte le temps avec vous : la bougie est pensée pour brûler toute la durée du jeu.', orbite: '10deg 30deg 135%', cible: '0m 0.075m 0m', point: '0m 0.085m 0m' },
+  { titre: 'L\'étiquette.', texte: 'En arche, comme toutes les bougies Scent Back. Un nom de parfum par licence, le logo de la collab, et le grammage.', orbite: '0deg 84deg 140%', cible: '0m 0.047m 0m', point: '0m 0.06m 0.039m' },
+  { titre: 'La cire.', texte: '140 g de cire 100 % végétale, coulée en France par La Belle Mèche, dans un verre épais à garder une fois la partie terminée.', orbite: '70deg 64deg 195%', cible: '0m 0.05m 0m', point: '0.034m 0.07m 0m' },
 ]
 function Anatomie() {
   const [ref, p] = useProgression()
@@ -297,7 +297,7 @@ function Anatomie() {
   const e = ETAPES_ANATOMIE[n]
   return (
     <section ref={ref} className="relative h-[400vh] bg-creme" aria-label="Anatomie de la bougie Rhum Marin">
-      <div className="sticky top-0 grid h-dvh grid-cols-[1fr_1.1fr] items-center overflow-hidden">
+      <div className="sticky top-0 grid h-dvh grid-cols-[1.25fr_1fr] items-center overflow-hidden">
         <div className="relative h-full">
           <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Rhum Marin en 3D, vue détail par détail" camera-orbit={e.orbite} camera-target={e.cible}
             field-of-view="26deg" exposure="1.1" shadow-intensity="1" interaction-prompt="none" disable-zoom interpolation-decay="160"
@@ -317,8 +317,8 @@ function Anatomie() {
             {ETAPES_ANATOMIE.map((x, i) => (
               <li key={x.titre} className={`border-l-2 py-4 pl-6 transition-all duration-500 ${i === n ? 'border-flamme' : 'border-trait opacity-30'}`}>
                 <p className="font-serif text-xs font-bold text-flamme">0{i + 1}</p>
-                <h3 className={`titre leading-tight transition-all duration-500 ${i === n ? 'text-[clamp(2rem,3.6vw,3.2rem)]' : 'text-2xl'}`}>{x.titre}</h3>
-                <p className={`overflow-hidden text-lg leading-relaxed text-doux transition-all duration-500 ${i === n ? 'mt-3 max-h-40' : 'max-h-0'}`}>{x.texte}</p>
+                <h3 className={`titre leading-[.95] transition-all duration-500 ${i === n ? 'text-[clamp(3rem,5.2vw,5.2rem)]' : 'text-3xl'}`}>{x.titre}</h3>
+                <p className={`overflow-hidden text-xl leading-relaxed text-doux transition-all duration-500 ${i === n ? 'mt-4 max-h-48' : 'max-h-0'}`}>{x.texte}</p>
               </li>
             ))}
           </ol>
@@ -347,61 +347,33 @@ export default function Landing() {
     <SiteDesktop>
       <LoaderBougie />
       <main id="contenu" ref={racine} data-curseur>
-        {/* Ouverture en grille de blocs (réf. August & Piers) : titre + arche « Boutique » | bougie 3D | box + « Installer l'appli » */}
-        <section data-ouverture className="grid min-h-[calc(100dvh-5.5rem)] grid-cols-[1.15fr_1fr_.85fr] grid-rows-[1fr_auto] border-b border-trait bg-creme text-encre">
-          <div className="relative row-span-2 flex flex-col justify-between gap-8 border-r border-trait p-10 pb-0">
-            <p className="text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
-            <div>
-              <h1 data-split={loaderAffiche ? 'loader' : ''} className="titre text-[clamp(3rem,6.4vw,6.4rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
-              <p className="mt-6 max-w-sm leading-relaxed text-doux">Ces mondes, vous les avez parcourus pendant des heures… mais vous ne les avez jamais sentis. Une box, un jeu culte, une bougie qui a l'odeur de son monde.</p>
+        {/* Ouverture : « FERMEZ » en haut à gauche, « LES YEUX. » en bas à droite, la bougie 3D en grand entre les deux */}
+        <section data-ouverture className="relative h-[calc(100dvh-5.5rem)] min-h-[640px] overflow-hidden bg-creme text-encre">
+          <p className="absolute top-8 left-8 text-xs font-bold tracking-[.22em] uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
+          <p className="absolute top-8 right-8 text-xs font-bold tracking-[.22em] text-doux uppercase">Collection All Stars · N°1</p>
+          <h1 className="titre pointer-events-none absolute inset-x-8 top-[12%] bottom-[16%] flex flex-col justify-between text-[clamp(4.6rem,13vw,15rem)] leading-[.82] tracking-tight">
+            <span data-split={loaderAffiche ? 'loader' : ''}>Fermez</span>
+            <span data-split={loaderAffiche ? 'loader' : ''} className="self-end">les yeux<span className="text-flamme">.</span></span>
+          </h1>
+          <model-viewer data-bougie-hero src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D, 140 g de cire 100 % végétale"
+            interaction-prompt="none" disable-zoom camera-orbit="20deg 72deg 175%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1.2"
+            style={{ position: 'absolute', left: '50%', top: '50%', translate: '-50% -50%', width: 'min(32vw, 460px)', height: '64%', pointerEvents: 'none', ['--poster-color' as string]: 'transparent' }}>
+            <div slot="progress-bar" />
+            <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
+          </model-viewer>
+          <div className="absolute inset-x-8 bottom-8 flex items-end justify-between gap-8">
+            <p className="max-w-sm leading-relaxed text-doux">Une box, un jeu culte d'Ubisoft, une bougie La Belle Mèche qui a l'odeur de son monde.</p>
+            <div className="flex gap-3">
+              <a href="#manifeste" className="min-h-12 content-center rounded-[10px] border-2 border-encre px-6 font-bold transition hover:bg-encre hover:text-creme">L'histoire ↓</a>
+              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Boutique</a>
             </div>
-            <a href="/boutique" className="grid h-28 place-items-center rounded-t-[999px] border-x border-t border-encre/30 transition hover:bg-flamme hover:text-[#023341]">
-              <span className="titre text-2xl tracking-wide">Boutique →</span>
-            </a>
-          </div>
-          <div className="relative row-span-2 overflow-hidden border-r border-trait bg-[radial-gradient(circle_at_50%_45%,var(--color-creme-2),var(--color-creme)_70%)]">
-            <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D" auto-rotate auto-rotate-delay="0" rotation-per-second="12deg" interaction-prompt="none" disable-zoom
-                camera-orbit="20deg 72deg 210%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" data-bougie-hero
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
-                <div slot="progress-bar" />
-                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
-              </model-viewer>
-            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.2em] text-doux uppercase">Rhum Marin · 140 g</p>
-          </div>
-          <img src="/site/box.webp" alt="La box Assassin's Creed IV Black Flag" className="size-full min-h-0 object-cover object-[30%_50%]" />
-          <button onClick={ouvrirTuto} className="flex items-center justify-between gap-4 border-t border-trait p-8 text-left transition hover:bg-flamme hover:text-[#023341]">
-            <span><span className="block text-xs font-bold tracking-[.2em] uppercase opacity-70">L'appli de chasse</span><span className="titre mt-1 block text-2xl">Installer l'appli</span></span>
-            <Icon name="nfc" size={28} />
-          </button>
-        </section>
-
-        {/* La collab (réf. « Our philosophy ») : mots géants, la bougie 3D penchée en travers */}
-        <section className="relative overflow-hidden bg-encre py-28 text-creme">
-          <div className="relative mx-auto max-w-6xl px-8">
-            <p className="titre text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">UBISOFT</p>
-            <p className="titre texte-contour text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">× LA BELLE</p>
-            <p className="titre text-[clamp(3rem,7.4vw,7.4rem)] leading-[.92] whitespace-nowrap">MÈCHE<span className="text-flamme">.</span></p>
-            <div className="pointer-events-none absolute top-1/2 -right-6 h-[380px] w-[260px] -translate-y-1/2 rotate-[-12deg]">
-              <model-viewer src="/models/bougie-rhum-marin.glb" alt="" auto-rotate auto-rotate-delay="0" rotation-per-second="0deg" interaction-prompt="none" disable-zoom
-                camera-orbit="-10deg 70deg 150%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.1" shadow-intensity="1" 
-                style={{ width: '100%', height: '100%', ['--poster-color' as string]: 'transparent' }}>
-                <div slot="progress-bar" />
-                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
-              </model-viewer>
-            </div>
-          </div>
-          <div className="mx-auto mt-16 grid max-w-6xl gap-10 px-8 md:grid-cols-2">
-            <p data-mots className="text-[clamp(1.4rem,2.2vw,2rem)] leading-snug">La Belle Mèche coule des bougies parfumées naturelles en France. Ubisoft crée des mondes. Les deux font voyager : l'un par l'image et le son, l'autre par l'odeur et la lumière.</p>
-            <p className="apparait leading-relaxed text-creme/70" style={{ ['--d' as string]: '.12s' }}>Notre collaboration remet au goût du jour les jeux cultes d'Ubisoft : chaque box réunit un jeu et une bougie au parfum de son univers, calculée pour brûler le temps de l'aventure. Premier pack : Assassin's Creed. Ensuite, chaque grande licence aura le sien dans la collection All Stars.</p>
           </div>
         </section>
 
-        <Anatomie />
-
-        {/* Photo plein cadre */}
-        <figure className="bg-encre">
-          <img src="/site/box.webp" alt="La box Scent Back sur un bureau de joueur : l'écrin Assassin's Creed, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="h-[88vh] w-full object-cover" />
-        </figure>
+        {/* Manifeste : le texte s'allume mot par mot */}
+        <section id="manifeste" className="bg-encre px-8 py-36 text-creme">
+          <p data-mots className="mx-auto max-w-5xl text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.18] font-medium">Fermez les yeux. Ces mondes, vous les avez parcourus pendant des heures, vous les connaissez par cœur… et pourtant, vous ne les avez jamais sentis. Ubisoft fait voyager par l'image et le son, La Belle Mèche par l'odeur et la lumière. Ensemble, nous ajoutons le sens qui manquait : l'odorat.</p>
+        </section>
 
         {/* 01 — Le sens manquant : un tableau, pas des cartes */}
         <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
@@ -420,6 +392,19 @@ export default function Landing() {
         </section>
 
 
+        <Anatomie />
+
+        {/* La box : photo plein cadre, titre posé dessus */}
+        <section id="box" className="relative bg-encre text-creme">
+          <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="h-[92vh] w-full object-cover" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pt-40 pb-12 text-[#FCF5E3]">
+            <div className="mx-auto grid max-w-6xl items-end gap-8 px-8 md:grid-cols-[1.4fr_1fr]">
+              <h2 className="titre text-[clamp(2.4rem,5vw,4.6rem)] leading-[.95]">Un jeu culte.<br />Une bougie qui a l'odeur<br />de son monde<span className="text-flamme">.</span></h2>
+              <p className="text-lg leading-relaxed text-[#FCF5E3]/85">Assassin's Creed IV Black Flag + la bougie Rhum Marin, dans un écrin en forme de logo. Le premier pack de la collection All Stars.</p>
+            </div>
+          </div>
+        </section>
+
         <Defi />
 
         {/* Règle d'or : chiffre géant en contour */}
@@ -433,7 +418,6 @@ export default function Landing() {
             </div>
           </div>
         </section>
-
         {/* Le pop-up store */}
         <section id="popup" className="bg-encre text-creme">
           <div className="mx-auto max-w-6xl px-8 pt-28">
@@ -452,7 +436,6 @@ export default function Landing() {
             ))}
           </div>
         </section>
-
         {/* L'appli */}
         <section id="chasse" className="bg-creme">
           <div className="mx-auto grid max-w-6xl items-center gap-14 px-8 py-28 lg:grid-cols-[1.1fr_.9fr]">
@@ -483,7 +466,6 @@ export default function Landing() {
             </div>
           </div>
         </section>
-
         {/* Shop (réf.) : rangée de produits + lots en points */}
         <section id="boutique" className="bg-encre py-28 text-creme">
           <div className="mx-auto max-w-6xl px-8">
@@ -506,7 +488,6 @@ export default function Landing() {
             <p className="mt-12 border-t border-creme/20 pt-6 text-sm text-creme/60">Et dans l'appli : les points de la chasse s'échangent contre des lots ({lots.map((l) => l.name).join(', ')}) à récupérer au pop-up.</p>
           </div>
         </section>
-
         {/* Fin : la phrase signature dans une grande étiquette */}
         <section className="bg-encre px-5 py-28">
           <Etiquette className="apparait mx-auto max-w-3xl" corps="flex flex-col items-center gap-6 px-8 py-14 text-center text-encre" larg="30%" arche="3.4rem">
@@ -519,8 +500,7 @@ export default function Landing() {
               <button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-encre px-7 font-bold">Installer l'appli</button>
             </div>
           </Etiquette>
-        </section>
-      </main>
+        </section>      </main>
       {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}
     </SiteDesktop>
   )

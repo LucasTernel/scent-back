@@ -186,5 +186,5 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 /* Repères de l'anatomie, accrochés au modèle 3D */
 .repere { display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity .5s; pointer-events: none; }
 .repere-actif { opacity: 1; }
-.repere-point { width: 14px; height: 14px; border-radius: 50%; background: #FF7722; box-shadow: 0 0 0 6px #FF772240; }
-.repere-texte { white-space: nowrap; border-radius: 8px; background: var(--color-encre); color: var(--color-creme); padding: 6px 12px; font: 700 13px var(--font-sans); translate: 0 0; }
+.repere-point { width: 18px; height: 18px; border-radius: 50%; background: #FF7722; box-shadow: 0 0 0 6px #FF772240; }
+.repere-texte { white-space: nowrap; border-radius: 8px; background: var(--color-encre); color: var(--color-creme); padding: 8px 16px; font: 700 17px var(--font-sans); translate: 0 0; }
