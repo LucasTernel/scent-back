@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { type Lot } from '../lib/api'
 import { Icon, LogoMarque } from '../ui'
 import SceneBougie from '../components/SceneBougie'
+import Compteur from '../components/Compteur'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
@@ -321,8 +322,10 @@ export default function Landing() {
           <section className="sticky top-0 grid h-dvh place-items-center rounded-t-[40px] bg-flamme px-[8vw] text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
             <div>
               <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
-              <h2 className="titre mt-5 text-[clamp(4rem,11vw,16rem)] leading-[.85]">Paris.<br />En vrai.</h2>
-              <p className="mx-auto mt-8 max-w-[min(40rem,40vw)] text-[clamp(1.2rem,1.4vw,1.9rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots. La communauté se retrouve ici.</p>
+              <h2 className="titre mt-4 text-[clamp(3.4rem,8vw,11rem)] leading-[.85]">13 novembre 2027<span className="text-[#FCF5E3]">.</span></h2>
+              <p className="mt-4 text-[clamp(1.2rem,1.6vw,2rem)] font-bold">Paris · le lieu sera dévoilé prochainement</p>
+              <div className="mt-10"><Compteur /></div>
+              <p className="mx-auto mt-10 max-w-[min(40rem,60vw)] text-[clamp(1rem,1.2vw,1.5rem)] leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p>
             </div>
           </section>
           <section className="sticky top-0 grid h-dvh items-center gap-12 rounded-t-[40px] bg-creme px-[8vw] text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)] lg:grid-cols-[1.1fr_.9fr]">

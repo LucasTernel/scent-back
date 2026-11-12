@@ -194,3 +194,8 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
   background: radial-gradient(circle, color-mix(in srgb, var(--c) 70%, transparent), transparent 70%); animation: volute 6s ease-in infinite; }
 @keyframes volute { 0% { opacity: 0; translate: 0 0; scale: .6 } 25% { opacity: .55 } 100% { opacity: 0; translate: 30px -140%; scale: 1.8 } }
 @media (prefers-reduced-motion: reduce) { .volute { animation: none; } }
+
+/* Flip clock : le volet du haut tombe à chaque changement */
+.volet-flip { transform-origin: 50% 100%; animation: volet .6s cubic-bezier(.4,0,.6,1) forwards; backface-visibility: hidden; }
+@keyframes volet { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .volet-flip { animation: none; display: none; } }
