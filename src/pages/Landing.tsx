@@ -111,7 +111,7 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <div className="flex-1">{children}</div>
-      <footer className="border-t border-trait">
+      <footer className="relative z-10 border-t border-trait bg-creme">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-doux md:flex-row md:items-center md:justify-between md:px-8">
           <p>Scent Back · projet étudiant BUT MMI</p>
           <nav aria-label="Informations légales" className="flex flex-wrap gap-x-5 gap-y-2">
