@@ -25,6 +25,9 @@ export async function saveSenteur(s: Senteur) {
   const { error } = await supabase.from('senteurs').upsert(s)
   if (error) throw error
 }
+// Mot de la note → photo de l'ingrédient (Wikimedia Commons, crédits dans les mentions légales) quand la tuile n'a pas d'image
+const PHOTOS: Record<string, string> = { 'VANILLÉ': 'vanille', VANILLE: 'vanille', FIGUE: 'figue', 'FRUITÉ': 'figue', ORANGE: 'orange', 'CÈDRE': 'bois', 'BOISÉ': 'bois', POIVRE: 'poivre', 'ÉPICÉ': 'poivre', TABAC: 'tabac', ROSE: 'rose', MIEL: 'miel', MENTHE: 'menthe', FRAIS: 'menthe', MARIN: 'marin', CUIR: 'cuir' }
+const photo = (x: Tuile) => x.image ?? (PHOTOS[x.mot] && `/senteurs/${PHOTOS[x.mot]}.webp`)
 const IMAGES: Record<string, string> = { 'rhum-marin': '/site/bougie.webp', 'box-ac4': '/site/box.webp', 'figue-tabacee': '/site/etiquette-pop.webp' }
 
 export function BoutonSentir({ id, nom, image, petit = false, className = '' }: { id: string; nom: string; image?: string; petit?: boolean; className?: string }) {
@@ -59,7 +62,7 @@ function Moodboard({ s, image, fermer }: { s: Senteur; image?: string; fermer: (
   const t = [...s.tuiles, ...Array(Math.max(0, 5 - s.tuiles.length)).fill({ mot: '' })].slice(0, 5)
   const tuile = (x: Tuile, i: number, cls: string) => (
     <div key={i} className={`monte relative grid place-items-center overflow-hidden ${cls}`} style={{ animationDelay: `${i * .12}s`,
-      background: x.image ? `center/cover url(${x.image})` : `radial-gradient(circle at ${30 + i * 15}% ${20 + i * 12}%, color-mix(in srgb, ${s.couleur} 35%, white), ${s.couleur} 55%, color-mix(in srgb, ${s.couleur} 60%, black))` }}>
+      background: photo(x) ? `linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)), center/cover url(${photo(x)})` : `radial-gradient(circle at ${30 + i * 15}% ${20 + i * 12}%, color-mix(in srgb, ${s.couleur} 35%, white), ${s.couleur} 55%, color-mix(in srgb, ${s.couleur} 60%, black))` }}>
       {x.mot && <span className="titre px-4 text-center text-[clamp(2rem,5vw,4.5rem)] leading-none tracking-wider text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.35)]">{x.mot}</span>}
     </div>
   )
@@ -74,7 +77,7 @@ function Moodboard({ s, image, fermer }: { s: Senteur; image?: string; fermer: (
         <p className="titre text-2xl text-white">{s.nom}</p>
       </div>
       {tuile(t[4], 4, 'min-h-[30vh]')}
-      <button ref={b} onClick={fermer} aria-label="Fermer" className="fixed top-4 right-4 z-10 grid size-14 place-items-center rounded-full bg-black/25 text-3xl text-white backdrop-blur">×</button>
+      <button ref={b} onClick={fermer} aria-label="Fermer" className="fixed top-[calc(env(safe-area-inset-top)+12px)] right-3 z-10 grid size-12 place-items-center rounded-full bg-[#023341] text-3xl text-[#FCF5E3] shadow-xl ring-2 ring-[#FCF5E3]">×</button>
     </div>
   )
 }
@@ -97,13 +100,13 @@ function MoodboardColonnes({ cols, nom, fermer }: { cols: [Senteur, string][]; n
           </div>
           {s.tuiles.slice(0, 4).map((x, i) => (
             <div key={i} className="monte grid min-h-[12vh] flex-1 place-items-center" style={{ animationDelay: `${c * .15 + (i + 1) * .08}s`,
-              background: x.image ? `center/cover url(${x.image})` : `radial-gradient(circle at ${30 + i * 15}% 40%, color-mix(in srgb, ${s.couleur} 35%, white), ${s.couleur} 60%, color-mix(in srgb, ${s.couleur} 60%, black))` }}>
+              background: photo(x) ? `linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)), center/cover url(${photo(x)})` : `radial-gradient(circle at ${30 + i * 15}% 40%, color-mix(in srgb, ${s.couleur} 35%, white), ${s.couleur} 60%, color-mix(in srgb, ${s.couleur} 60%, black))` }}>
               <span className="titre text-[clamp(1.4rem,3vw,2.8rem)] tracking-wider text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.35)]">{x.mot}</span>
             </div>
           ))}
         </section>
       ))}
-      <button ref={b} onClick={fermer} aria-label="Fermer" className="fixed top-4 right-4 z-10 grid size-14 place-items-center rounded-full bg-black/35 text-3xl text-white backdrop-blur">×</button>
+      <button ref={b} onClick={fermer} aria-label="Fermer" className="fixed top-[calc(env(safe-area-inset-top)+12px)] right-3 z-10 grid size-12 place-items-center rounded-full bg-[#023341] text-3xl text-[#FCF5E3] shadow-xl ring-2 ring-[#FCF5E3]">×</button>
     </div>
   )
 }

@@ -4,6 +4,7 @@ export const pages: Record<string, { titre: string; court: string; intro: string
   mentions: {
     titre: 'Mentions légales', court: 'Mentions', intro: 'Qui édite Scent Back, qui l\'héberge, et dans quel cadre il a été conçu.',
     sections: [
+      ['Crédits photos', 'Photos des notes olfactives (vanille, figue, orange, poivre, tabac, rose, miel, menthe, mer, bois, cuir) et logos des jeux : Wikimedia Commons, sous leurs licences libres respectives. Les logos et marques restent la propriété d\'Ubisoft.'],
       ['Éditeur', 'Lucas TERNEL — BUT MMI 3, parcours Développement web (WEB).\nResponsable de la publication : Lucas TERNEL.'],
       ['Cadre du projet', 'Scent Back est réalisé dans le cadre d\'une SAE (situation d\'apprentissage et d\'évaluation) de 3ᵉ année de BUT Métiers du Multimédia et de l\'Internet.\n\nLe projet imagine une collaboration fictive entre Ubisoft (Assassin\'s Creed × The Lapins Crétins) et la marque de bougies La Belle Mèche : une identité de marque (Scent Back), des bougies et coffrets, un pop-up store parisien, et cette application de chasse urbaine où les joueurs retrouvent des statuettes équipées de puces NFC.\n\nProjet pédagogique, non commercial.'],
       ['Équipe projet', 'Lucas TERNEL — MMI3 WEB\nRobin BRIDOUX — MMI3 MUL\nMathis BRIANCHON — MMI3 MUL\nEthan HELDEBAUME — MMI3 MUL\nAdrien POUILLART — MMI3 MUL\nClémentine JASIAK — MMI3 COM\nKenza SALMI — MMI3 COM\nCandice DECROIX — MMI3 COM\n\nWEB : développement web · MUL : création multimédia · COM : stratégie de communication.'],
