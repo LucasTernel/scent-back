@@ -6,7 +6,7 @@ import { Fragment, useCallback, useState, type FormEvent, type ReactNode } from 
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   adminCollectionsStats, adminScansParJour, adminStats, adminStatues, adminStatuesStats, createCollection, createStatue, updateCollection, updateStatue, enregistrerLot, getLots, supprimerLot, validerBon, type Lot,
-  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte, getPopup, setPopup, getProduits, enregistrerProduit, supprimerProduit, type Produit } from '../lib/api'
+  getCollections, getProfile, HEX_RARETE, RARETES, rangRarete, uploadMedia, type Rarity, getBoutiqueOuverte, setBoutiqueOuverte, getPopup, setPopup, getProduits, enregistrerProduit, supprimerProduit, type Produit, AFFICHE_POPUP } from '../lib/api'
 import { useData } from '../lib/useData'
 import { Icon, Lapin, rarityLabel } from '../ui'
 import Scene3D from '../components/Scene3D'
@@ -488,7 +488,7 @@ function AdminPopup() {
     e.preventDefault(); setBusy(true); setOk('')
     const f = new FormData(e.currentTarget), img = f.get('affiche') as File
     try {
-      const affiche = f.get('sansAffiche') ? null : img?.size ? await uploadMedia(img) : p!.affiche
+      const affiche = f.get('sansAffiche') ? null : img?.size ? await uploadMedia(img) : f.get('officielle') ? AFFICHE_POPUP : p!.affiche
       const date = String(f.get('date'))
       await setPopup({ annonce: f.get('annonce') === 'on', adresse: String(f.get('adresse')).trim(), date: date ? new Date(date).toISOString() : p!.date, affiche })
       setV(v + 1); setOk('Pop-up enregistré ✓')
@@ -509,6 +509,7 @@ function AdminPopup() {
         </label>
         {p.affiche && <img src={p.affiche} alt="Affiche actuelle" className="max-h-56 self-start rounded-xl" />}
         <Champ label={p.affiche ? 'Nouvelle affiche (PNG, laisser vide pour garder)' : 'Affiche (PNG)'} name="affiche" type="file" accept="image/png,image/jpeg,image/webp" />
+        {p.affiche !== AFFICHE_POPUP && <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="officielle" /> Utiliser l'affiche officielle (Paris 2027)</label>}
         {p.affiche && <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="sansAffiche" /> Retirer l'affiche</label>}
         <button disabled={busy} className="btn btn-encre">{busy ? 'Enregistrement…' : 'Enregistrer'}</button>
         {ok && <p role="status" className="text-sm font-bold">{ok}</p>}

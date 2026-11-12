@@ -344,6 +344,7 @@ export async function getProfilAmi(pseudo: string): Promise<ProfilAmi | null> {
 /** Pop-up store : date, lieu (affiché seulement une fois annoncé), affiche. */
 export type Popup = { annonce: boolean; adresse: string; date: string; affiche: string | null }
 const POPUP_DEFAUT: Popup = { annonce: false, adresse: '23 Rue de Bretagne, 75003 Paris', date: '2027-11-13T10:00:00+01:00', affiche: null }
+export const AFFICHE_POPUP = '/site/affiche-popup.webp' // affiche officielle (Paris 2027), proposée en un clic dans l'admin
 export async function getPopup(): Promise<Popup> {
   if (MOCK) return { ...POPUP_DEFAUT, ...JSON.parse(localStorage.getItem('popup') ?? '{}') }
   const { data } = await supabase.from('reglages').select('valeur').eq('cle', 'popup').maybeSingle()
