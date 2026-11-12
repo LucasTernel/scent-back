@@ -70,7 +70,7 @@ export default function App() {
 
   if (bureau && location.pathname === '/boutique') return <SiteDesktop><BoutiqueSite /></SiteDesktop>
   if (bureau) return location.pathname.startsWith('/legal')
-    ? <SiteDesktop><main id="contenu" className="mx-auto max-w-3xl px-5 py-10 md:px-8 md:py-14"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop>
+    ? <div data-theme="sombre" className="bg-creme"><SiteDesktop><main id="contenu" className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16"><Routes><Route path="legal/:page" element={<Legal />} /></Routes></main></SiteDesktop></div>
     : <Landing />
 
   return (
