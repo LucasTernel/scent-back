@@ -1,9 +1,9 @@
 import { getBoutiqueOuverte } from './lib/api'
 import Amis, { ProfilAmi } from './pages/Amis'
 import { useData } from './lib/useData'
-import { LogoMarque } from './ui'
+import { Icon, LogoMarque } from './ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import Scan from './pages/Scan'
 import Gallery, { GalleryCollection } from './pages/Gallery'
 import Account from './pages/Account'
@@ -35,6 +35,31 @@ function Layout({ admin }: { admin?: boolean }) {
     const pivot = () => { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('main')?.animate([{ transform: `rotate(${m.matches ? 8 : -8}deg) scale(.92)`, opacity: .4 }, { transform: 'none', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(.2,.8,.2,1)' }) }
     m.addEventListener('change', pivot); return () => m.removeEventListener('change', pivot)
   }, []) // la carte de chasse prend tout l'écran
+  if (admin) return (
+    // Admin : barre latérale sur ordinateur, barre du bas sur téléphone
+    <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
+      <aside className="sticky top-0 hidden h-dvh flex-col gap-2 bg-[#023341] p-5 text-[#FCF5E3] lg:flex">
+        <img src="/logo-orange.png" alt="Scent Back" className="-mx-2 -my-4 w-44" />
+        <p className="mt-2 mb-4 text-[11px] font-bold tracking-[.22em] text-flamme uppercase">Espace admin</p>
+        <nav aria-label="Navigation admin" className="flex flex-col gap-1">
+          {tabsAdmin.map((t) => (
+            <NavLink key={t.to} to={t.to} end={t.to === '/'} viewTransition
+              className={({ isActive }) => `flex min-h-12 items-center gap-3 rounded-[12px] px-4 font-bold transition ${isActive || (t.to !== '/' && pathname.startsWith(t.to)) || (t.to === '/collections' && pathname.startsWith('/statuette')) ? 'bg-flamme text-[#023341]' : 'text-[#FCF5E3]/80 hover:bg-[#FCF5E3]/10'}`}>
+              <Icon name={t.icon} size={20} />{t.label}
+            </NavLink>
+          ))}
+        </nav>
+        <p className="mt-auto text-xs text-[#FCF5E3]/50">Scent Back · Ubisoft × La Belle Mèche</p>
+      </aside>
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl max-lg:landscape:max-w-none">
+        <header className="sticky top-0 z-30 flex justify-center bg-creme pt-[env(safe-area-inset-top)] lg:hidden">
+          <LogoMarque className="-my-5 h-[92px] w-auto" />
+        </header>
+        <main className="admin px-5 pt-4 pb-36 lg:px-10 lg:pt-10 lg:pb-16"><Outlet /></main>
+        <div className="lg:hidden"><TabBar tabs={tabsAdmin} /></div>
+      </div>
+    </div>
+  )
   return (
     <div className="mx-auto min-h-dvh max-w-md lg:max-w-3xl max-lg:landscape:max-w-none">
       {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
@@ -44,7 +69,7 @@ function Layout({ admin }: { admin?: boolean }) {
             <LogoMarque className="-my-5 h-[92px] w-auto max-lg:landscape:-my-3 max-lg:landscape:h-[60px]" />
           </header>}
       <main className="px-5 pt-4 pb-36 landscape:px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))]"><Outlet /></main>
-      <TabBar tabs={admin ? tabsAdmin : undefined} fondu={!carte} />
+      <TabBar fondu={!carte} />
     </div>
   )
 }

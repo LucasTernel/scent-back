@@ -193,7 +193,7 @@ export function AdminCollections() {
   return (
     <div className="flex flex-col gap-5">
       <Tete sous="Espace admin" titre="Collections" action={<BoutonAjout to="/collections/nouvelle" label="Collection" />} />
-      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
         {cols?.map((c, i) => (
           <li key={c.id} className="monte" style={{ animationDelay: `${i * 45}ms` }}>
             <Link viewTransition to={`/collections/${c.id}`} className="relative flex aspect-[4/5] flex-col justify-end gap-1 overflow-hidden rounded-[22px] bg-encre p-4 text-creme">
@@ -292,7 +292,7 @@ export function AdminCollection() {
         ))}
         {id !== 'aucune' && <Link viewTransition to={`/collections/${id}/modifier`} className="ml-auto rounded-full border-[1.5px] border-trait bg-papier px-3.5 py-1.5 text-xs font-bold">Modifier la collection</Link>}
       </div>
-      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
         {statues.map((s, i) => (<Fragment key={s.id}>
           {(i === 0 || statues[i - 1].rarity !== s.rarity) && (
                 <li className="col-span-2 mt-2 flex items-center gap-2 first:mt-0">
@@ -599,7 +599,7 @@ function AdminPermanente() {
       <section className="flex flex-col gap-3" aria-labelledby="lancements">
         <h2 id="lancements" className="titre text-xl">Collections</h2>
         <p className="-mt-2 text-xs text-doux">Non lancée : produits « Prochainement ». Masquée : la collection entière disparaît de la boutique.</p>
-        <ul className="grid grid-cols-2 gap-2 landscape:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-2 landscape:grid-cols-4 lg:grid-cols-4">
           {[...new Set(produits.map((p) => p.licence).filter(Boolean))].map((l) => {
             const on = lancees.includes(l!), cachee = cachees.includes(l!)
             return (
@@ -619,7 +619,7 @@ function AdminPermanente() {
           <button onClick={() => setEdition(edition === 'nouveau' ? undefined : 'nouveau')} className="flex min-h-11 items-center gap-1 rounded-full bg-encre px-4 text-sm font-bold text-creme"><Icon name="plus" size={18} />Ajouter</button>
         </div>
         {edition === 'nouveau' && <Carton><FormProduit ordre={produits.length + 1} fini={fini} /></Carton>}
-        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {produits.map((p) => (
             <li key={p.id} className={`flex flex-col overflow-hidden rounded-[22px] border-[1.5px] bg-papier ${edition === p.id ? 'col-span-2 border-flamme' : 'border-trait'}`}>
               <div className="relative">
@@ -714,7 +714,7 @@ export function AdminBoutique() {
           <button onClick={() => setEdition(edition === 'nouveau' ? undefined : 'nouveau')} className="flex min-h-11 items-center gap-1 rounded-full bg-encre px-4 text-sm font-bold text-creme"><Icon name="plus" size={18} />Ajouter</button>
         </div>
         {edition === 'nouveau' && <Carton><FormLot fini={fini} /></Carton>}
-        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-3 landscape:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {lots.map((l) => {
             const max = Math.max(...lots.map((x) => x.stock), 1)
             return (
