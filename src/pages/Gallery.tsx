@@ -30,9 +30,9 @@ export default function Gallery() {
           const fini = siennes.length > 0 && trouvees === siennes.length
           return (
             <li key={c.id} className="monte" style={{ animationDelay: `${i * 60}ms` }}>
-              <Link viewTransition to={`/galerie/c/${c.id}`} className="relative flex min-h-[150px] items-end overflow-hidden rounded-[24px] bg-encre p-4 text-creme active:scale-[.98] transition">
+              <Link viewTransition to={`/galerie/c/${c.id}`} className="relative flex min-h-[150px] items-end overflow-hidden rounded-[24px] bg-[#023341] p-4 text-[#FCF5E3] active:scale-[.98] transition">
                 {c.logo_url && <img src={c.logo_url} alt="" className="absolute inset-0 size-full object-cover" />}
-                <span className="absolute inset-0 bg-gradient-to-t from-encre via-encre/75 to-encre/10" />
+                <span className="absolute inset-0 bg-gradient-to-t from-[#023341] via-[#023341]/75 to-[#023341]/10" />
                 {fini && <span className="absolute top-3 right-3 rounded-full bg-flamme px-3 py-1 text-[11px] font-bold text-encre">Complétée ✓</span>}
                 <span className="relative flex w-full flex-col gap-2">
                   <span className="font-serif text-[17px] leading-snug font-bold">{c.name}</span>
