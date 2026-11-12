@@ -243,7 +243,9 @@ export function FicheProduit({ mobile = false }: { mobile?: boolean }) {
   const lien = (x: Produit) => (mobile ? `/boutique/${x.id}` : `/produit/${x.id}`)
   const achetable = p.dispo && !p.epuise
   const statut = p.epuise ? ['Sold out', 'Victime de son succès'] : !p.dispo ? ['Prochainement', 'Disponible au lancement de la collection'] : p.precommande ? ['Précommande', `Livraison prévue le ${dateLivraison(p.precommande)}`] : ['En stock', 'Retrait au pop-up store, Paris']
-  const autres = tous.filter((x) => x.id !== p.id && (x.licence === p.licence || x.categorie === p.categorie)).slice(0, mobile ? 4 : 3)
+  // d'abord la même collection (licence), puis on complète avec les autres collections
+  const reste = tous.filter((x) => x.id !== p.id)
+  const autres = [...reste.filter((x) => x.licence === p.licence), ...reste.filter((x) => x.licence !== p.licence)].slice(0, mobile ? 4 : 3)
   const contenu = CONTENU[p.id]
 
   return (
