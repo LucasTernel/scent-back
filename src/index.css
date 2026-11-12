@@ -168,3 +168,16 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 @keyframes defile { to { translate: -50% 0; } }
 .chiffre-contour { color: transparent; -webkit-text-stroke: 2px currentColor; }
 @media (prefers-reduced-motion: reduce) { .defile { animation: none; } }
+
+/* Curseur personnalisé du site vitrine */
+.curseur { position: fixed; top: 0; left: 0; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #FF7722; pointer-events: none; z-index: 70;
+  mix-blend-mode: difference; opacity: 0; transition: width .25s, height .25s, margin .25s, opacity .3s; }
+.curseur.curseur-vu { opacity: 1; }
+.curseur.curseur-actif { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
+.texte-contour { color: transparent; -webkit-text-stroke: 2px #FCF5E3; }
+
+/* Flamme accrochée à la mèche de la bougie 3D (hotspot model-viewer) */
+.flamme-3d { pointer-events: none; width: 1px; height: 1px; }
+.flamme-3d span { position: absolute; left: 50%; bottom: 0; width: 22px; height: 46px; translate: -50% 0; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 78%, #FFF6CC 0%, #FFC24A 38%, #FF7722 72%, transparent 100%);
+  transform-origin: 50% 100%; animation: vacille 2.4s ease-in-out infinite; filter: drop-shadow(0 0 10px #FFB347) drop-shadow(0 0 30px #FF772288); }

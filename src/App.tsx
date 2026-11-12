@@ -27,7 +27,7 @@ function Layout({ admin }: { admin?: boolean }) {
   const type = useNavigationType()
   useEffect(() => { if (type !== 'POP') window.scrollTo(0, 0) }, [pathname, type]) // la carte de chasse prend tout l'écran
   return (
-    <div className="mx-auto min-h-dvh max-w-md">
+    <div className="mx-auto min-h-dvh max-w-md lg:max-w-3xl">
       {/* Barre du haut floutée + rappel du logo : la zone de l'encoche/heure reste lisible */}
       {carte
         ? <LogoMarque className="pointer-events-none fixed top-[calc(env(safe-area-inset-top)_-_14px)] left-1/2 z-30 h-[92px] w-auto -translate-x-1/2" />
@@ -40,6 +40,8 @@ function Layout({ admin }: { admin?: boolean }) {
   )
 }
 
+const ADMIN_PATH = (import.meta.env.VITE_ADMIN_PATH as string | undefined) || '/coulisses-de-la-confrerie'
+
 export default function App() {
   const { session, username, role, refresh, loading } = useAuth()
   const [shown, setShown] = useState(false)
@@ -50,7 +52,13 @@ export default function App() {
   // Ordinateur (grand écran + souris, hors appli installée) → landing uniquement, aucune connexion possible.
   // Seule exception : l'aperçu de l'appli affiché DANS la landing (iframe ?mobile=1, non cliquable).
   const apercu = window.self !== window.top && new URLSearchParams(location.search).has('mobile')
-  const bureau = !apercu && matchMedia('(min-width: 1024px) and (pointer: fine)').matches && !matchMedia('(display-mode: standalone)').matches
+  // Admin sur ordinateur : uniquement via l'adresse secrète (VITE_ADMIN_PATH), mémorisée pour la session.
+  // La vraie protection reste le rôle admin vérifié par la base (RLS) : un joueur retombe sur le site.
+  if (location.pathname === ADMIN_PATH) { try { sessionStorage.setItem('ordi-admin', '1') } catch { /* rien */ } history.replaceState(null, '', '/') }
+  let entreeAdmin = false
+  try { entreeAdmin = sessionStorage.getItem('ordi-admin') === '1' } catch { /* rien */ }
+  if (entreeAdmin && session && role && role !== 'admin') { try { sessionStorage.removeItem('ordi-admin') } catch { /* rien */ } entreeAdmin = false }
+  const bureau = !apercu && !entreeAdmin && matchMedia('(min-width: 1024px) and (pointer: fine)').matches && !matchMedia('(display-mode: standalone)').matches
 
   // Connexion (ou déconnexion) : on repart toujours de l'accueil, pas de la dernière page visitée
   const navigate = useNavigate()

@@ -239,6 +239,14 @@ export default function Landing() {
   const lots = useData(getLots) ?? []
   const [demo, setDemo] = useState<Lot>()
   const [refDefi, p] = useProgression()
+  const racine = useRef<HTMLElement>(null)
+  const [loaderAffiche] = useState(() => { try { return sessionStorage.getItem('loader-vu') !== '1' } catch { return true } })
+  useEffect(() => {
+    import('@google/model-viewer')
+    let stop = () => {}
+    import('../lib/animations').then(({ lancerAnimations }) => racine.current && lancerAnimations(racine.current).then((s) => { stop = s }))
+    return () => stop()
+  }, [])
   const etapesDefi = [
     ['Allumez', 'Installez-vous dans une lumière douce, allumez la mèche et respirez : l\'ambiance revient avant même que l\'écran s\'allume.'],
     ['Jouez', 'Elle compte le temps avec vous. Plus la cire fond, plus la fin approche.'],
@@ -251,12 +259,12 @@ export default function Landing() {
   return (
     <SiteDesktop>
       <LoaderBougie />
-      <main id="contenu">
+      <main id="contenu" ref={racine} data-curseur>
         {/* Ouverture : grand titre + sommaire à gauche, la box dans une arche à droite */}
         <section className="mx-auto grid max-w-6xl gap-12 px-5 pt-10 pb-20 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-end">
           <div className="flex flex-col gap-8">
             <p className="apparait text-sm font-bold tracking-[.22em] text-doux uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
-            <h1 className="apparait titre text-[clamp(3.4rem,8vw,7.2rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+            <h1 data-split={loaderAffiche ? 'loader' : ''} className="titre text-[clamp(3.4rem,8vw,7.2rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
             <p className="apparait max-w-md text-xl leading-relaxed">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… <b>et pourtant, vous ne les avez jamais sentis.</b></p>
             <nav aria-label="Chapitres" className="apparait mt-2 border-t-2 border-encre">
               {sommaire.map(([n, l, h]) => (
@@ -269,8 +277,15 @@ export default function Landing() {
             </nav>
           </div>
           <div className="apparait relative" style={{ ['--d' as string]: '.15s' }}>
-            <div className="overflow-hidden rounded-t-full border-4 border-encre bg-white">
-              <img src="/site/bougie.webp" alt="La bougie Scent Back Rhum Marin, 140 g de cire 100 % végétale, avec son étiquette en arche" className="aspect-[4/5] w-full object-contain px-6 pt-16" />
+            <div data-parallax=".12" className="relative overflow-hidden rounded-t-full border-4 border-encre bg-[radial-gradient(circle_at_50%_40%,#ffffff,#F2E7CB)]">
+              <model-viewer src="/models/bougie-rhum-marin.glb" alt="La bougie Scent Back Rhum Marin en 3D, 140 g de cire 100 % végétale. Faites-la tourner."
+                camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="16deg" interaction-prompt="none" disable-zoom disable-pan
+                camera-orbit="25deg 72deg 165%" camera-target="0m 0.05m 0m" field-of-view="26deg" exposure="1.05" shadow-intensity="1" shadow-softness=".9"
+                min-camera-orbit="auto 40deg auto" max-camera-orbit="auto 95deg auto"
+                style={{ display: 'block', width: '100%', height: 'min(64vh, 600px)', cursor: 'grab', ['--poster-color' as string]: 'transparent' }}>
+                <div slot="hotspot-flamme" data-position="0m 0.083m 0m" data-normal="0m 1m 0m" aria-hidden className="flamme-3d"><span /></div>
+              </model-viewer>
+              <p className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-[8px] bg-[#023341]/80 px-3 py-1.5 text-[11px] font-bold text-[#FCF5E3]">↻ Faites-la tourner</p>
             </div>
             <p className="mt-3 flex justify-between text-xs font-bold tracking-[.18em] text-doux uppercase"><span>Fig. 1 — Rhum Marin</span><span>140 g · cire végétale</span></p>
           </div>
@@ -300,7 +315,7 @@ export default function Landing() {
             <h2 className="apparait titre mt-10 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Un jeu culte. Une bougie qui a l'odeur de son monde.</h2>
           </div>
           <div className="mx-auto max-w-6xl px-5 md:px-8">
-            <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" className="apparait mt-14 w-full rounded-[18px] border-4 border-[#FCF5E3]/15" />
+            <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" data-volet className="mt-14 w-full rounded-[18px]" />
           </div>
           <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-3 md:px-8">
             {[['Le jeu', 'Assassin\'s Creed IV Black Flag. La piraterie, les Caraïbes, le pont du Jackdaw.'], ['La bougie', 'Rhum Marin. 140 g de cire 100 % végétale, coulée en France par La Belle Mèche.'], ['L\'écrin', 'Une box en forme de logo Assassin\'s Creed, faite pour rester sur le bureau.']].map(([k, v], i) => (
@@ -311,6 +326,18 @@ export default function Landing() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* La Confrérie : le lapin 3D tourne pendant que les mots glissent derrière (section épinglée) */}
+        <section data-lapin className="relative grid h-dvh place-items-center overflow-hidden bg-[#011A22] text-[#FCF5E3]" aria-label="Le lapin de la Confrérie">
+          <div aria-hidden className="pointer-events-none absolute inset-0 flex flex-col justify-center gap-2 leading-[.85] select-none">
+            <p data-glisse className="titre text-center text-[clamp(5rem,15vw,15rem)] whitespace-nowrap">LE TEMPS</p>
+            <p data-glisse className="titre texte-contour text-center text-[clamp(5rem,15vw,15rem)] whitespace-nowrap">D'UNE BOUGIE</p>
+          </div>
+          <model-viewer src="/models/lapin-ultimate.glb" alt="Le Lapin Ultimate, mascotte de la Confrérie, en 3D" camera-orbit="-30deg 80deg 150%" camera-target="0m auto 0m"
+            field-of-view="30deg" exposure="1.1" shadow-intensity="1" interaction-prompt="none" disable-zoom
+            style={{ position: 'relative', width: 'min(52vw, 620px)', height: '86vh', ['--poster-color' as string]: 'transparent' }} />
+          <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs font-bold tracking-[.22em] text-[#FCF5E3]/50 uppercase">Le Lapin Ultimate · légendaire</p>
         </section>
 
         {/* 03 — Le défi : la cire fond au fil du défilement, règle graduée en heures */}
@@ -429,22 +456,27 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* All Stars : les vraies étiquettes, puis des étiquettes vides */}
-        <section className="mx-auto max-w-6xl px-5 py-28 md:px-8">
-          <Chapitre n="06" titre="La suite" />
-          <h2 className="apparait titre mt-10 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La collection All Stars.</h2>
-          <p className="apparait mt-4 max-w-2xl text-lg text-doux">Assassin's Creed ouvre le bal. Ensuite, chaque grande licence Ubisoft aura sa box et sa bougie, au parfum de son monde.</p>
-          <div className="mt-14 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {[['/site/etiquette-ac.webp', 'Rhum Marin', 'Assassin\'s Creed IV — disponible'], ['/site/etiquette-pop.webp', 'Figue Tabacée', 'Prochainement']].map(([img, nom, info], i) => (
-              <figure key={nom} className="apparait" style={{ ['--d' as string]: `${i * .1}s` }}>
+        {/* All Stars : galerie horizontale épinglée */}
+        <section data-horizontal className="flex h-dvh flex-col justify-center overflow-hidden bg-creme">
+          <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
+            <Chapitre n="06" titre="La suite" />
+            <h2 className="titre mt-6 text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La collection All Stars.</h2>
+          </div>
+          <div data-piste className="mt-10 flex w-max gap-8 pr-[10vw] pl-[max(1.25rem,calc((100vw-72rem)/2+2rem))]">
+            <div className="flex w-[360px] shrink-0 flex-col justify-end">
+              <p className="text-xl leading-relaxed text-doux">Assassin's Creed ouvre le bal. Ensuite, chaque grande licence Ubisoft aura sa box et sa bougie, au parfum de son monde.</p>
+              <p className="mt-6 text-sm font-bold tracking-[.2em] text-flamme uppercase">Défilez →</p>
+            </div>
+            {[['/site/etiquette-ac.webp', 'Rhum Marin', 'Assassin\'s Creed IV — disponible'], ['/site/etiquette-pop.webp', 'Figue Tabacée', 'Prochainement']].map(([img, nom, info]) => (
+              <figure key={nom} className="w-[360px] shrink-0">
                 <img src={img} alt={`Étiquette de la bougie ${nom}`} loading="lazy" className="w-full" />
                 <figcaption className="mt-3 border-t border-trait pt-2 text-sm"><b>{nom}</b> · <span className="text-doux">{info}</span></figcaption>
               </figure>
             ))}
-            {[0, 1].map((i) => (
-              <div key={i} className="apparait" style={{ ['--d' as string]: `${(i + 2) * .1}s` }}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-[360px] shrink-0">
                 <Etiquette couleur="#DCD2BA" fond="transparent" className="aspect-[700/832]" corps="grid place-items-center border-dashed" larg="40%">
-                  <span className="titre text-5xl text-trait">?</span>
+                  <span className="titre text-6xl text-trait">?</span>
                 </Etiquette>
                 <p className="mt-3 border-t border-trait pt-2 text-sm text-doux">Licence mystère</p>
               </div>
