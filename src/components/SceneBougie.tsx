@@ -22,7 +22,7 @@ const VUES: { pos: [number, number, number]; cible: [number, number, number] }[]
   { pos: [0.2, 0.7, 2.8], cible: [-0.55, 0.45, 0] },   // 2 · voir      ┘ bougie immobile à droite
   { pos: [-0.2, 1.0, 2.6], cible: [0.55, 0.5, 0] },    // 3 · la mèche  ┐ texte à droite
   { pos: [-0.2, 1.0, 2.6], cible: [0.55, 0.5, 0] },    // 4 · étiquette ┘ bougie immobile à gauche
-  { pos: [0.2, 0.8, 2.6], cible: [-0.55, 0.42, 0] },   // 5 · le défi : texte à gauche
+  { pos: [0.75, 1.85, 0.95], cible: [-0.6, 0.2, 0] },   // 5 · le défi : vue de dessus, on voit la cire fondre puis la flamme s'éteindre
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },          // 6 · règle d'or (texte en haut)
 ]
 
@@ -147,18 +147,21 @@ export default function SceneBougie() {
       camera.position.lerp(vPos, .05); cible.lerp(vCib, .05); camera.lookAt(cible)
 
       // le défi : la cire fond entre le chapitre 4,6 et 5,8 (puis reste basse)
-      const viseFonte = Math.min(.85, Math.max(0, (f - 4.35) / .65) * .85) // fond pendant l'arrivée du texte « Le défi », finie quand il est centré
+      const viseFonte = Math.min(.85, Math.max(0, (f - 4.35) / .95) * .85) // fond pendant l'arrivée du texte « Le défi », finie quand il est centré
       fonte += (viseFonte - fonte) * .25
       if (cire) cire.scale.y = 1 - fonte
       const baisse = fonte * hauteurCire
       if (haut) haut.position.y = -baisse
       if (compteur) compteur.textContent = String(Math.round(140 * (1 - fonte / .85 * .99)))
 
+      // plus de cire → la flamme s'éteint (et se rallume si on remonte)
+      const vie = 1 - Math.min(1, Math.max(0, (fonte - .8) / .05))
+      groupeFlamme.visible = vie > .02
       // flamme vivante
       const vac = 1 + Math.sin(t * 13) * .05 + Math.sin(t * 29) * .04 + (Math.random() - .5) * .06
       groupeFlamme.position.set(sommetMeche.x, sommetMeche.y - baisse - .005, sommetMeche.z)
-      flammeExt.scale.set(.085 * (2 - vac), .2 * vac, 1); flammeInt.scale.set(.045, .12 * vac, 1)
-      flamme.position.set(0, sommetMeche.y - baisse + .06, 0); flamme.intensity = 1.4 * vac
+      flammeExt.scale.set(.085 * (2 - vac) * vie, .2 * vac * vie, 1); flammeInt.scale.set(.045 * vie, .12 * vac * vie, 1)
+      flamme.position.set(0, sommetMeche.y - baisse + .06, 0); flamme.intensity = 1.4 * vac * vie
       // braises
       for (let n = 0; n < NB; n++) {
         vieB[n] += .006 + (n % 5) * .001
