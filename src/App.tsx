@@ -1,5 +1,6 @@
 import { getBoutiqueOuverte } from './lib/api'
 import Amis, { ProfilAmi } from './pages/Amis'
+import AdminJoueurs from './pages/AdminJoueurs'
 import { useData } from './lib/useData'
 import { Icon, LogoMarque } from './ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -42,7 +43,7 @@ function Layout({ admin }: { admin?: boolean }) {
         <img src="/logo-orange.png" alt="Scent Back" className="-mx-2 -my-4 w-44" />
         <p className="mt-2 mb-4 text-[11px] font-bold tracking-[.22em] text-flamme uppercase">Espace admin</p>
         <nav aria-label="Navigation admin" className="flex flex-col gap-1">
-          {tabsAdmin.map((t) => (
+          {[...tabsAdmin.slice(0, 2), { to: '/joueurs', label: 'Joueurs', icon: 'amis' as const }, ...tabsAdmin.slice(2)].map((t) => (
             <NavLink key={t.to} to={t.to} end={t.to === '/'} viewTransition
               className={({ isActive }) => `flex min-h-12 items-center gap-3 rounded-[12px] px-4 font-bold transition ${isActive || (t.to !== '/' && pathname.startsWith(t.to)) || (t.to === '/collections' && pathname.startsWith('/statuette')) ? 'bg-flamme text-[#023341]' : 'text-[#FCF5E3]/80 hover:bg-[#FCF5E3]/10'}`}>
               <Icon name={t.icon} size={20} />{t.label}
@@ -132,6 +133,7 @@ export default function App() {
             <Route path="statuette/:sid/modifier" element={<AdminFormStatue />} />
             <Route path="boutique" element={<AdminBoutique />} />
             <Route path="reglages" element={<AdminReglages />} />
+            <Route path="joueurs" element={<AdminJoueurs />} />
             <Route path="statuette/:id" element={<AdminStatue />} />
             <Route path="compte" element={<Account />} />
             <Route path="legal/:page" element={<Legal />} />

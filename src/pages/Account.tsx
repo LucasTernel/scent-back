@@ -103,6 +103,7 @@ export default function Account() {
         </div>
       </section>
 
+      {p?.role === 'admin' && <Link viewTransition to="/joueurs" className="monte flex min-h-16 items-center gap-3 rounded-[20px] border-[1.5px] border-trait bg-papier px-4 py-3"><span className="flex-1"><span className="block font-serif text-[16px] font-bold">Joueurs</span><span className="block text-xs text-doux">Classement, amis et parrainages</span></span><Icon name="chevron" size={18} className="text-doux" /></Link>}
       {p?.role !== 'admin' && <nav className="monte overflow-hidden rounded-[20px] border-[1.5px] border-trait bg-papier" style={{ animationDelay: '.12s' }}>
         {[['/amis', 'Mes amis', 'Liste, recherche et parrainage'], ['/classement', 'Classement', 'Les meilleurs chasseurs de lapins']].map(([to, t, s]) => (
           <Link viewTransition key={to} to={to} className="flex min-h-16 items-center gap-3 border-t border-creme-2 px-4 py-3 first:border-0 active:bg-creme-2">

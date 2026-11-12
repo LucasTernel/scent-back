@@ -410,3 +410,11 @@ export async function supprimerProduit(id: string) {
 
 /** « 13 novembre 2027 » */
 export const dateLivraison = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+
+export type LienAmi = { joueur: string; avatar_url: string | null; amis: string[]; parrain: string | null; filleuls: number }
+export async function adminAmis(): Promise<LienAmi[]> {
+  if (MOCK) return [{ joueur: 'altair_bwaah', avatar_url: 'lapin:ultimate', amis: ['ezio_cretin', 'lapin_furtif'], parrain: null, filleuls: 1 }, { joueur: 'lapin_furtif', avatar_url: 'jeu:farcry', amis: ['altair_bwaah'], parrain: 'altair_bwaah', filleuls: 0 }]
+  const { data, error } = await supabase.rpc('admin_amis')
+  if (error) throw error
+  return data ?? []
+}
