@@ -27,6 +27,10 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
 
       {model ? (
         pret && (
+          <>
+          {/* socle derrière le modèle (un hotspot HTML passait devant le canvas) */}
+          <div aria-hidden className="socle absolute bottom-[8%] left-1/2 -translate-x-1/2"
+            style={{ ['--c' as string]: hex, zIndex: 0, width: '58%', height: 'auto', aspectRatio: '58 / 13', filter: debloque ? undefined : 'brightness(0) invert(1) opacity(.35)' }} />
           <model-viewer src={model} alt={debloque ? `Modèle 3D de ${nom}` : 'Silhouette d\'une statuette mystère'}
             {...(mini ? {} : { 'camera-controls': true, 'touch-action': 'none', 'min-camera-orbit': 'auto 45deg auto', 'max-camera-orbit': 'auto 100deg auto' })}
             auto-rotate auto-rotate-delay="0" rotation-per-second={mini ? '18deg' : '24deg'} interaction-prompt="none"
@@ -34,9 +38,8 @@ export default function Scene3D({ rarity, nom, model, image, debloque = true, mi
             camera-orbit="0deg 80deg 145%" camera-target="0m auto 0m" field-of-view="30deg" loading={mini ? 'lazy' : 'eager'}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: mini ? 'none' : undefined, cursor: mini ? undefined : 'grab', zIndex: 1, ['--poster-color' as string]: 'transparent',
               filter: debloque ? `drop-shadow(0 18px 30px ${hex}66)` : 'brightness(0) drop-shadow(0 0 18px #ffffff40)' }}>
-            <div slot="hotspot-socle" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-hidden className="socle"
-              style={{ ['--c' as string]: hex, filter: debloque ? undefined : 'brightness(0) invert(1) opacity(.35)' }} />
           </model-viewer>
+          </>
         )
       ) : image ? (
         <img src={image} alt={nom} className="absolute inset-0 size-full object-cover" />
