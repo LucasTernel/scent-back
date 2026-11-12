@@ -31,8 +31,8 @@ const Carton = ({ children, className = '' }: { children: ReactNode; className?:
 
 /** En-tête admin : ligne retour + action à droite, puis titre complet (jamais coupé) et description. */
 /** Tête du lapin (même rendu que les avatars) d'après le nom de son modèle 3D. */
-const TETES = ['arc', 'canal', 'eiffel', 'louvre', 'luxem', 'marais', 'montm', 'ndame', 'opera', 'panth', 'pneuf', 'revolutionnaire', 'ultimate']
-const tete = (model?: string | null) => { const m = model?.match(/lapin-([a-z]+)\.glb/)?.[1]; return m && TETES.includes(m) ? `/avatars/lapin-${m}.png` : undefined }
+// ponytail: un nouveau modèle 3D = générer sa tête dans public/avatars/lapin-<nom>.png (sinon on retombe sur l'image)
+const tete = (model?: string | null) => { const m = model?.match(/(lapin-[a-z0-9-]+)\.glb/)?.[1]; return m && `/avatars/${m}.png` }
 
 function Tete({ sous, titre, retour, action, desc }: { sous?: string; titre: string; retour?: string; action?: ReactNode; desc?: string }) {
   return (
