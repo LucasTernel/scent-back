@@ -310,15 +310,15 @@ export default function Landing() {
 
         {/* La suite : un chapitre = un écran, chacun avec sa propre animation */}
         <div className="relative z-10 bg-creme">
-          <section className="relative h-dvh overflow-hidden bg-encre text-creme">
+          <section className="relative h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
             <img data-parallax="-.1" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 h-[115%] w-full object-cover opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#011A22] via-[#011A22]/70 to-transparent" />
             <div className="relative flex h-full max-w-[min(60rem,55vw)] flex-col justify-center px-[8vw]">
               <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 01 · La première collection</p>
               <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,10rem)] leading-[.9]">Assassin's<br />Creed IV<span className="text-flamme">.</span></h2>
-              <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-creme/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
-              <div className="mt-8 flex gap-10 border-t border-creme/20 pt-6">
-                {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-creme/60">{b}</span></p>)}
+              <p className="mt-6 max-w-[min(32rem,32vw)] text-[clamp(1.1rem,1.2vw,1.6rem)] leading-relaxed text-[#FCF5E3]/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
+              <div className="mt-8 flex gap-10 border-t border-[#FCF5E3]/20 pt-6">
+                {[['13.11.27', 'en avant-première au pop-up'], ['140 g', 'Rhum Marin'], ['PS5', 'Black Flag']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
               </div>
             </div>
           </section>
