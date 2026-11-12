@@ -2,19 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { Etiquette } from './Landing'
 import { Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
+import { getProduits } from '../lib/api'
+import { useData } from '../lib/useData'
 
 /** Boutique du site (ordinateur) — démonstration : panier + commande fictive, aucun paiement, aucune donnée bancaire. */
-type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean }
-export const PRODUITS: Produit[] = [
-  { id: 'box-ac4', nom: 'Box Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 + la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo.', prix: 59.9, image: '/site/box.webp', dispo: true },
-  { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale · coulée en France. Brûle le temps du jeu.', prix: 24.9, image: '/site/bougie.webp', dispo: true },
-  { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '70 g · cire 100 % végétale. La prochaine licence de la collection All Stars.', prix: 16.9, image: '/site/etiquette-pop.webp', dispo: false },
-]
 export const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 type Panier = Record<string, number>
 const lirePanier = (): Panier => { try { return JSON.parse(localStorage.getItem('panier') || '{}') } catch { return {} } }
 
 export default function BoutiqueSite() {
+  const PRODUITS = useData(getProduits) ?? []
   const [panier, setPanier] = useState<Panier>(lirePanier)
   const [commande, setCommande] = useState<{ num: string; total: number }>()
   useEffect(() => { try { localStorage.setItem('panier', JSON.stringify(panier)) } catch { /* rien */ } }, [panier])
@@ -41,7 +38,7 @@ export default function BoutiqueSite() {
               <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="30%" arche="1.7rem">
                 <div className="relative overflow-hidden rounded-[10px] bg-white">
                   <img src={p.image} alt={p.nom} loading="lazy" className={`aspect-[4/3] w-full ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
-                  <BoutonSentir id={p.id} nom={p.nom} className="absolute top-3 right-3 size-20" />
+                  <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-3 right-3 size-20" />
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
                 </div>
                 <h2 className="titre mt-4 text-xl leading-tight">{p.nom}</h2>

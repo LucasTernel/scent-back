@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { getBoutiqueOuverte, getPopup, type Lot } from '../lib/api'
+import { getBoutiqueOuverte, getPopup, getProduits, type Lot } from '../lib/api'
+import { euros } from './BoutiqueSite'
 import { useData } from '../lib/useData'
 import { Icon } from '../ui'
 import SceneBougie from '../components/SceneBougie'
@@ -262,6 +263,7 @@ function LoaderBougie() {
 export default function Landing() {
   const boutique = useBoutique()
   const popup = useData(getPopup)
+  const produits = useData(getProduits)
   useApparition()
   useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
   const [demo, setDemo] = useState<Lot>()
@@ -377,10 +379,10 @@ export default function Landing() {
               <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique →</a>
             </div>
             <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {[['/site/box.webp', 'Box Assassin\'s Creed IV', '59,90 €', true], ['/site/bougie.webp', 'Bougie Rhum Marin', '24,90 €', false], ['/site/etiquette-pop.webp', 'Bougie Figue Tabacée', 'Bientôt', false]].map(([img, nom, prix, cover]) => (
-                <a key={nom as string} href="/boutique" className="group block">
-                  <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]"><img src={img as string} alt={nom as string} className={`aspect-[4/3] w-full transition duration-700 group-hover:scale-105 ${cover ? 'object-cover' : 'object-contain p-5'}`} /></div>
-                  <p className="mt-3 flex justify-between gap-3"><span className="titre">{nom}</span><span className="font-bold text-flamme">{prix}</span></p>
+              {(produits ?? []).slice(0, 3).map((p) => (
+                <a key={p.id} href="/boutique" className="group block">
+                  <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]"><img src={p.image} alt={p.nom} className={`aspect-[4/3] w-full transition duration-700 group-hover:scale-105 ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-5'}`} /></div>
+                  <p className="mt-3 flex justify-between gap-3"><span className="titre">{p.nom}</span><span className="font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Bientôt'}</span></p>
                 </a>
               ))}
             </div>

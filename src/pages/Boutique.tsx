@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { echangerLot, getBons, getBoutiqueOuverte, getLots, getWallet, type Lot } from '../lib/api'
+import { echangerLot, getBons, getBoutiqueOuverte, getProduits, getLots, getWallet, type Lot } from '../lib/api'
 import { secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
 import { BoutonSentir } from '../components/Sentir'
 import QrCode from '../components/QrCode'
-import { PRODUITS, euros } from './BoutiqueSite'
+import { euros } from './BoutiqueSite'
 
 /** Boutique : on échange ses points contre des lots, récupérés au pop-up store avec un bon. */
 export default function Boutique() {
@@ -14,6 +14,7 @@ export default function Boutique() {
   const lots = useData(getLots, v) ?? []
   const bons = useData(getBons, v) ?? []
   const ouverte = useData(getBoutiqueOuverte) ?? false
+  const PRODUITS = useData(getProduits) ?? []
   const [choixOnglet, setOnglet] = useState<'boutique' | 'recompenses'>()
   const onglet = ouverte ? choixOnglet ?? 'boutique' : 'recompenses'
   const [qr, setQr] = useState<{ code: string; lot: string }>()
@@ -58,7 +59,7 @@ export default function Boutique() {
             {PRODUITS.map((p) => (
               <a key={p.id} href="/boutique-produits" onClick={(e) => e.preventDefault()} className="relative overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
                 <img src={p.image} alt={p.nom} className={`aspect-square w-full bg-white ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-4'}`} />
-                <BoutonSentir id={p.id} nom={p.nom} className="absolute top-1.5 right-1.5 size-16" />
+                <BoutonSentir id={p.id} nom={p.nom} image={p.image} className="absolute top-1.5 right-1.5 size-16" />
                 <div className="p-3"><p className="font-serif text-sm leading-tight font-bold">{p.nom}</p><p className="mt-1 text-sm font-bold text-flamme">{p.dispo ? euros(p.prix) : 'Prochainement'}</p></div>
               </a>
             ))}

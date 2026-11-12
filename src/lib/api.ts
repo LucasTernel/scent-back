@@ -354,3 +354,26 @@ export async function setPopup(p: Popup) {
   const { error } = await supabase.from('reglages').upsert({ cle: 'popup', valeur: p })
   if (error) throw error
 }
+
+/* ---------- Boutique permanente (produits) ---------- */
+export type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean; ordre: number }
+export const PRODUITS_DEFAUT: Produit[] = [
+  { id: 'box-ac4', nom: 'Box Assassin\'s Creed IV Black Flag', detail: 'Le jeu PS5 + la bougie Rhum Marin 140 g, dans l\'écrin en forme de logo.', prix: 59.9, image: '/site/box.webp', dispo: true, ordre: 1 },
+  { id: 'rhum-marin', nom: 'Bougie Rhum Marin', detail: '140 g · cire 100 % végétale · coulée en France. Brûle le temps du jeu.', prix: 24.9, image: '/site/bougie.webp', dispo: true, ordre: 2 },
+  { id: 'figue-tabacee', nom: 'Bougie Figue Tabacée', detail: '70 g · cire 100 % végétale. La prochaine licence de la collection All Stars.', prix: 16.9, image: '/site/etiquette-pop.webp', dispo: false, ordre: 3 },
+]
+export async function getProduits(): Promise<Produit[]> {
+  if (MOCK) return JSON.parse(localStorage.getItem('produits') ?? 'null') ?? PRODUITS_DEFAUT
+  const { data } = await supabase.from('produits').select('*').order('ordre')
+  return data?.length ? data.map((p) => ({ ...p, prix: Number(p.prix) })) : PRODUITS_DEFAUT // table pas encore créée → valeurs d'origine
+}
+export async function enregistrerProduit(p: Produit) {
+  if (MOCK) { const l = (await getProduits()).filter((x) => x.id !== p.id); return localStorage.setItem('produits', JSON.stringify([...l, p].sort((a, b) => a.ordre - b.ordre))) }
+  const { error } = await supabase.from('produits').upsert(p)
+  if (error) throw new Error('Enregistrement impossible : ' + error.message)
+}
+export async function supprimerProduit(id: string) {
+  if (MOCK) return localStorage.setItem('produits', JSON.stringify((await getProduits()).filter((x) => x.id !== id)))
+  const { error } = await supabase.from('produits').delete().eq('id', id)
+  if (error) throw new Error('Suppression impossible : ' + error.message)
+}

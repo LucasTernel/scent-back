@@ -19,7 +19,7 @@ export async function saveSenteur(s: Senteur) {
 }
 const IMAGES: Record<string, string> = { 'rhum-marin': '/site/bougie.webp', 'box-ac4': '/site/box.webp', 'figue-tabacee': '/site/etiquette-pop.webp' }
 
-export function BoutonSentir({ id, nom, className = '' }: { id: string; nom: string; className?: string }) {
+export function BoutonSentir({ id, nom, image, className = '' }: { id: string; nom: string; image?: string; className?: string }) {
   const [s, setS] = useState<Senteur | null>()
   const ouvrir = async (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
@@ -31,7 +31,7 @@ export function BoutonSentir({ id, nom, className = '' }: { id: string; nom: str
       className={`grid size-24 place-items-center rounded-full bg-[#F6D6C8] p-2 text-center text-[#023341] shadow-lg ring-4 ring-white/70 transition hover:scale-105 ${className}`}>
       <span className="leading-tight"><span aria-hidden className="block text-lg">✺</span><span className="block text-[11px]">Cliquez pour</span><span className="titre block text-base">sentir</span></span>
     </button>
-    {s && <Moodboard s={s} image={IMAGES[id]} fermer={() => setS(undefined)} />}
+    {s && <Moodboard s={s} image={image ?? IMAGES[id]} fermer={() => setS(undefined)} />}
   </>
 }
 
