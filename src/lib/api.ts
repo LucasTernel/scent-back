@@ -112,11 +112,18 @@ const mock = {
 
 export const { getStatues, getCollections, getCaptures, getTransactions, getWallet, claimStatue } = MOCK ? mock : sb
 
-export async function getProfile(): Promise<{ username: string; friend_code: string; created_at: string; role: string; email: string }> {
-  if (MOCK) return { username: 'ezio_cretin', friend_code: 'K7Q2', created_at: new Date().toISOString(), role: 'player', email: 'ezio@exemple.fr' }
+export async function getProfile(): Promise<{ username: string; friend_code: string; created_at: string; role: string; email: string; avatar_url: string | null }> {
+  if (MOCK) return { username: 'ezio_cretin', friend_code: 'K7Q2', created_at: new Date().toISOString(), role: 'player', email: 'ezio@exemple.fr', avatar_url: localStorage.getItem('avatar') }
   const { data: { user } } = await supabase.auth.getUser()
-  const { data } = await supabase.from('profiles').select('username, friend_code, created_at, role').eq('id', user!.id).single()
+  const { data } = await supabase.from('profiles').select('username, friend_code, created_at, role, avatar_url').eq('id', user!.id).single()
   return { ...data!, email: user!.email ?? '' }
+}
+/** Avatar choisi (id du catalogue, voir components/Avatar.tsx). */
+export async function setAvatar(avatar: string) {
+  if (MOCK) return localStorage.setItem('avatar', avatar)
+  const { data: { user } } = await supabase.auth.getUser()
+  const { error } = await supabase.from('profiles').update({ avatar_url: avatar }).eq('id', user!.id)
+  if (error) throw new Error('Impossible d\'enregistrer l\'avatar pour le moment.')
 }
 /** Règle du nom de code : renvoie le problème en clair, ou '' si c'est bon. */
 export function verifierPseudo(s: string) {

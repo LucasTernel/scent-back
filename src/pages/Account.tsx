@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { getIdentite, getProfile, getWallet, MOCK, resetMock, setIdentite, setUsername, supabase } from '../lib/api'
+import { getIdentite, getProfile, getWallet, MOCK, resetMock, setAvatar, setIdentite, setUsername, supabase } from '../lib/api'
+import { Avatar, avatarParDefaut, ChoixAvatar } from '../components/Avatar'
 import { useData } from '../lib/useData'
-import { Icon, Lapin } from '../ui'
+import { Icon } from '../ui'
 import { choisirTheme, lireTheme, type Choix } from '../lib/theme'
 
 const Info = ({ k, v }: { k: string; v?: string }) => (
@@ -20,6 +21,8 @@ export default function Account() {
   const [theme, setTheme] = useState(lireTheme)
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
+  const [choix, setChoix] = useState(false)
+  const avatar = p ? p.avatar_url || avatarParDefaut(p.friend_code) : undefined
   const depuis = p && new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
   async function enregistrer(e: FormEvent<HTMLFormElement>) {
@@ -37,7 +40,10 @@ export default function Account() {
   return (
     <div className="flex flex-col gap-5">
       <header className="monte flex items-center gap-3.5">
-        <span className="grid size-[60px] shrink-0 place-items-end justify-center overflow-hidden rounded-full bg-creme-2"><Lapin className="w-11 translate-y-1" /></span>
+        <button onClick={() => setChoix(true)} aria-label="Changer d'avatar" className="relative shrink-0">
+          {avatar ? <Avatar id={avatar} className="size-[64px]" /> : <span className="block size-[64px] rounded-[22%] bg-creme-2" />}
+          <span aria-hidden className="absolute -right-1 -bottom-1 grid size-6 place-items-center rounded-full bg-flamme text-encre"><Icon name="plus" size={14} /></span>
+        </button>
         <div className="min-w-0 flex-1">
           <h1 className="titre truncate text-[24px]">{p?.username ?? '…'}</h1>
           <p className="text-xs text-doux">Membre depuis le {depuis}</p>
@@ -46,6 +52,9 @@ export default function Account() {
           ? <span className="rounded-full bg-flamme px-3 py-1 text-xs font-bold">ADMIN</span>
           : <p className="text-right"><span className="titre block text-[26px] text-flamme">{w?.total ?? 0}</span><span className="text-[11px] font-bold text-doux">POINTS</span></p>}
       </header>
+
+      {choix && avatar && <ChoixAvatar actuel={avatar} fermer={() => setChoix(false)}
+        choisir={async (id) => { try { await setAvatar(id); setV(v + 1); setChoix(false) } catch (err) { setMsg((err as Error).message); setChoix(false) } }} />}
 
       {msg && <p role="status" className="rounded-2xl bg-flamme/12 px-4 py-3 text-sm font-medium">{msg}</p>}
 
