@@ -1,8 +1,8 @@
 /** Textes légaux : utilisés par l'appli ET par scripts/legal-statique.mjs (pages HTML lisibles sans JavaScript). */
 // ponytail: textes types pour le prototype étudiant, à faire relire avant toute vraie mise en ligne
-export const pages: Record<string, { titre: string; sections: [string, string][] }> = {
+export const pages: Record<string, { titre: string; court: string; intro: string; sections: [string, string][] }> = {
   mentions: {
-    titre: 'Mentions légales',
+    titre: 'Mentions légales', court: 'Mentions', intro: 'Qui édite Scent Back, qui l\'héberge, et dans quel cadre il a été conçu.',
     sections: [
       ['Éditeur', 'Lucas TERNEL — BUT MMI 3, parcours Développement web (WEB).\nResponsable de la publication : Lucas TERNEL.'],
       ['Cadre du projet', 'Scent Back est réalisé dans le cadre d\'une SAE (situation d\'apprentissage et d\'évaluation) de 3ᵉ année de BUT Métiers du Multimédia et de l\'Internet.\n\nLe projet imagine une collaboration fictive entre Ubisoft (Assassin\'s Creed × The Lapins Crétins) et la marque de bougies La Belle Mèche : une identité de marque (Scent Back), des bougies et coffrets, un pop-up store parisien, et cette application de chasse urbaine où les joueurs retrouvent des statuettes équipées de puces NFC.\n\nProjet pédagogique, non commercial.'],
@@ -14,7 +14,7 @@ export const pages: Record<string, { titre: string; sections: [string, string][]
     ],
   },
   conditions: {
-    titre: 'Conditions d\'utilisation',
+    titre: 'Conditions générales d\'utilisation', court: 'CGU', intro: 'Les règles du jeu : ce que l\'on peut faire avec l\'appli Scent Back, et ce que l\'on ne peut pas faire.',
     sections: [
       ['Objet', 'Les présentes conditions encadrent l\'utilisation de Scent Back, application de chasse urbaine réalisée dans le cadre d\'une SAE du BUT MMI. En créant un compte, tu les acceptes.'],
       ['Compte', 'L\'inscription se fait par e-mail ou avec un compte Google. Tu choisis un nom de code : il doit rester correct (pas d\'insulte, pas d\'usurpation d\'identité). Tu es responsable de la confidentialité de ton mot de passe.'],
@@ -27,8 +27,22 @@ export const pages: Record<string, { titre: string; sections: [string, string][]
       ['Contact', 'Pour toute question : Lucas TERNEL, éditeur de l\'application (voir les mentions légales).'],
     ],
   },
+  cgv: {
+    titre: 'Conditions générales de vente', court: 'CGV', intro: 'Les conditions qui s\'appliquent aux réservations faites sur la boutique Scent Back.',
+    sections: [
+      ['Boutique de démonstration', 'Scent Back est un projet étudiant pédagogique. La boutique en ligne est une démonstration : aucune commande n\'est facturée, aucun paiement n\'est demandé et aucune coordonnée bancaire n\'est collectée.'],
+      ['Produits', '• Box Assassin\'s Creed IV Black Flag : le jeu, la bougie Rhum Marin 140 g et l\'écrin.\n• Bougie Rhum Marin, 140 g de cire végétale.\n• Bougie Figue Tabacée, 70 g (prochainement).\nLes visuels sont non contractuels.'],
+      ['Prix', 'Les prix sont affichés en euros, toutes taxes comprises. Ils sont indicatifs dans le cadre de ce prototype.'],
+      ['Réservation', 'Ajoutez vos produits au panier puis validez : un numéro de réservation vous est attribué. Il ne s\'agit pas d\'un contrat de vente.'],
+      ['Retrait', 'Les réservations se retirent au pop-up store Ubisoft × La Belle Mèche, à Paris, à partir du 13 novembre 2027. Le lieu sera communiqué prochainement.'],
+      ['Lots de l\'application', 'Les lots obtenus avec les points de la chasse (autocollants, tote bag, bougies…) sont gratuits, dans la limite des stocks, et se retirent au pop-up sur présentation du bon.'],
+      ['Droit de rétractation', 'Aucune vente n\'étant conclue, le droit de rétractation ne s\'applique pas. Dans une version commerciale, vous disposeriez de 14 jours pour vous rétracter (Code de la consommation, art. L221-18).'],
+      ['Sécurité des bougies', 'Ne laissez jamais une bougie allumée plus de 3 à 4 heures d\'affilée, ni sans surveillance. Tenez-la hors de portée des enfants et des animaux, sur un support stable et loin de tout objet inflammable.'],
+      ['Contact', 'Pour toute question : Lucas TERNEL, éditeur de Scent Back (voir les mentions légales).'],
+    ],
+  },
   confidentialite: {
-    titre: 'Politique de confidentialité',
+    titre: 'Politique de confidentialité', court: 'Confidentialité', intro: 'Quelles données nous collectons, pourquoi, combien de temps, et comment exercer vos droits.',
     sections: [
       ['Qui est responsable de tes données ?', 'Le responsable du traitement est Lucas TERNEL, éditeur de Scent Back, application réalisée dans le cadre d\'une SAE du BUT MMI (projet pédagogique, non commercial).\nContact : lucas.ternel62@gmail.com\nDernière mise à jour : novembre 2026.'],
       ['Données que nous collectons', '• Compte : adresse e-mail, nom de code (pseudo), mot de passe chiffré si tu t\'inscris par e-mail.\n• Profil (facultatif) : prénom et nom.\n• Jeu : statuettes capturées, date de capture, points gagnés, historique des points.\n• Photos : la photo prise au moment d\'une capture.\n• Position GPS : uniquement au moment d\'une capture (latitude, longitude), pour vérifier que tu es bien sur place.\n• Technique : journaux de connexion conservés par nos prestataires pour la sécurité.'],
@@ -44,7 +58,7 @@ export const pages: Record<string, { titre: string; sections: [string, string][]
     ],
   },
   cookies: {
-    titre: 'Gestion des cookies',
+    titre: 'Gestion des cookies', court: 'Cookies', intro: 'Ce que Scent Back stocke sur votre appareil, et comment changer vos choix.',
     sections: [
       ['Ce qu\'on utilise', 'Aucun cookie publicitaire ni outil de mesure d\'audience. Seulement un stockage local strictement nécessaire : ta session de connexion et tes préférences (dont ce choix).'],
       ['Position en temps réel', 'Utilisée pour le radar, seulement si tu l\'autorises. Tu peux changer d\'avis ci-dessous. Pense aussi à vérifier l\'autorisation dans les réglages de ton navigateur.'],

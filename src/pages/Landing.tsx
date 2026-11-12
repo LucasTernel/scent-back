@@ -7,7 +7,7 @@ import Scene3D from '../components/Scene3D'
 import { choisirTaille, choisirTheme, lireTaille, lireTheme, type Choix } from '../lib/theme'
 
 const ADRESSE = 'scent-back.lucasternel.com'
-const LEGAL = [['mentions', 'Mentions légales'], ['conditions', 'Conditions d\'utilisation'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
+const LEGAL = [['mentions', 'Mentions légales'], ['conditions', 'CGU'], ['cgv', 'CGV'], ['confidentialite', 'Confidentialité'], ['cookies', 'Cookies']]
 
 const ETAPES_OS: [string, string, string[]][] = [
   ['iPhone', 'Safari', ['Scanne le QR code ou ouvre ' + ADRESSE + ' dans Safari', 'Touche le bouton Partager (le carré avec une flèche)', 'Choisis « Sur l\'écran d\'accueil », puis « Ajouter »']],
