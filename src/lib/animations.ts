@@ -28,16 +28,21 @@ export async function lancerAnimations(racine: HTMLElement) {
     if (cible) { e.preventDefault(); lenis.scrollTo(cible as HTMLElement, { offset: -20 }) }
   }
   racine.addEventListener('click', ancres)
-  // Visite automatique : la page défile seule à travers l'expérience 3D ; molette / touche = on reprend la main
+  // Visite automatique : démarre au premier défilement en haut de page ; molette/touche = arrêt pour toute la session
+  const stoppee = () => { try { return sessionStorage.getItem('visite-stop') === '1' } catch { return false } }
+  let enCours = false
   const visite = () => {
     const exp = document.querySelector<HTMLElement>('[data-experience]')
-    if (!exp) return
+    if (!exp || enCours || stoppee()) return
+    enCours = true
     const fin = exp.offsetTop + exp.offsetHeight - innerHeight
-    lenis.scrollTo(fin, { duration: Math.max(8, (fin - scrollY) / 280), easing: (t: number) => t })
-    const stop = () => { lenis.scrollTo(scrollY, { immediate: true }); removeEventListener('wheel', stop); removeEventListener('keydown', stop) }
-    addEventListener('wheel', stop, { once: true }); addEventListener('keydown', stop, { once: true })
+    lenis.scrollTo(fin, { duration: Math.max(10, (fin - scrollY) / 260), easing: (t: number) => t, onComplete: () => { enCours = false } })
+    const stop = () => { if (!enCours) return; enCours = false; lenis.scrollTo(scrollY, { immediate: true }); try { sessionStorage.setItem('visite-stop', '1') } catch { /* rien */ } }
+    setTimeout(() => { addEventListener('wheel', stop, { once: true }); addEventListener('keydown', stop, { once: true }); addEventListener('touchstart', stop, { once: true }) }, 900)
   }
-  addEventListener('visite-auto', visite)
+  const premier = () => { if (scrollY < innerHeight * .5) visite() }
+  addEventListener('wheel', premier, { once: true })
+  addEventListener('visite-auto', () => { try { sessionStorage.removeItem('visite-stop') } catch { /* rien */ } visite() })
 
   const ctx = gsap.context(() => {
     // Titres lettre par lettre (découpe toujours depuis le HTML d'origine : sûr même si l'effet est relancé)
@@ -92,6 +97,15 @@ export async function lancerAnimations(racine: HTMLElement) {
       el.dataset.origine ??= el.textContent ?? ''
       el.replaceChildren(...el.dataset.origine.split(/(\s+)/).map((m) => { const s = document.createElement('span'); s.textContent = m; if (m.trim()) s.className = 'mot'; return s }))
       gsap.fromTo(el.querySelectorAll('.mot'), { opacity: .14 }, { opacity: 1, stagger: .08, ease: 'none', scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true } })
+    })
+    // La box : la photo s'ouvre en plein écran, le titre géant s'efface, puis les 3 éléments arrivent
+    racine.querySelectorAll<HTMLElement>('[data-box]').forEach((sec) => {
+      const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top top', end: 'bottom bottom', scrub: .6 } })
+      tl.to(sec.querySelector('[data-box-img]'), { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'power2.inOut', duration: 1 })
+        .to(sec.querySelector('[data-box-titre]'), { scale: 1.6, opacity: 0, ease: 'power2.in', duration: .7 }, 0)
+        .to(sec.querySelector('[data-box-voile]'), { opacity: 1, duration: .4 }, .7)
+        .to(sec.querySelectorAll('[data-box-item]'), { opacity: 1, y: 0, stagger: .15, duration: .4 }, .9)
+        .from(sec.querySelectorAll('[data-box-item]'), { y: 40, stagger: .15, duration: .4 }, .9)
     })
     // Mots géants qui glissent en sens opposés au défilement (hors section lapin)
     racine.querySelectorAll<HTMLElement>('[data-glisse]').forEach((el, i) => {
