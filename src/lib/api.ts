@@ -31,8 +31,11 @@ const sb = {
   async getCaptures(): Promise<Capture[]> {
     const { data } = await supabase.from('captures').select('statue_id, photo_path, created_at')
     if (!data?.length) return []
-    const { data: urls } = await supabase.storage.from('captures').createSignedUrls(data.map((c) => c.photo_path), 3600)
-    return data.map((c, i) => ({ statueId: c.statue_id, photo: urls?.[i]?.signedUrl ?? undefined, createdAt: c.created_at }))
+    // captures sans photo (ex. données de démo) : pas d'URL signée à demander
+    const chemins = data.map((c) => c.photo_path).filter(Boolean) as string[]
+    const { data: urls } = chemins.length ? await supabase.storage.from('captures').createSignedUrls(chemins, 3600) : { data: [] }
+    const url = (p: string | null) => urls?.find((u) => u.path === p)?.signedUrl ?? undefined
+    return data.map((c) => ({ statueId: c.statue_id, photo: url(c.photo_path), createdAt: c.created_at }))
   },
   async getTransactions(): Promise<Tx[]> {
     const { data } = await supabase.from('point_transactions').select('amount, source, note, created_at').order('created_at')
