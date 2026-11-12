@@ -306,9 +306,9 @@ export default function Landing() {
           </div></section>
         </div>
 
-        {/* La suite : des cartes plein écran qui se superposent en remontant (sticky), comme des pages qu'on empile */}
-        <div className="relative z-10">
-          <section className="sticky top-0 h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
+        {/* La suite : un chapitre = un écran, chacun avec sa propre animation */}
+        <div className="relative z-10 bg-[#011A22]">
+          <section className="relative h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
             <img data-parallax="-.1" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 h-[115%] w-full object-cover opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#011A22] via-[#011A22]/70 to-transparent" />
             <div className="relative flex h-full max-w-[min(60rem,55vw)] flex-col justify-center px-[8vw]">
