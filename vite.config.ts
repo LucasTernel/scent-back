@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: false, // enregistré dans main.tsx
       workbox: { clientsClaim: true, skipWaiting: true, cleanupOutdatedCaches: true },
-      includeAssets: ['favicon.ico', 'favicon-16.png', 'favicon-32.png', 'apple-touch-icon.png', 'og-image.png', 'logo-blanc.png', 'logo-bleu.png'],
+      includeAssets: ['favicon.ico', 'favicon-16.png', 'favicon-32.png', 'apple-touch-icon.png', 'og-image.png', 'logo-blanc.png', 'logo-bleu.png', 'logo-orange.png'],
       manifest: {
         name: 'Scent Back',
         short_name: 'Scent Back',

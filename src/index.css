@@ -131,7 +131,7 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
    #FF7722 sur crème = 2,4:1 (insuffisant) → texte orange foncé #B8470D (4,9:1) sur fond clair.
    Sur fond bleu, l'orange vif reste (5,1:1). Les boutons / fonds orange ne changent pas. */
 [data-theme=clair] .text-flamme { color: #B8470D; }
-[data-theme=clair] :is(.bg-encre, [class*="bg-[#023341]"]) .text-flamme,
+[data-theme=clair] :is(.bg-encre, [class*="bg-[#023341]"], [class*="bg-[#011A22]"]) .text-flamme,
 [data-theme=sombre] .text-flamme { color: #FF7722; }
 [data-theme=sombre] .bg-encre .text-flamme { color: #B8470D; }
 
@@ -144,3 +144,27 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .socle { width: 58cqw; height: 13cqw; border-radius: 50%; border: 2px solid var(--c); pointer-events: none;
   box-shadow: 0 0 34px 6px color-mix(in srgb, var(--c) 55%, transparent), inset 0 0 18px color-mix(in srgb, var(--c) 70%, transparent);
   background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 35%, transparent), transparent); }
+
+/* ---------- Site vitrine (desktop) : storytelling ---------- */
+/* apparition au défilement (data-vu ajouté par IntersectionObserver) */
+.apparait { opacity: 0; translate: 0 34px; transition: opacity .9s cubic-bezier(.2,.8,.2,1), translate .9s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+.apparait[data-vu] { opacity: 1; translate: 0 0; }
+/* flamme vivante */
+.flamme-vive { transform-origin: 50% 100%; animation: vacille 2.6s ease-in-out infinite; filter: drop-shadow(0 0 18px #FFB34788) drop-shadow(0 0 46px #FF772255); }
+@keyframes vacille { 0%,100% { transform: scale(1, 1) rotate(-1deg); } 25% { transform: scale(.94, 1.07) rotate(1.5deg); } 50% { transform: scale(1.04, .95) rotate(-.5deg); } 75% { transform: scale(.97, 1.04) rotate(1deg); } }
+.halo-vif { animation: respire 3.4s ease-in-out infinite; }
+@keyframes respire { 50% { opacity: .65; transform: scale(1.08); } }
+.indice-scroll { animation: descend 1.8s ease-in-out infinite; }
+@keyframes descend { 50% { translate: 0 8px; opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .apparait { opacity: 1; translate: none; transition: none; } }
+
+/* ---------- Site vitrine v2 : langage « étiquette » (forme des étiquettes Scent Back) ---------- */
+.etiquette { position: relative; padding-top: var(--arche, 2.6rem); }
+.etiquette > .etq-arche { position: absolute; top: 0; left: 50%; translate: -50% 0; width: var(--larg, 38%); height: calc(var(--arche, 2.6rem) + 6px);
+  border: var(--trait, 4px) solid var(--etq, #023341); border-bottom: 0; border-radius: 999px 999px 0 0; background: var(--fond, #FCF5E3); z-index: 1; }
+.etiquette > .etq-corps { border: var(--trait, 4px) solid var(--etq, #023341); border-radius: 18px; background: var(--fond, #FCF5E3); height: 100%; }
+/* bandeau qui défile */
+.defile { display: flex; width: max-content; animation: defile 38s linear infinite; }
+@keyframes defile { to { translate: -50% 0; } }
+.chiffre-contour { color: transparent; -webkit-text-stroke: 2px currentColor; }
+@media (prefers-reduced-motion: reduce) { .defile { animation: none; } }

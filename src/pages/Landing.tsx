@@ -65,7 +65,7 @@ function Accessibilite() {
   return (
     <div ref={zone} className="relative">
       <button onClick={() => setOuvert(!ouvert)} aria-expanded={ouvert} aria-controls="panneau-a11y"
-        className="flex items-center gap-2 rounded-full border-[1.5px] border-trait px-4 py-2.5 text-sm font-bold transition hover:border-encre">
+        className="flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-trait px-4 text-sm font-bold transition hover:border-encre">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="4.5" r="1.8" /><path d="M5 8.5l7 1.5 7-1.5M12 10v5m0 0l-3.5 6M12 15l3.5 6" /></svg>
         Accessibilité
       </button>
@@ -102,11 +102,11 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-creme text-encre">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-encre focus:px-5 focus:py-3 focus:text-creme">Aller au contenu</a>
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-5 pb-1 md:px-8">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b-2 border-encre px-5 py-3 md:px-8">
         <a href="/" aria-label="Accueil Scent Back" className="block h-16 w-36 overflow-hidden"><LogoMarque className="h-full w-full scale-[2] object-contain" /></a>
         <div className="flex items-center gap-2">
         <Accessibilite />
-        <button onClick={() => setTuto(true)} className="flex items-center gap-2 rounded-full bg-[#023341] px-4 py-2.5 text-sm font-bold text-[#FCF5E3] shadow-md transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
+        <button onClick={() => setTuto(true)} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-[#023341] px-4 text-sm font-bold text-[#FCF5E3] transition hover:bg-[#0E4D61] md:px-5 dark:bg-flamme dark:text-[#023341] dark:hover:bg-flamme"><Icon name="nfc" size={18} />Installer l'appli</button>
         </div>
       </header>
       <div className="flex-1">{children}</div>
@@ -123,93 +123,312 @@ export function SiteDesktop({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Accueil sur ordinateur : Scent Back se joue dans la rue, donc on invite à passer sur mobile. */
+/* ---------- Effets ---------- */
+/** Ajoute data-vu aux éléments .apparait quand ils entrent à l'écran. */
+function useApparition() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.apparait')
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.setAttribute('data-vu', ''); io.unobserve(e.target) } }), { threshold: .15 })
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  })
+}
+/** Progression (0 → 1) du défilement à travers un élément. */
+function useProgression() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [p, setP] = useState(0)
+  useEffect(() => {
+    let raf = 0
+    const calc = () => { raf = 0; const r = ref.current?.getBoundingClientRect(); if (!r) return; setP(Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)))) }
+    const surDefil = () => { if (!raf) raf = requestAnimationFrame(calc) }
+    calc(); addEventListener('scroll', surDefil, { passive: true }); addEventListener('resize', surDefil)
+    return () => { removeEventListener('scroll', surDefil); removeEventListener('resize', surDefil); cancelAnimationFrame(raf) }
+  }, [])
+  return [ref, p] as const
+}
+
+/** Bougie dessinée : pot en verre, cire qui baisse avec `cire` (1 → 0), flamme vivante. */
+function Bougie({ cire = 1, className = '' }: { cire?: number; className?: string }) {
+  const h = 30 + cire * 150 // hauteur de cire dans le pot
+  const eteinte = cire <= 0.02
+  return (
+    <svg viewBox="0 0 220 330" className={className} role="img" aria-label={eteinte ? 'Bougie consumée' : `Bougie, ${Math.round(cire * 100)} % de cire restante`}>
+      <defs>
+        <linearGradient id="verre" x1="0" x2="1"><stop offset="0" stopColor="#ffffff" stopOpacity=".25" /><stop offset=".5" stopColor="#ffffff" stopOpacity=".06" /><stop offset="1" stopColor="#ffffff" stopOpacity=".22" /></linearGradient>
+        <linearGradient id="cire" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#FFF6E0" /><stop offset="1" stopColor="#E9DCC0" /></linearGradient>
+        <radialGradient id="flamme" cx=".5" cy=".75" r=".7"><stop offset="0" stopColor="#FFF4C2" /><stop offset=".45" stopColor="#FFC24A" /><stop offset="1" stopColor="#FF7722" /></radialGradient>
+      </defs>
+      <rect x="30" y="300 " width="160" height="6" rx="3" fill="#000" opacity=".25" />
+      <rect x="40" y={300 - h} width="140" height={h} fill="url(#cire)" />
+      {!eteinte && <g transform={`translate(110 ${300 - h})`}>
+        <line x1="0" y1="0" x2="0" y2="-14" stroke="#2A1D12" strokeWidth="3" strokeLinecap="round" />
+        <path className="flamme-vive" d="M0 -12 C 14 -30, 10 -52, 0 -72 C -10 -52, -14 -30, 0 -12 Z" fill="url(#flamme)" />
+      </g>}
+      {eteinte && <path d={`M110 ${286} q 6 -20 -2 -40 q -8 -18 4 -36`} stroke="#ffffff55" strokeWidth="3" fill="none" strokeLinecap="round" />}
+      <rect x="34" y="96" width="152" height="208" rx="18" fill="url(#verre)" stroke="#ffffff40" strokeWidth="2" />
+      <rect x="62" y="170" width="96" height="86" rx="10" fill="#FCF5E3" stroke="#023341" strokeWidth="4" />
+      <text x="110" y="205" textAnchor="middle" fontFamily="Outfit, sans-serif" fontSize="15" fill="#023341">RHUM</text>
+      <text x="110" y="225" textAnchor="middle" fontFamily="Outfit, sans-serif" fontSize="15" fill="#023341">MARIN</text>
+      <rect x="96" y="236" width="28" height="3" rx="1.5" fill="#023341" />
+    </svg>
+  )
+}
+
+/** Cadre en forme d'étiquette Scent Back (arche en haut, contour épais). */
+function Etiquette({ children, couleur = '#023341', fond = '#FCF5E3', larg = '38%', arche = '2.6rem', className = '', corps = '' }: {
+  children: React.ReactNode; couleur?: string; fond?: string; larg?: string; arche?: string; className?: string; corps?: string
+}) {
+  return (
+    <div className={`etiquette ${className}`} style={{ ['--etq' as string]: couleur, ['--fond' as string]: fond, ['--larg' as string]: larg, ['--arche' as string]: arche }}>
+      <span aria-hidden className="etq-arche" />
+      <div className={`etq-corps ${corps}`}>{children}</div>
+    </div>
+  )
+}
+/** En-tête de chapitre : numéro + filet + intitulé, façon magazine. */
+const Chapitre = ({ n, titre, clair = false }: { n: string; titre: string; clair?: boolean }) => (
+  <div className={`apparait flex items-center gap-4 text-xs font-bold tracking-[.22em] uppercase ${clair ? 'text-[#FCF5E3]/70' : 'text-doux'}`}>
+    <span className="font-serif text-flamme">{n}</span><span aria-hidden className={`h-px flex-1 ${clair ? 'bg-[#FCF5E3]/25' : 'bg-trait'}`} /><span>{titre}</span>
+  </div>
+)
+const Bandeau = ({ mots }: { mots: string[] }) => (
+  <div aria-hidden className="overflow-hidden border-y-2 border-[#023341] bg-flamme py-3 text-[#023341]">
+    <div className="defile">{[0, 1].map((k) => <span key={k} className="flex shrink-0">{mots.map((m) => <span key={m} className="titre px-6 text-xl whitespace-nowrap">{m} <span className="pl-6">✦</span></span>)}</span>)}</div>
+  </div>
+)
+
+/** Site vitrine sur ordinateur : l'histoire de Scent Back, chapitre par chapitre. */
 export default function Landing() {
+  useApparition()
+  useEffect(() => { if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50) }, []) // liens /#boutique, /#box…
   const lots = useData(getLots) ?? []
   const [demo, setDemo] = useState<Lot>()
-  const etapes = [
-    ['01', 'Traque', 'Un radar suit ta position et fait vibrer ton téléphone de plus en plus vite quand une statuette est proche.'],
-    ['02', 'Scanne', 'Approche ton téléphone de la puce NFC cachée sous la statuette : elle apparaît dans un flash.'],
-    ['03', 'Collectionne', 'Chaque capture devient une carte. Complète les collections et gagne des points pour le pop-up store.'],
+  const [refDefi, p] = useProgression()
+  const etapesDefi = [
+    ['Allumez', 'Installez-vous dans une lumière douce, allumez la mèche et respirez : l\'ambiance revient avant même que l\'écran s\'allume.'],
+    ['Jouez', 'Elle compte le temps avec vous. Plus la cire fond, plus la fin approche.'],
+    ['Sauvegardez', 'Éteignez-la à la fin de chaque partie et rallumez-la à la suivante : elle vous attend comme une sauvegarde.'],
+    ['Gagnez', 'Si vous finissez l\'aventure avant la dernière goutte de cire, c\'est gagné.'],
   ]
+  const etape = Math.min(etapesDefi.length - 1, Math.floor(p * etapesDefi.length))
+  const sommaire = [['01', 'Le sens manquant', '#sens'], ['02', 'La box', '#box'], ['03', 'Le défi', '#defi'], ['04', 'La chasse', '#chasse'], ['05', 'La boutique', '#boutique']]
 
   return (
     <SiteDesktop>
-
-      {/* Héros : texte + QR à gauche, aperçu réel de l'appli à droite */}
-      <main id="contenu" className="mx-auto grid max-w-6xl items-center gap-12 px-5 pt-8 pb-16 md:gap-16 md:px-8 md:pt-10 md:pb-20 lg:grid-cols-[1.1fr_.9fr]">
-        <section className="monte flex flex-col gap-6">
-          <p className="w-fit rounded-full bg-encre px-4 py-1.5 text-xs font-bold tracking-[.16em] text-creme">UBISOFT × LA BELLE MÈCHE · POP-UP PARIS</p>
-          <h1 className="titre text-[clamp(2.6rem,5vw,4.4rem)] leading-[1.02]">La chasse est ouverte.<br /><span className="text-flamme">Sur ton téléphone.</span></h1>
-          <p className="max-w-xl text-lg leading-relaxed text-doux">
-            Des lapins encapuchonnés se cachent dans Paris. Scent Back se joue dans la rue : radar, vibrations, puces NFC et appareil photo. Tout ce qu'un ordinateur n'a pas.
-          </p>
-
-          <div className="mt-2 flex flex-col items-start gap-5 rounded-[28px] border-[1.5px] border-trait bg-papier p-5 sm:flex-row sm:items-center sm:gap-6 sm:pr-8 shadow-[0_6px_0_var(--color-trait)]">
-            <img src="/qr-app.svg" alt={`QR code qui ouvre ${ADRESSE} sur ton téléphone`} className="size-36 shrink-0 rounded-2xl bg-[#FCF5E3] p-2" />
-            <div className="flex flex-col gap-2">
-              <p className="font-serif text-xl font-bold">Scanne pour jouer</p>
-              <p className="text-sm leading-relaxed text-doux">Ouvre l'appareil photo de ton téléphone et vise le code. Ou tape l'adresse :</p>
-              <p className="w-fit rounded-full bg-creme-2 px-3 py-1 font-mono text-sm font-bold">{ADRESSE}</p>
-            </div>
+      <main id="contenu">
+        {/* Ouverture : grand titre + sommaire à gauche, la box dans une arche à droite */}
+        <section className="mx-auto grid max-w-6xl gap-12 px-5 pt-10 pb-20 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-end">
+          <div className="flex flex-col gap-8">
+            <p className="apparait text-sm font-bold tracking-[.22em] text-doux uppercase">Ubisoft <span className="text-flamme">×</span> La Belle Mèche</p>
+            <h1 className="apparait titre text-[clamp(3.4rem,8vw,7.2rem)] leading-[.88] tracking-tight">Fermez<br />les yeux<span className="text-flamme">.</span></h1>
+            <p className="apparait max-w-md text-xl leading-relaxed">Ces mondes, vous les avez parcourus pendant des heures. Vous les connaissez par cœur… <b>et pourtant, vous ne les avez jamais sentis.</b></p>
+            <nav aria-label="Chapitres" className="apparait mt-2 border-t-2 border-encre">
+              {sommaire.map(([n, l, h]) => (
+                <a key={n} href={h} className="group flex items-center gap-5 border-b border-trait py-3.5 transition hover:pl-2">
+                  <span className="font-serif text-sm font-bold text-flamme">{n}</span>
+                  <span className="flex-1 text-lg font-medium">{l}</span>
+                  <span aria-hidden className="text-doux transition group-hover:translate-x-1 group-hover:text-encre">→</span>
+                </a>
+              ))}
+            </nav>
           </div>
-
-          <a href="#boutique" className="flex w-fit items-center gap-2 font-bold text-encre underline-offset-4 hover:underline"><Icon name="boutique" size={20} />Voir la boutique et ses lots ↓</a>
+          <div className="apparait relative" style={{ ['--d' as string]: '.15s' }}>
+            <div className="overflow-hidden rounded-t-full border-4 border-encre bg-white">
+              <img src="/site/bougie.webp" alt="La bougie Scent Back Rhum Marin, 140 g de cire 100 % végétale, avec son étiquette en arche" className="aspect-[4/5] w-full object-contain px-6 pt-16" />
+            </div>
+            <p className="mt-3 flex justify-between text-xs font-bold tracking-[.18em] text-doux uppercase"><span>Fig. 1 — Rhum Marin</span><span>140 g · cire végétale</span></p>
+          </div>
         </section>
 
-        <div className="monte relative mx-auto hidden lg:block" style={{ animationDelay: '.15s' }} aria-hidden>
-          <div className="absolute -inset-10 -z-10 rounded-full bg-flamme/20 blur-3xl" />
-          <div className="rounded-[54px] bg-encre p-3 shadow-2xl ring-1 ring-trait">
-            <div className="relative h-[675px] w-[312px] overflow-hidden rounded-[44px] bg-creme">
-              {/* l'appli elle-même, à taille de téléphone */}
-              <iframe src="/?mobile=1" title="Aperçu de Scent Back" tabIndex={-1} className="pointer-events-none absolute top-0 left-0 h-[844px] w-[390px] origin-top-left scale-[.8] border-0" />
+        <Bandeau mots={['Rhum Marin', 'Assassin\'s Creed IV', '140 g', 'Cire 100 % végétale', 'Coulée en France', 'Pop-up Paris']} />
+
+        {/* 01 — Le sens manquant : un tableau, pas des cartes */}
+        <section id="sens" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
+          <Chapitre n="01" titre="Le sens manquant" />
+          <h2 className="apparait titre mt-10 max-w-4xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Dans un jeu, on voit et on entend le monde. On ne le sent jamais.</h2>
+          <dl className="mt-16 border-t-2 border-encre">
+            {[['Voir', 'L\'image', 'Ubisoft', true], ['Entendre', 'Le son', 'Ubisoft', true], ['Sentir', 'L\'odeur', 'La Belle Mèche', false]].map(([verbe, sens, qui, deja], i) => (
+              <div key={verbe as string} className={`apparait grid grid-cols-[1fr_auto] items-baseline gap-6 border-b border-trait py-7 md:grid-cols-[180px_1fr_auto] ${deja ? '' : 'bg-flamme/10 px-4 -mx-4'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
+                <dt className="titre text-4xl md:text-5xl">{verbe as string}</dt>
+                <dd className="hidden text-lg text-doux md:block">{sens as string}</dd>
+                <dd className={`text-right text-sm font-bold tracking-[.16em] uppercase ${deja ? 'text-doux' : 'text-flamme'}`}>{deja ? `✓ ${qui}` : `Le sens manquant — ${qui}`}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="apparait mt-12 ml-auto max-w-xl text-xl leading-relaxed">Ubisoft fait voyager par l'image et le son. La Belle Mèche, par l'odeur et la lumière. Scent Back réunit les deux et ajoute ce qui manquait : <b>l'odorat.</b></p>
+        </section>
+
+        {/* 02 — La box : photo pleine largeur + légendes en colonnes */}
+        <section id="box" className="bg-[#011A22] text-[#FCF5E3]">
+          <div className="mx-auto max-w-6xl px-5 pt-28 md:px-8">
+            <Chapitre n="02" titre="La box" clair />
+            <h2 className="apparait titre mt-10 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Un jeu culte. Une bougie qui a l'odeur de son monde.</h2>
+          </div>
+          <div className="mx-auto max-w-6xl px-5 md:px-8">
+            <img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" className="apparait mt-14 w-full rounded-[18px] border-4 border-[#FCF5E3]/15" />
+          </div>
+          <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-3 md:px-8">
+            {[['Le jeu', 'Assassin\'s Creed IV Black Flag. La piraterie, les Caraïbes, le pont du Jackdaw.'], ['La bougie', 'Rhum Marin. 140 g de cire 100 % végétale, coulée en France par La Belle Mèche.'], ['L\'écrin', 'Une box en forme de logo Assassin\'s Creed, faite pour rester sur le bureau.']].map(([k, v], i) => (
+              <div key={k} className="apparait border-t-2 border-flamme pt-5" style={{ ['--d' as string]: `${i * .1}s` }}>
+                <p className="text-xs font-bold tracking-[.2em] text-flamme uppercase">Fig. 2.{i + 1}</p>
+                <p className="titre mt-2 text-2xl">{k}</p>
+                <p className="mt-2 leading-relaxed text-[#FCF5E3]/70">{v}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 03 — Le défi : la cire fond au fil du défilement, règle graduée en heures */}
+        <section id="defi" ref={refDefi} className="relative h-[300vh] bg-creme" aria-labelledby="titre-defi">
+          <div className="sticky top-0 flex h-dvh flex-col justify-center overflow-hidden">
+            <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
+              <Chapitre n="03" titre="Le défi" />
+              <div className="mt-10 grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr]">
+                <Etiquette className="mx-auto w-full max-w-[300px]" corps="p-6 pt-4" larg="44%">
+                  <Bougie cire={1 - p} className="mx-auto w-44" />
+                  <p className="mt-3 text-center text-xs font-bold tracking-[.18em] text-doux uppercase">Rhum Marin — {Math.round((1 - p) * 140)} g</p>
+                </Etiquette>
+                <div>
+                  <h2 id="titre-defi" className="titre text-[clamp(2rem,4vw,3.4rem)] leading-[1.02]">Finirez-vous le jeu avant la dernière goutte ?</h2>
+                  <p className="mt-4 max-w-xl text-lg leading-relaxed text-doux">Le poids de la bougie est calculé au plus juste pour brûler pendant toute la durée du jeu.</p>
+                  <ol className="mt-8 border-t-2 border-encre">
+                    {etapesDefi.map(([t, d], i) => (
+                      <li key={t} className={`border-b border-trait py-4 transition-opacity duration-500 ${i === etape ? '' : 'opacity-35'}`}>
+                        <p className="flex items-baseline gap-4"><span className="font-serif text-sm font-bold text-flamme">0{i + 1}</span><span className="titre text-2xl">{t}</span></p>
+                        <p className={`overflow-hidden pl-9 leading-relaxed text-doux transition-all duration-500 ${i === etape ? 'mt-2 max-h-24' : 'max-h-0'}`}>{d}</p>
+                      </li>
+                    ))}
+                  </ol>
+                  {/* règle graduée : heures de jeu */}
+                  <div className="mt-8" aria-label={`Temps de jeu : ${Math.round(p * 30)} heures sur 30`}>
+                    <div className="relative h-2 bg-creme-2"><div className="absolute inset-y-0 left-0 bg-flamme" style={{ width: `${p * 100}%` }} /></div>
+                    <div className="mt-2 flex justify-between font-mono text-xs text-doux" aria-hidden>{[0, 5, 10, 15, 20, 25, 30].map((h) => <span key={h}>{h}h</span>)}</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </section>
 
-      {/* Comment ça marche */}
-      <section className="bg-[#023341] py-20 text-[#FCF5E3] dark:bg-[#073D4F]">
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <h2 className="titre text-4xl">Comment on joue</h2>
-          <ol className="mt-10 grid gap-5 md:grid-cols-3">
-            {etapes.map(([n, t, d]) => (
-              <li key={n} className="flex flex-col gap-3 rounded-[28px] bg-[#FCF5E3]/8 p-7 ring-1 ring-[#FCF5E3]/10">
-                <span className="titre text-5xl text-flamme">{n}</span>
-                <h3 className="font-serif text-xl font-bold">{t}</h3>
-                <p className="leading-relaxed text-[#FCF5E3]/75">{d}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Boutique mise en avant */}
-      <section id="boutique" className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20" aria-labelledby="titre-boutique">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="w-fit rounded-full bg-flamme px-3 py-1 text-xs font-bold tracking-[.14em] text-[#023341]">LA BOUTIQUE</p>
-            <h2 id="titre-boutique" className="titre mt-3 text-4xl">Tes points valent de vrais lots</h2>
-            <p className="mt-3 max-w-2xl text-lg text-doux">Chaque lapin capturé rapporte des points. Échange-les dans l'appli, puis récupère ton lot au pop-up store Ubisoft × La Belle Mèche avec ton bon.</p>
+        {/* Règle d'or : chiffre géant en contour */}
+        <section className="border-y-2 border-encre bg-papier">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-[1.3fr_1fr]">
+            <p className="apparait chiffre-contour titre text-[clamp(6rem,16vw,13rem)] leading-[.85] text-encre">3–4h</p>
+            <div className="apparait" style={{ ['--d' as string]: '.12s' }}>
+              <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">La règle d'or</p>
+              <p className="mt-4 text-xl leading-relaxed">Comme dans tout bon jeu, il y a une règle : ne laissez jamais votre bougie allumée plus de 3 à 4 heures d'affilée.</p>
+              <p className="mt-3 leading-relaxed text-doux">Au-delà, la mèche s'abîme et la cire peut brûler. Faites des pauses, c'est bon pour la flamme et pour les yeux. Laissez-la refroidir, puis rallumez-la à la session suivante.</p>
+            </div>
           </div>
-          <button onClick={ouvrirTuto} className="btn btn-encre !w-auto shrink-0 px-7">Commencer la chasse</button>
-        </div>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {lots.map((l) => (
-            <li key={l.id} className="flex flex-col gap-3 rounded-[26px] border-[1.5px] border-trait bg-papier p-3 pb-5">
-              <div className="relative grid aspect-square place-items-center overflow-hidden rounded-[20px] bg-creme-2">
-                {l.image_url ? <img src={l.image_url} alt="" className="absolute inset-0 size-full object-cover" /> : <Icon name="boutique" size={56} className="text-doux" />}
-                <span className="absolute top-3 right-3 rounded-full bg-[#023341] px-3 py-1.5 text-sm font-bold text-[#FCF5E3]">{l.cost} pts</span>
-              </div>
-              <p className="min-h-[2.6em] px-1 font-serif text-base leading-snug font-bold">{l.name}</p>
-              <button onClick={() => setDemo(l)} disabled={l.stock === 0} className="btn btn-encre !min-h-11 text-sm disabled:opacity-40">
-                {l.stock === 0 ? 'Rupture de stock' : 'Réserver (démo)'}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+        </section>
 
+        {/* Valeurs : citation + deux colonnes séparées par un filet */}
+        <section className="mx-auto max-w-6xl px-5 py-28 md:px-8">
+          <blockquote className="apparait titre max-w-4xl text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1]">« Une odeur suffit à faire revenir un souvenir, et l'émotion qui va avec. »</blockquote>
+          <div className="mt-16 grid gap-10 md:grid-cols-2 md:divide-x-2 md:divide-encre">
+            {[['Nostalgie', 'C\'est l\'effet « madeleine de Proust » : un parfum de rhum et d\'embruns, et vous êtes de retour sur le pont du Jackdaw.'], ['Communauté', 'On partage ses souvenirs de jeu ensemble : en ligne, sur les réseaux et dans l\'appli, et en vrai, au pop-up store parisien.']].map(([t, d], i) => (
+              <div key={t} className={`apparait ${i ? 'md:pl-10' : 'md:pr-10'}`} style={{ ['--d' as string]: `${i * .12}s` }}>
+                <p className="text-xs font-bold tracking-[.22em] text-flamme uppercase">Valeur 0{i + 1}</p>
+                <h3 className="titre mt-3 text-4xl">{t}</h3>
+                <p className="mt-4 text-lg leading-relaxed text-doux">{d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <Bandeau mots={['La chasse est ouverte', 'Radar', 'Puces NFC', 'Lapins encapuchonnés', 'Pop-up Paris']} />
+
+        {/* 04 — La chasse : texte + QR dans une étiquette, aperçu de l'appli */}
+        <section id="chasse" className="mx-auto max-w-6xl px-5 py-28 md:px-8">
+          <Chapitre n="04" titre="La chasse" />
+          <div className="mt-10 grid items-center gap-14 lg:grid-cols-[1.1fr_.9fr]">
+            <div className="flex flex-col gap-8">
+              <h2 className="apparait titre text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La chasse est ouverte. Sur votre téléphone.</h2>
+              <p className="apparait max-w-xl text-lg leading-relaxed text-doux">Des lapins encapuchonnés se cachent dans Paris. Un radar fait vibrer le téléphone quand on approche, on scanne la puce NFC cachée sous la statuette, et chaque capture rapporte des points à dépenser au pop-up store.</p>
+              <Etiquette className="apparait w-full max-w-md" corps="flex items-center gap-5 p-5" larg="30%" arche="1.9rem">
+                <img src="/qr-app.svg" alt={`QR code qui ouvre ${ADRESSE} sur votre téléphone`} className="size-32 shrink-0" />
+                <div className="flex flex-col gap-2">
+                  <p className="titre text-xl">Scannez pour jouer</p>
+                  <p className="font-mono text-sm">{ADRESSE}</p>
+                  <button onClick={ouvrirTuto} className="w-fit text-sm font-bold text-flamme underline underline-offset-4">Comment installer l'appli →</button>
+                </div>
+              </Etiquette>
+            </div>
+            <div className="apparait relative mx-auto hidden lg:block" aria-hidden>
+              <div className="rounded-[54px] border-4 border-encre bg-[#023341] p-2.5">
+                <div className="relative h-[675px] w-[312px] overflow-hidden rounded-[44px] bg-creme">
+                  <iframe src="/?mobile=1" title="Aperçu de l'appli Scent Back" tabIndex={-1} loading="lazy" className="pointer-events-none absolute top-0 left-0 h-[844px] w-[390px] origin-top-left scale-[.8] border-0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 05 — La boutique : chaque lot dans une étiquette */}
+        <section id="boutique" className="border-t-2 border-encre bg-creme-2/50 py-28" aria-labelledby="titre-boutique">
+          <div className="mx-auto max-w-6xl px-5 md:px-8">
+            <Chapitre n="05" titre="La boutique" />
+            <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <h2 id="titre-boutique" className="apparait titre max-w-2xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">Vos points valent de vrais lots.</h2>
+              <p className="apparait max-w-sm leading-relaxed text-doux">Échangez vos points dans l'appli, puis récupérez le lot au pop-up store avec votre bon.</p>
+            </div>
+            <ul className="mt-14 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+              {lots.map((l, i) => (
+                <li key={l.id} className="apparait" style={{ ['--d' as string]: `${i * .08}s` }}>
+                  <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="34%" arche="1.6rem" fond="#FFFCF4">
+                    <div className="relative grid aspect-square place-items-center overflow-hidden rounded-[10px] bg-creme-2">
+                      {l.image_url ? <img src={l.image_url} alt="" className="absolute inset-0 size-full object-cover" /> : <Icon name="boutique" size={52} className="text-doux" />}
+                    </div>
+                    <p className="titre mt-4 min-h-[2.4em] text-center text-base leading-tight">{l.name}</p>
+                    <span aria-hidden className="mx-auto my-3 block h-[3px] w-8 bg-encre" />
+                    <p className="text-center text-sm font-bold">{l.cost} points</p>
+                    <button onClick={() => setDemo(l)} disabled={l.stock === 0} className="mt-4 min-h-11 rounded-[10px] border-2 border-encre text-sm font-bold transition hover:bg-[#023341] hover:text-[#FCF5E3] disabled:opacity-40">
+                      {l.stock === 0 ? 'Rupture de stock' : 'Réserver (démo)'}
+                    </button>
+                  </Etiquette>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* All Stars : les vraies étiquettes, puis des étiquettes vides */}
+        <section className="mx-auto max-w-6xl px-5 py-28 md:px-8">
+          <Chapitre n="06" titre="La suite" />
+          <h2 className="apparait titre mt-10 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02]">La collection All Stars.</h2>
+          <p className="apparait mt-4 max-w-2xl text-lg text-doux">Assassin's Creed ouvre le bal. Ensuite, chaque grande licence Ubisoft aura sa box et sa bougie, au parfum de son monde.</p>
+          <div className="mt-14 grid grid-cols-2 gap-6 lg:grid-cols-4">
+            {[['/site/etiquette-ac.webp', 'Rhum Marin', 'Assassin\'s Creed IV — disponible'], ['/site/etiquette-pop.webp', 'Figue Tabacée', 'Prochainement']].map(([img, nom, info], i) => (
+              <figure key={nom} className="apparait" style={{ ['--d' as string]: `${i * .1}s` }}>
+                <img src={img} alt={`Étiquette de la bougie ${nom}`} loading="lazy" className="w-full" />
+                <figcaption className="mt-3 border-t border-trait pt-2 text-sm"><b>{nom}</b> · <span className="text-doux">{info}</span></figcaption>
+              </figure>
+            ))}
+            {[0, 1].map((i) => (
+              <div key={i} className="apparait" style={{ ['--d' as string]: `${(i + 2) * .1}s` }}>
+                <Etiquette couleur="#DCD2BA" fond="transparent" className="aspect-[700/832]" corps="grid place-items-center border-dashed" larg="40%">
+                  <span className="titre text-5xl text-trait">?</span>
+                </Etiquette>
+                <p className="mt-3 border-t border-trait pt-2 text-sm text-doux">Licence mystère</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Fin : la phrase signature dans une grande étiquette */}
+        <section className="bg-[#011A22] px-5 py-28">
+          <Etiquette className="apparait mx-auto max-w-3xl" corps="flex flex-col items-center gap-6 px-8 py-14 text-center text-[#023341]" larg="30%" arche="3.4rem">
+            <Bougie className="w-20" />
+            <p className="titre text-[clamp(2.4rem,5vw,4.4rem)] leading-none">Scent Back.</p>
+            <span aria-hidden className="block h-[3px] w-12 bg-[#023341]" />
+            <p className="max-w-lg text-xl leading-relaxed">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
+            <div className="mt-2 flex flex-wrap justify-center gap-3">
+              <a href="#box" className="min-h-12 content-center rounded-[10px] bg-[#023341] px-7 font-bold text-[#FCF5E3]">Voir la box</a>
+              <button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-[#023341] px-7 font-bold">Installer l'appli</button>
+            </div>
+          </Etiquette>
+        </section>
+      </main>
       {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}
     </SiteDesktop>
   )

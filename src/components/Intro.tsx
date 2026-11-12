@@ -51,7 +51,7 @@ export default function Intro({ ready, onReveal, onDone }: { ready: boolean; onR
         <div className="pop grid size-40 place-items-center rounded-full bg-flamme shadow-[0_0_0_14px_#FCF5E314]">
           <Logo className="w-24 text-white" />
         </div>
-        <img src="/logo-blanc.png" alt="Scent Back" className="monte -my-6 w-64" style={{ animationDelay: '.25s' }} />
+        <img src="/logo-orange.png" alt="Scent Back" className="monte -my-6 w-64" style={{ animationDelay: '.25s' }} />
         <p className="monte mt-3 text-[11px] font-medium tracking-[.14em] text-creme/70" style={{ animationDelay: '.4s' }}>UBISOFT × LA BELLE MÈCHE</p>
       </div>
     </div>

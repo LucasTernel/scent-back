@@ -90,10 +90,10 @@ export function CarteVerrouillee({ hint, numero }: { hint: string; numero: numbe
   )
 }
 
-/** Logo Scent Back : bleu en clair, blanc en sombre. */
+/** Logo Scent Back (charte) : bleu sur fond clair, orange sur fond bleu. */
 export function LogoMarque({ className = '' }: { className?: string }) {
   return <>
     <img src="/logo-bleu.png" alt="Scent Back" className={`${className} dark:hidden`} />
-    <img src="/logo-blanc.png" alt="Scent Back" className={`${className} hidden dark:block`} />
+    <img src="/logo-orange.png" alt="Scent Back" className={`${className} hidden dark:block`} />
   </>
 }
