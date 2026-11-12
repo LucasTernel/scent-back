@@ -294,25 +294,22 @@ export default function Landing() {
           </div></section>
         </div>
 
-        {/* La box : « ASSASSIN'S CREED » géant, la photo s'ouvre du centre jusqu'au plein écran, puis les 3 éléments arrivent */}
-        <section id="box" data-box className="relative z-10 h-[320vh] bg-encre text-creme">
-          <div className="sticky top-0 h-dvh overflow-hidden">
-            <div data-box-titre className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-white mix-blend-difference">
-              <p className="text-sm font-bold tracking-[.3em] uppercase">La première collection Scent Back</p>
-              <p className="titre mt-4 text-[clamp(3.4rem,10vw,11rem)] leading-[.85]">Assassin's</p>
-              <p className="titre text-[clamp(3.4rem,10vw,11rem)] leading-[.85]">Creed.</p>
+        {/* La box : grande photo qui glisse en parallaxe, texte éditorial dessous */}
+        <section id="box" className="relative z-10 overflow-hidden bg-encre text-creme">
+          <div className="h-[80vh] overflow-hidden"><img data-parallax="-.12" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" loading="lazy" className="h-[120%] w-full object-cover" /></div>
+          <div className="mx-auto grid max-w-6xl gap-12 px-8 py-24 md:grid-cols-[1.2fr_1fr]">
+            <div>
+              <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">La première collection Scent Back</p>
+              <h2 className="titre mt-4 text-[clamp(3rem,6vw,6rem)] leading-[.9]">Assassin's Creed IV<br />Black Flag<span className="text-flamme">.</span></h2>
             </div>
-            <img data-box-img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 size-full object-cover" style={{ clipPath: 'inset(32% 36% 32% 36% round 24px)' }} />
-            <div data-box-voile className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0" />
-            <div className="absolute inset-x-0 bottom-0 z-20 mx-auto grid max-w-6xl gap-6 px-8 pb-14 text-[#FCF5E3] md:grid-cols-3">
-              {[['Le jeu', 'Assassin\'s Creed IV Black Flag. La piraterie, les Caraïbes, le pont du Jackdaw.'], ['La bougie', 'Rhum Marin. 140 g de cire végétale, à l\'odeur de son monde.'], ['L\'écrin', 'Une box en forme de logo Assassin\'s Creed, à garder sur le bureau.']].map(([k, v], i) => (
-                <div key={k} data-box-item className="border-t-2 border-flamme pt-4 opacity-0">
-                  <p className="font-serif text-xs font-bold text-flamme">0{i + 1}</p>
-                  <p className="titre mt-1 text-3xl">{k}</p>
-                  <p className="mt-2 leading-relaxed text-[#FCF5E3]/80">{v}</p>
-                </div>
+            <ul className="flex flex-col divide-y divide-current/15 self-end">
+              {[['Le jeu', 'La piraterie, les Caraïbes, le pont du Jackdaw.'], ['La bougie', 'Rhum Marin, 140 g de cire végétale.'], ['L\'écrin', 'Une box en forme de logo, à garder sur le bureau.']].map(([k, v], n) => (
+                <li key={k} className="apparait flex items-baseline gap-5 py-4" style={{ ['--d' as string]: `${n * .1}s` }}>
+                  <span className="font-serif text-xs font-bold text-flamme">0{n + 1}</span>
+                  <span><span className="titre block text-2xl">{k}</span><span className="opacity-75">{v}</span></span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
 

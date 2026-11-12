@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Etiquette } from './Landing'
 import { Icon } from '../ui'
+import { BoutonSentir } from '../components/Sentir'
 
 /** Boutique du site (ordinateur) — démonstration : panier + commande fictive, aucun paiement, aucune donnée bancaire. */
 type Produit = { id: string; nom: string; detail: string; prix: number; image: string; dispo: boolean }
@@ -40,6 +41,7 @@ export default function BoutiqueSite() {
               <Etiquette className="h-full" corps="flex h-full flex-col p-4" larg="30%" arche="1.7rem">
                 <div className="relative overflow-hidden rounded-[10px] bg-white">
                   <img src={p.image} alt={p.nom} loading="lazy" className={`aspect-[4/3] w-full ${p.id === 'box-ac4' ? 'object-cover' : 'object-contain p-3'}`} />
+                  <BoutonSentir id={p.id} nom={p.nom} className="absolute top-3 right-3 size-20" />
                   {!p.dispo && <span className="absolute top-3 left-3 rounded-[8px] bg-[#023341] px-2.5 py-1 text-xs font-bold text-[#FCF5E3]">Prochainement</span>}
                 </div>
                 <h2 className="titre mt-4 text-xl leading-tight">{p.nom}</h2>

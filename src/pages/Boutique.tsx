@@ -3,6 +3,7 @@ import { echangerLot, getBons, getLots, getWallet, type Lot } from '../lib/api'
 import { secouer, vibrer } from '../lib/haptique'
 import { useData } from '../lib/useData'
 import { Flamme, Icon } from '../ui'
+import { BoutonSentir } from '../components/Sentir'
 
 /** Boutique : on échange ses points contre des lots, récupérés au pop-up store avec un bon. */
 export default function Boutique() {
@@ -51,6 +52,19 @@ export default function Boutique() {
           ))}
         </section>
       )}
+
+      <section aria-labelledby="bougies" className="flex flex-col gap-2.5">
+        <h2 id="bougies" className="font-serif text-lg font-bold">Les bougies</h2>
+        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none]">
+          {[['rhum-marin', 'Rhum Marin', '/site/bougie.webp', 'Assassin\'s Creed IV'], ['figue-tabacee', 'Figue Tabacée', '/site/etiquette-pop.webp', 'Prochainement']].map(([id, nom, img, info]) => (
+            <div key={id} className="relative w-56 shrink-0 overflow-hidden rounded-[22px] border-[1.5px] border-trait bg-papier">
+              <img src={img} alt={`Bougie ${nom}`} className="aspect-square w-full bg-white object-contain p-4" />
+              <BoutonSentir id={id} nom={`Bougie ${nom}`} className="absolute top-2 right-2 size-20" />
+              <div className="p-3"><p className="font-serif font-bold">{nom}</p><p className="text-xs text-doux">{info}</p></div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section aria-labelledby="lots" className="flex flex-col gap-2.5">
         <h2 id="lots" className="font-serif text-lg font-bold">Les lots</h2>

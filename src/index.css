@@ -188,3 +188,9 @@ body { @apply font-sans text-encre antialiased; min-height: 100dvh; -webkit-tap-
 .repere-actif { opacity: 1; }
 .repere-point { width: 18px; height: 18px; border-radius: 50%; background: #FF7722; box-shadow: 0 0 0 6px #FF772240; }
 .repere-texte { white-space: nowrap; border-radius: 8px; background: var(--color-encre); color: var(--color-creme); padding: 8px 16px; font: 700 17px var(--font-sans); translate: 0 0; }
+
+/* Volutes de fumée (fiche olfactive) */
+.volute { position: absolute; bottom: -30%; width: 120px; height: 120px; border-radius: 50%; filter: blur(28px); opacity: 0;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 70%, transparent), transparent 70%); animation: volute 6s ease-in infinite; }
+@keyframes volute { 0% { opacity: 0; translate: 0 0; scale: .6 } 25% { opacity: .55 } 100% { opacity: 0; translate: 30px -140%; scale: 1.8 } }
+@media (prefers-reduced-motion: reduce) { .volute { animation: none; } }

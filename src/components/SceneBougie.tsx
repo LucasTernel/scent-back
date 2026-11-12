@@ -143,8 +143,8 @@ export default function SceneBougie() {
       camera.position.lerp(vPos, .07); cible.lerp(vCib, .07); camera.lookAt(cible)
 
       // le défi : la cire fond entre le chapitre 4,6 et 5,8 (puis reste basse)
-      const viseFonte = Math.min(.85, Math.max(0, (f - 4.6) / 1.2) * .85)
-      fonte += (viseFonte - fonte) * .08
+      const viseFonte = Math.min(.85, Math.max(0, (f - 4.35) / .65) * .85) // fond pendant l'arrivée du texte « Le défi », finie quand il est centré
+      fonte += (viseFonte - fonte) * .25
       if (cire) cire.scale.y = 1 - fonte
       const baisse = fonte * hauteurCire
       if (haut) haut.position.y = -baisse
