@@ -123,11 +123,11 @@ export async function lancerAnimations(racine: HTMLElement) {
       const lettres = [...sec.querySelectorAll<HTMLElement>('h1, h2, p:not([data-mots])')].flatMap((el) => fondre(el) ?? [])
       if (!lettres.length) return
       const coulure = lettres.map(() => 40 + Math.random() * 140)
-      const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: .5 } })
+      // 1er écran : visible d'office, ne fond que quand on a vraiment commencé à descendre
+      const tl = gsap.timeline({ scrollTrigger: i === 0 ? { trigger: sec, start: 'top+=15% top', end: 'bottom top', scrub: .5 } : { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: .5 } })
       if (i > 0) tl.fromTo(lettres, { opacity: 0, y: -24, filter: 'blur(10px)', color: '#FF7722' }, { opacity: 1, y: 0, filter: 'blur(0px)', color: '', stagger: { each: .006, from: 'random' }, duration: .3, ease: 'power2.out' }, 0)
-      else tl.set({}, {}, .3)
-      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { each: .004, from: 'random' }, duration: .3, ease: 'power2.in' }, .65)
-      tl.to(sec.querySelectorAll('a, button'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2 }, .65)
+      tl.to(lettres, { y: (k) => coulure[k], scaleY: (k) => 1.4 + coulure[k] / 120, transformOrigin: '50% 0%', opacity: 0, filter: 'blur(3px)', stagger: { each: .004, from: 'random' }, duration: .3, ease: 'power2.in', immediateRender: false }, i === 0 ? .1 : .65)
+      tl.to(sec.querySelectorAll('a, button'), { opacity: 0, y: 30, filter: 'blur(4px)', duration: .2, immediateRender: false }, i === 0 ? .1 : .65)
     })
     // 1er écran : allumage au chargement (après le loader)
     const premiers = document.querySelectorAll<HTMLElement>('[data-experience] > section:first-child .inline-block .inline-block')
