@@ -302,11 +302,65 @@ export default function Landing() {
             <p className="titre text-[clamp(5rem,12vw,11rem)] leading-none whitespace-nowrap">3–4h</p>
             <p className="mx-auto mt-6 max-w-xl text-xl font-medium">Jamais plus de 3 à 4 heures d'affilée. Éteignez-la, elle vous attend comme une sauvegarde.</p>
           </div></section>
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl"><p className="font-serif text-sm font-bold text-flamme">La première collection</p><h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">Assassin's Creed IV<span className="text-flamme">.</span></h2><p className="mt-5 text-lg opacity-80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p><img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV" className="mt-6 w-full rounded-[18px] shadow-2xl" /></div></section>
-          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl"><p className="font-serif text-sm font-bold text-flamme">Le pop-up store</p><h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">Paris. En vrai<span className="text-flamme">.</span></h2><p className="mt-5 text-lg opacity-80">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots.</p></div></section>
-          <section className="relative z-10 flex min-h-dvh items-center px-[8vw]"><div className="max-w-xl"><p className="font-serif text-sm font-bold text-flamme">L'application</p><h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">La chasse est ouverte<span className="text-flamme">.</span></h2><p className="mt-5 text-lg opacity-80">Des lapins encapuchonnés cachés dans Paris : un radar qui vibre, une puce NFC à scanner, des points à gagner.</p><div className="mt-6 flex items-center gap-4"><img src="/qr-app.svg" alt="QR code de l'appli" className="size-28 rounded-xl bg-[#FCF5E3] p-2" /><button onClick={ouvrirTuto} className="font-bold underline underline-offset-4">Installer l'appli →</button></div></div></section>
-          <section className="relative z-10 flex min-h-dvh items-center justify-end px-[8vw] text-right"><div className="max-w-xl"><p className="font-serif text-sm font-bold text-flamme">La boutique</p><h2 className="titre mt-3 text-[clamp(2.6rem,5vw,5rem)] leading-[.95]">Ramenez-la chez vous<span className="text-flamme">.</span></h2><p className="mt-5 text-lg opacity-80">La box Assassin's Creed IV, la bougie Rhum Marin, et bientôt la collection All Stars.</p><a href="/boutique" className="mt-6 inline-block min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique →</a></div></section>
-          <section className="relative z-10 flex min-h-dvh items-start justify-center px-[8vw] pt-[14vh] text-center"><div className="max-w-xl"><p className="titre text-[clamp(3rem,7vw,7rem)] leading-[.9]">Scent Back<span className="text-flamme">.</span></p><p className="mx-auto mt-6 max-w-lg text-2xl">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p></div></section>
+        </div>
+
+        {/* La suite : des cartes plein écran qui se superposent en remontant (sticky), comme des pages qu'on empile */}
+        <div className="relative z-10">
+          <section className="sticky top-0 h-dvh overflow-hidden bg-[#011A22] text-[#FCF5E3]">
+            <img data-parallax="-.1" src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 h-[115%] w-full object-cover opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#011A22] via-[#011A22]/70 to-transparent" />
+            <div className="relative flex h-full max-w-2xl flex-col justify-center px-[8vw]">
+              <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 01 · La première collection</p>
+              <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,6.5rem)] leading-[.9]">Assassin's<br />Creed IV<span className="text-flamme">.</span></h2>
+              <p className="mt-6 max-w-md text-lg leading-relaxed text-[#FCF5E3]/80">Le jeu, la bougie Rhum Marin et un écrin en forme de logo. Une box à garder sur le bureau.</p>
+              <div className="mt-8 flex gap-10 border-t border-[#FCF5E3]/20 pt-6">
+                {[['PS5', 'Black Flag'], ['140 g', 'Rhum Marin'], ['1', 'écrin logo']].map(([a, b]) => <p key={a}><span className="titre block text-3xl">{a}</span><span className="text-sm text-[#FCF5E3]/60">{b}</span></p>)}
+              </div>
+            </div>
+          </section>
+          <section className="sticky top-0 grid h-dvh place-items-center rounded-t-[40px] bg-flamme px-[8vw] text-center text-[#023341] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+            <div>
+              <p className="text-xs font-bold tracking-[.25em] uppercase">Chapitre 02 · Le pop-up store</p>
+              <h2 className="titre mt-5 text-[clamp(4rem,11vw,11rem)] leading-[.85]">Paris.<br />En vrai.</h2>
+              <p className="mx-auto mt-8 max-w-xl text-xl leading-relaxed">Sentez toutes les bougies, manipulez les box, et récupérez vos commandes et vos lots. La communauté se retrouve ici.</p>
+            </div>
+          </section>
+          <section className="sticky top-0 grid h-dvh items-center gap-12 rounded-t-[40px] bg-creme px-[8vw] text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)] lg:grid-cols-[1.1fr_.9fr]">
+            <div>
+              <p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 03 · L'application</p>
+              <h2 className="titre mt-5 text-[clamp(3rem,6.5vw,6.5rem)] leading-[.9]">La chasse<br />est ouverte<span className="text-flamme">.</span></h2>
+              <p className="mt-6 max-w-md text-lg leading-relaxed text-doux">Des lapins encapuchonnés cachés dans Paris : un radar qui vibre, une puce NFC à scanner, des points à échanger au pop-up.</p>
+              <div className="mt-8 flex items-center gap-5"><img src="/qr-app.svg" alt="QR code de l'appli Scent Back" className="size-28 rounded-xl border-2 border-encre bg-[#FCF5E3] p-2" /><button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] bg-encre px-6 font-bold text-creme">Installer l'appli</button></div>
+            </div>
+            <div className="mx-auto hidden lg:block" aria-hidden>
+              <div className="rounded-[54px] border-4 border-encre bg-[#023341] p-2.5">
+                <div className="relative h-[620px] w-[286px] overflow-hidden rounded-[44px] bg-creme">
+                  <iframe src="/?mobile=1" title="Aperçu de l'appli" tabIndex={-1} loading="lazy" className="pointer-events-none absolute top-0 left-0 h-[844px] w-[390px] origin-top-left scale-[.733] border-0" />
+                </div>
+              </div>
+            </div>
+          </section>
+          <section className="sticky top-0 grid h-dvh content-center rounded-t-[40px] bg-[#011A22] px-[8vw] text-[#FCF5E3] shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div><p className="text-xs font-bold tracking-[.25em] text-flamme uppercase">Chapitre 04 · La boutique</p><h2 className="titre mt-5 text-[clamp(3rem,6.5vw,6.5rem)] leading-[.9]">Ramenez-la<br />chez vous<span className="text-flamme">.</span></h2></div>
+              <a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-6 font-bold text-[#023341]">Voir la boutique →</a>
+            </div>
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {[['/site/box.webp', 'Box Assassin\'s Creed IV', '59,90 €', true], ['/site/bougie.webp', 'Bougie Rhum Marin', '24,90 €', false], ['/site/etiquette-pop.webp', 'Bougie Figue Tabacée', 'Bientôt', false]].map(([img, nom, prix, cover]) => (
+                <a key={nom as string} href="/boutique" className="group block">
+                  <div className="overflow-hidden rounded-[14px] bg-[#FCF5E3]"><img src={img as string} alt={nom as string} className={`aspect-[4/3] w-full transition duration-700 group-hover:scale-105 ${cover ? 'object-cover' : 'object-contain p-5'}`} /></div>
+                  <p className="mt-3 flex justify-between gap-3"><span className="titre">{nom}</span><span className="font-bold text-flamme">{prix}</span></p>
+                </a>
+              ))}
+            </div>
+          </section>
+          <section className="sticky top-0 grid h-dvh place-items-center rounded-t-[40px] bg-creme px-[8vw] text-center text-encre shadow-[0_-30px_60px_rgba(0,0,0,.35)]">
+            <div>
+              <LogoMarque className="mx-auto -my-6 w-72" />
+              <p className="mx-auto mt-4 max-w-xl text-3xl leading-snug">Le temps d'une bougie, retrouvez ce que vous ressentiez.</p>
+              <div className="mt-10 flex justify-center gap-3"><a href="/boutique" className="min-h-12 content-center rounded-[10px] bg-flamme px-7 font-bold text-[#023341]">Boutique</a><button onClick={ouvrirTuto} className="min-h-12 rounded-[10px] border-2 border-encre px-7 font-bold">Installer l'appli</button></div>
+            </div>
+          </section>
         </div>
       </main>
       {demo && <AchatDemo lot={demo} fermer={() => setDemo(undefined)} />}

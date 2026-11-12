@@ -24,11 +24,6 @@ const VUES: { pos: [number, number, number]; cible: [number, number, number] }[]
   { pos: [-0.2, 1.0, 2.6], cible: [0.55, 0.5, 0] },    // 4 · étiquette ┘ bougie immobile à gauche
   { pos: [0.2, 0.8, 2.6], cible: [-0.55, 0.42, 0] },   // 5 · le défi : texte à gauche
   { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },          // 6 · règle d'or (texte en haut)
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
-  { pos: [0, 0.9, 4.0], cible: [0, 1.3, 0] },
 ]
 
 /** Texture de flamme (dégradé en goutte) dessinée sur un canvas. */
@@ -145,7 +140,7 @@ export default function SceneBougie() {
       t += 1 / 60
       const p = r ? Math.min(1, Math.max(0, -r.top / (r.height - innerHeight))) : 0
       const f = p * (VUES.length - 1), i = Math.min(VUES.length - 2, Math.floor(f)), k = lisse(f - i)
-      el.style.opacity = String(1 - Math.min(1, Math.max(0, (f - 6.3) / .5)))
+      el.style.opacity = String(1 - Math.min(1, Math.max(0, (f - 99))))
       vPos.copy(a.set(...VUES[i].pos)).lerp(bb.set(...VUES[i + 1].pos), k)
       vCib.copy(a.set(...VUES[i].cible)).lerp(bb.set(...VUES[i + 1].cible), k)
       
