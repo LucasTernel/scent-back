@@ -294,12 +294,13 @@ export default function Landing() {
           </div></section>
         </div>
 
-        {/* La box : « UN JEU CULTE » géant, la photo s'ouvre du centre jusqu'au plein écran, puis les 3 éléments arrivent */}
+        {/* La box : « ASSASSIN'S CREED » géant, la photo s'ouvre du centre jusqu'au plein écran, puis les 3 éléments arrivent */}
         <section id="box" data-box className="relative z-10 h-[320vh] bg-encre text-creme">
           <div className="sticky top-0 h-dvh overflow-hidden">
             <div data-box-titre className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-white mix-blend-difference">
-              <p className="titre text-[clamp(4rem,12vw,13rem)] leading-[.85]">Un jeu</p>
-              <p className="titre text-[clamp(4rem,12vw,13rem)] leading-[.85]">culte.</p>
+              <p className="text-sm font-bold tracking-[.3em] uppercase">La première collection Scent Back</p>
+              <p className="titre mt-4 text-[clamp(3.4rem,10vw,11rem)] leading-[.85]">Assassin's</p>
+              <p className="titre text-[clamp(3.4rem,10vw,11rem)] leading-[.85]">Creed.</p>
             </div>
             <img data-box-img src="/site/box.webp" alt="La box Scent Back Assassin's Creed IV Black Flag : l'écrin en forme de logo, le jeu PS5 et la bougie Rhum Marin" className="absolute inset-0 size-full object-cover" style={{ clipPath: 'inset(32% 36% 32% 36% round 24px)' }} />
             <div data-box-voile className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0" />
