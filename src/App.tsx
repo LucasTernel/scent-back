@@ -21,6 +21,7 @@ import Boutique from './pages/Boutique'
 import NomDeCode from './pages/NomDeCode'
 import TabBar, { tabsAdmin } from './components/TabBar'
 import Intro from './components/Intro'
+import Installer from './components/Installer'
 import { MOCK } from './lib/api'
 import { useAuth } from './lib/useAuth'
 
@@ -71,6 +72,7 @@ function Layout({ admin }: { admin?: boolean }) {
             <LogoMarque className="-my-5 h-[92px] w-auto max-lg:landscape:-my-3 max-lg:landscape:h-[60px]" />
           </header>}
       <main className="px-5 pt-4 pb-36 landscape:px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))]"><Outlet /></main>
+      {!carte && <Installer flottant />}
       <TabBar fondu={!carte} />
     </div>
   )

@@ -1,3 +1,4 @@
+import Installer from '../components/Installer'
 import { LogoMarque } from '../ui'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -59,6 +60,7 @@ export default function Login() {
           return <div key={z} className="monte cq absolute w-[160px]" style={{ left: x, top: y, rotate: `${rot}deg`, zIndex: z, animationDelay: `${z * 90}ms` }}><Carte statue={c} /></div>
         })}
       </div>
+      <Installer />
       <div className="flex items-center gap-2">
         <LogoMarque className="-my-6 -ml-5 w-32 shrink-0" />
         <div><p className="text-[11px] font-bold tracking-[.2em] text-flamme uppercase">La Chasse</p><h1 className="titre text-[22px] leading-tight">Scent Back</h1><p className="text-sm font-medium text-doux">Rejoins la Confrérie.</p></div>
