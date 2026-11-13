@@ -32,7 +32,7 @@ function TutoInstallation({ fermer }: { fermer: () => void }) {
     <div role="dialog" aria-modal="true" aria-labelledby="tuto-titre" className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#023341]/70 p-5 backdrop-blur-sm" onClick={fermer}>
       <div className="pop relative w-full max-w-3xl rounded-[32px] bg-papier p-6 shadow-2xl md:p-9" onClick={(e) => e.stopPropagation()}>
         <button ref={bouton} onClick={fermer} aria-label="Fermer le tutoriel" className="absolute top-4 right-4 grid size-11 place-items-center rounded-full bg-creme-2 text-xl font-bold">×</button>
-        <h2 id="tuto-titre" className="titre pr-12 text-3xl">Installer Scent Back</h2>
+        <h2 id="tuto-titre" className="titre pr-12 text-3xl">Installer Scent Back <span className="text-flamme">— La Chasse</span></h2>
         <p className="mt-2 max-w-xl text-doux">Pas besoin de store : l'appli s'installe depuis le navigateur de ton téléphone et s'ouvre ensuite en plein écran, comme une vraie appli.</p>
         <div className="mt-6 grid gap-6 md:grid-cols-[auto_1fr] md:items-start">
           <div className="flex flex-col items-center gap-2 rounded-[24px] bg-creme-2 p-4">

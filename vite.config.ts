@@ -14,7 +14,7 @@ export default defineConfig({
       workbox: { clientsClaim: true, skipWaiting: true, cleanupOutdatedCaches: true },
       includeAssets: ['favicon.ico', 'favicon-16.png', 'favicon-32.png', 'apple-touch-icon.png', 'og-image.png', 'logo-blanc.png', 'logo-bleu.png', 'logo-orange.png'],
       manifest: {
-        name: 'Scent Back',
+        name: 'Scent Back — La Chasse', // nom complet (installation) ; l'icône garde « Scent Back »
         short_name: 'Scent Back',
         description: 'Chasse aux Lapins Crétins dans Paris',
         lang: 'fr',

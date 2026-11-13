@@ -61,7 +61,7 @@ export default function Login() {
       </div>
       <div className="flex items-center gap-2">
         <LogoMarque className="-my-6 -ml-5 w-32 shrink-0" />
-        <div><h1 className="titre text-[22px] leading-tight">Scent Back</h1><p className="text-sm font-medium text-doux">Rejoins la Confrérie.</p></div>
+        <div><p className="text-[11px] font-bold tracking-[.2em] text-flamme uppercase">La Chasse</p><h1 className="titre text-[22px] leading-tight">Scent Back</h1><p className="text-sm font-medium text-doux">Rejoins la Confrérie.</p></div>
       </div>
 
       <div role="tablist" aria-label="Choix" className="relative grid grid-cols-2 rounded-3xl bg-creme-2 p-1">
